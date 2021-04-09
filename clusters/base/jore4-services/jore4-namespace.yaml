@@ -1,0 +1,8 @@
+# Creates namespace for jore4 services
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hsl-jore4
+---
+

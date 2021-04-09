@@ -1,0 +1,34 @@
+name: Test kustomize
+
+on:
+  push:
+  pull_request:
+    branches: [master]
+
+jobs:
+  test-kustomizations:
+    name: Test whether all kustomizations build without issues
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks out a copy of your repository on the ubuntu-latest machine
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run Kustomization build for DEV
+        uses: karancode/kustomize-github-action@master
+        with:
+          kustomize_version: "4.0.4"
+          kustomize_build_dir: "./clusters/dev"
+
+      - name: Run Kustomization build for TEST
+        uses: karancode/kustomize-github-action@master
+        with:
+          kustomize_version: "4.0.4"
+          kustomize_build_dir: "./clusters/test"
+
+      - name: Run Kustomization build for PROD
+        uses: karancode/kustomize-github-action@master
+        with:
+          kustomize_version: "4.0.4"
+          kustomize_build_dir: "./clusters/prod"

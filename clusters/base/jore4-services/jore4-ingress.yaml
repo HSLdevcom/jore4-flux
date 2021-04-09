@@ -1,0 +1,25 @@
+# Describes the jore4 ingress
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: jore4-ingress
+  namespace: hsl-jore4
+  annotations:
+    kubernetes.io/ingress.class: azure/application-gateway
+    appgw.ingress.kubernetes.io/ssl-redirect: "true"
+    appgw.ingress.kubernetes.io/appgw-ssl-certificate: <replace>
+spec:
+  rules:
+    # only listen to requests from this host
+    - host: <replace>
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: jore4-frontend
+              servicePort: 80
+          - path: /api
+            backend:
+              serviceName: jore4-backend
+              servicePort: 8080

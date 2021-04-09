@@ -1,0 +1,25 @@
+name: Super-Linter
+
+on:
+  push:
+  pull_request:
+    branches: [master]
+
+jobs:
+  # general linter for many languages and tools
+  # https://github.com/github/super-linter
+  super-linter:
+    name: Lint code base
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run Super-Linter
+        uses: github/super-linter@v3
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_KUBERNETES_KUBEVAL: false # it cannot validate non-default resource types and kustomize patches
+          VALIDATE_JSCPD: false # it does not significantly improve the code-base and it's a very slow linter
