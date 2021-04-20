@@ -1,0 +1,21 @@
+name: Doctoc
+
+on:
+  push:
+  pull_request:
+    branches: [master]
+
+jobs:
+  verify-doctoc:
+    name: Verifies whether table of contents has been updated
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run doctoc on README
+        run: npx doctoc README.md
+
+      - name: Verify that doctoc command made no changes, so ToC is up to date
+        run: '[ -z "$(git status --porcelain)" ]'

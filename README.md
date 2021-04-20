@@ -1,13 +1,13 @@
+<!-- markdownlint-disable MD025 MD040 MD034 -->
+
 # jore4-flux
 
 Flux configuration for the jore4 Kubernetes deployment
 
-## Deployment strategies
+<!-- regenerate with: "./development.sh toc" -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-### 1. Everything in the main branch
+- [jore4-flux](#jore4-flux)
 
-![Main-branch-strategy](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/HSLdevcom/jore4-flux/master/main-branch-strategy.iuml)
-
-### 2. Own branch for `dev`, `test` and `prod`
-
-![Own-branch-strategy](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/HSLdevcom/jore4-flux/master/own-branch-strategy.iuml)
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
