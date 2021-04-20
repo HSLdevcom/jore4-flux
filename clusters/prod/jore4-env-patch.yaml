@@ -1,0 +1,15 @@
+# Patches the jore4 services to add/customize some environment variables
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jore4-backend
+  namespace: hsl-jore4
+spec:
+  template:
+    spec:
+      containers:
+        - name: jore4-backend-image
+          env:
+            - name: EXAMPLE_ENV_VARIABLE
+              value: "bar"

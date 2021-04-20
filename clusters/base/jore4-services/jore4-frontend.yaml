@@ -1,0 +1,37 @@
+# Describes the deployment template and the service for jore4 frontend
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jore4-frontend
+  namespace: hsl-jore4
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: jore4-frontend
+  template:
+    metadata:
+      labels:
+        app: jore4-frontend
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: jore4-frontend-image
+          image: hsldevcom/jore4-ui:merge-b4b722c5c49a570e80069705b03e2c0cac4a54ef
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jore4-frontend
+  namespace: hsl-jore4
+spec:
+  selector:
+    app: jore4-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

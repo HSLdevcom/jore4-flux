@@ -1,0 +1,37 @@
+# Describes the deployment template and the service for jore4 backend
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jore4-backend
+  namespace: hsl-jore4
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: jore4-backend
+  template:
+    metadata:
+      labels:
+        app: jore4-backend
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: jore4-backend-image
+          image: "hsldevcom/jore4-backend:merge-d6a1364e6f93f0e7a17497d98052d73f1da097bf"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jore4-backend
+  namespace: hsl-jore4
+spec:
+  selector:
+    app: jore4-backend
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
