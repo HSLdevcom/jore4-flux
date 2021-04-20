@@ -12,6 +12,12 @@ Flux configuration for the jore4 Kubernetes deployment
 - [Concept](#concept)
   - [Flux](#flux)
   - [Kustomize](#kustomize)
+- [Deployment Strategy](#deployment-strategy)
+  - [Basic Idea](#basic-idea)
+  - [Trackability](#trackability)
+  - [Branching](#branching)
+  - [Rebasing](#rebasing)
+  - [Rollback and Hotfixes](#rollback-and-hotfixes)
 - [Development](#development)
   - [Cluster Directory Structure](#cluster-directory-structure)
     - [CRDs](#crds)
@@ -87,6 +93,86 @@ Kustomize restrictions:
     requires the _caller_ to define the target resource the patch should be applied to
   - [patchesStrategicMerge](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/patchesstrategicmerge/)
     allows the _patch_ to define the target resource, but the syntax is very verbose
+
+## Deployment Strategy
+
+### Basic Idea
+
+- The current Flux setup is monitoring changes in `dev`, `test` and `prod` branches.
+- Other branches don't affect the deployment. Also you need to remember to push the branches to github :)
+- When the branch is moved to a different commit, Flux picks up the configuration: `./clusters/dev`
+  for `dev` branch, `./clusters/test` for `test` branch and `./clusters/prod` for `prod` branch. Flux
+  tries to deploy the given configuration and sends a message to Slack when it succeeds/fails (to
+  be implemented later).
+
+### Trackability
+
+We have to following rules for the deployments' trackability:
+
+_Rule 1:_ We should be able to pinpoint with a high confidence that at what _time_ in what _stage_ what
+_version_ was deployed. We are aiming to use the git history for this, which is of course not 100%
+reliable, because failed deployments don't show in the git history. We are assuming here that git
+commits contain configurations which will succeed to deploy.
+
+_Rule 2:_ We should be able to _confidently_ push versions to `prod`, knowing that if the same configuration
+worked in `dev` and `test`, it will also work in `prod`. This implies that we have to minimize the
+difference between the `dev`, `test` and `prod` deployment configurations and that we ensure that
+all the tested changes in the `dev` configurations will be fluently propagated to `test` and `prod`.
+
+### Branching
+
+We will use the `main` branch to store the deployment configurations for _all_ stages. Every time
+you make a change to the deployment configuration, create a `feature branch` with the changes and do
+a pull request to merge these changes to `main`. Both the developer and the reviewer should make
+sure that all the changes are applied to all `dev`, `test` and `prod` cluster configurations. At this
+point, the deployment configuration changes don't get deployed to the different stages as `dev`,
+`test` and `prod` branches haven't been touched. This should ensure Trackability Rule 2 to be
+implemented.
+
+Whenever deploying a version to a stage, should use no fast-forward git merging to make sure that at
+least an empty commit is created to testity of the configuration change in the given stage
+(Trackability Rule 1). For `dev` stage, it should look like this:
+
+```
+git checkout dev
+git merge --no-ff main
+```
+
+You should always test your deployment changes in `dev` first, then in `test`, then `prod`.
+Propagating changes to `test` and `prod` work similarly:
+
+```
+git checkout test
+git merge --no-ff dev
+```
+
+These operations will make your git history look like this for the `main` branch:
+
+![deployment-strategy-main](./images/deployment-strategy-master.png "Deployment Strategy main branch only")
+
+And this is how the git history looks when changes are propagated to the `dev` and `test` branches.
+Propagating to `prod` works the same, it's been omitted from the image for clarity.
+
+![deployment-strategy-test](./images/deployment-strategy-test.png "Deployment Strategy with dev and test branches")
+
+### Rebasing
+
+Sometimes you may need to rebase your changes, e.g. when fixing a mistake in your commit. The default
+`git rebase` command discards the empty merge commits, so use `git rebase -i --rebase-merges [commit]`
+to preserve them.
+
+### Rollback and Hotfixes
+
+When rolling back changes to the deployment configuration, you should never reset a branch to an
+older commit using e.g. `git reset --hard [commit]`, because you will lose the information from the
+git history that for a while a faulty configuration was deployed. Instead, always create a new commit
+to the `main` branch that reverts the changes back to the desired state and propagate it the usual way
+to `dev`, `test` and then `prod`.
+
+In case you want to do a hotfix in production for a critical issue, you may create the hotfix in
+`main` and propagate if to `prod` with the `--no-ff` merge. On in some cases you may want to create a
+commit directly in the `prod` branch even. However avoid hotfixing the deployments and test your
+changes properly in `dev` and `test`.
 
 ## Development
 
