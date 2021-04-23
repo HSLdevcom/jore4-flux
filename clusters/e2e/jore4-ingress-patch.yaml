@@ -1,0 +1,30 @@
+# Patches the jore4 ingress to work with nginx
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jore4-ingress
+  namespace: hsl-jore4
+  annotations:
+    kubernetes.io/ingress.class: nginx
+
+spec:
+  rules:
+    # listen on localhost
+    - host: ""
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: jore4-frontend
+                port:
+                  number: 80
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: jore4-backend
+                port:
+                  number: 8080
