@@ -1,6 +1,6 @@
 # Patches the jore4 ingress to tell where to find the certificate from and what is the hostname
 
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: jore4-ingress
@@ -15,10 +15,16 @@ spec:
       http:
         paths:
           - path: /
+            pathType: Prefix
             backend:
-              serviceName: jore4-frontend
-              servicePort: 80
+              service:
+                name: jore4-frontend
+                port:
+                  number: 80
           - path: /api
+            pathType: Prefix
             backend:
-              serviceName: jore4-backend
-              servicePort: 8080
+              service:
+                name: jore4-backend
+                port:
+                  number: 8080
