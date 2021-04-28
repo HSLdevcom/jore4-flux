@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../base/jore4-services
+  - ../base/jore4-secret-bindings
+  - ./flux-sync.yaml
+patchesStrategicMerge:
+  - ./jore4-env-patch.yaml
+  - ./jore4-ingress-patch.yaml
+  - ./jore4-secret-keyvaults-patch.yaml
+  - ./jore4-secret-mounts-patch.yaml
