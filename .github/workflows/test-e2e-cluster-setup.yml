@@ -1,0 +1,29 @@
+name: Test e2e cluster setup
+
+on:
+  push:
+  pull_request:
+    branches: [master]
+
+jobs:
+  test-local-e2e-setup:
+    name: Test whether e2e cluster can be set up locally, from the repository
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Start Kind
+        run: "./kindcluster.sh start --cluster=clusters/e2e"
+
+      - name: Verify that application is up and running
+        run: |
+          for i in {1..20}; do
+            curl --fail http://localhost:8000 --output /dev/null --silent && break
+            sleep 5
+            echo $i
+          done
+
+      - name: Stop Kind
+        run: "./kindcluster.sh stop"
