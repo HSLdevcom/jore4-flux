@@ -52,6 +52,9 @@ function deploy_CRDs {
   NGINX_INGRESS_VERSION=ed5aee7659bdd9a5f018ef56ddd2de664b2d96e7
   kubectl apply -f "https://raw.githubusercontent.com/kubernetes/ingress-nginx/$NGINX_INGRESS_VERSION/deploy/static/provider/kind/deploy.yaml"
 
+  # killing the unnecessary ingress-nginx-admission webhook validation because it slows down the startup
+  kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
+
   # Have to wait for the nginx ingress controller to be ready, otherwise the JORE4 Ingress
   # deployment will fail
   echo "Waiting for ingress controller to be ready"

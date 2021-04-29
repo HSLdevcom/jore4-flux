@@ -23,8 +23,8 @@ chmod u+x "$tmp_dir/kindcluster.sh"
 # Loading the base e2e cluster definition, then patch it:
 # - FRONTEND_DOCKER_IMAGE env variable is defined, the frontend image in the Kind cluster will be
 # replaced with image in the value, e.g. FRONTEND_DOCKER_IMAGE="hsldevcom/jore4-ui:abc"
-# - BACKEND_DOCKER_IMAGE env variable is defined, the frontend image in the Kind cluster will be
-# replaced with image in the value, e.g. BACKEND_DOCKER_IMAGE="hsldevcom/jore4-backend:def"
+# - HASURA_DOCKER_IMAGE env variable is defined, the frontend image in the Kind cluster will be
+# replaced with image in the value, e.g. HASURA_DOCKER_IMAGE="hsldevcom/jore4-hasura:def"
 echo "Customizing cluster definition"
 cat <<EOT >"$tmp_dir/kustomization.yaml"
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -50,14 +50,14 @@ patchesStrategicMerge:
   apiVersion: apps/v1
   kind: Deployment
   metadata:
-    name: jore4-backend
+    name: jore4-hasura
     namespace: hsl-jore4
   spec:
     template:
       spec:
         containers:
-        - name: jore4-backend-image
-          ${BACKEND_DOCKER_IMAGE:+image: $BACKEND_DOCKER_IMAGE}
+        - name: jore4-hasura-image
+          ${HASURA_DOCKER_IMAGE:+image: $HASURA_DOCKER_IMAGE}
 EOT
 
 echo "Downloading Kind config"

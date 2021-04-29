@@ -205,7 +205,7 @@ CRDs first with `./kubernetes.sh deploy:crd <stage>`
 
 The base resource templates can be found from `clusters/base`.
 
-`jore4-services` defines the basic Kubernetes services for jore4: backend, frontend
+`jore4-services` defines the basic Kubernetes services for jore4: hasura, frontend
 and ingress. The ingress defines how the HTTP requests are mapped to the Kubernetes pods.
 
 `jore4-secret-bindings` defines the resources required for mapping Azure key-vault secrets to
@@ -388,8 +388,8 @@ The script recognizes the following environment variables as parameters:
 
 - `FRONTEND_DOCKER_IMAGE`: redefines which frontend docker image should be used instead of the e2e
   cluster default. E.g `FRONTEND_DOCKER_IMAGE="hsldevcom/jore4-ui:latest"`
-- `BACKEND_DOCKER_IMAGE`: redefines which backend docker image should be used instead of the e2e
-  cluster default. E.g `FRONTEND_DOCKER_IMAGE="hsldevcom/jore4-backend:latest"`
+- `HASURA_DOCKER_IMAGE`: redefines which hasura docker image should be used instead of the e2e
+  cluster default. E.g `FRONTEND_DOCKER_IMAGE="hsldevcom/jore4-hasura:latest"`
 
 To stop and remove the cluster, call `kind delete clusters jore4-local-cluster`. This will delete
 the docker container(s) where Kind is running and free up all resources. Currently we are not using

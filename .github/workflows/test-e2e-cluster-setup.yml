@@ -33,6 +33,14 @@ jobs:
             echo $i
           done
 
+      - name: Verify that hasura is up and running
+        run: |
+          for i in {1..20}; do
+            curl --fail http://localhost:3300/graphql/healthz --output /dev/null --silent && break
+            sleep 5
+            echo $i
+          done
+
       - name: Stop Kind
         run: "./kindcluster.sh stop"
 
@@ -45,13 +53,13 @@ jobs:
         include:
           # no overwrites
           - frontend-docker-image: ""
-            backend-docker-image: ""
+            hasura-docker-image: ""
           # overwrite all
           - frontend-docker-image: "hsldevcom/jore4-ui:latest"
-            backend-docker-image: "hsldevcom/jore4-backend:latest"
+            hasura-docker-image: "hsldevcom/jore4-hasura:latest"
           # overwrite some
           - frontend-docker-image: "hsldevcom/jore4-ui:latest"
-            backend-docker-image: ""
+            hasura-docker-image: ""
 
     steps:
       # note that we don't checkout code in this job to make sure that the script works from an empty workspace!
@@ -72,7 +80,7 @@ jobs:
         env:
           # change some docker images to use a different version
           FRONTEND_DOCKER_IMAGE: ${{ matrix.frontend-docker-image }}
-          BACKEND_DOCKER_IMAGE: ${{ matrix.backend-docker-image }}
+          HASURA_DOCKER_IMAGE: ${{ matrix.hasura-docker-image }}
           # make sure we are testing the remotecluster.sh against the current branch
           E2E_SCRIPTS_VERSION: ${{ env.BRANCH_NAME }}
         run: "curl https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${BRANCH_NAME}/remotecluster.sh | bash"
@@ -93,6 +101,14 @@ jobs:
             echo $i
           done
 
+      - name: Verify that hasura is up and running
+        run: |
+          for i in {1..20}; do
+            curl --fail http://localhost:3300/graphql/healthz --output /dev/null --silent && break
+            sleep 5
+            echo $i
+          done
+
       - name: Testing that the correct version got deployed from frontend
         # if matrix.frontend-docker-image is defined should use that, otherwise use default
         run: |
@@ -104,15 +120,15 @@ jobs:
             [[ "$FRONTEND_DEPLOYED_VERSION" == "${{ matrix.frontend-docker-image }}" ]]
           fi
 
-      - name: Testing that the correct version got deployed from backend
-        # if matrix.backend-docker-image is defined should use that, otherwise use default
+      - name: Testing that the correct version got deployed from hasura
+        # if matrix.hasura-docker-image is defined should use that, otherwise use default
         run: |
-          BACKEND_DEPLOYED_VERSION=`kubectl get deployment jore4-backend --namespace hsl-jore4 --output jsonpath='{.spec.template.spec.containers[0].image}'`
-          if [[ "${{ matrix.backend-docker-image }}" == "" ]]
+          HASURA_DEPLOYED_VERSION=`kubectl get deployment jore4-hasura --namespace hsl-jore4 --output jsonpath='{.spec.template.spec.containers[0].image}'`
+          if [[ "${{ matrix.hasura-docker-image }}" == "" ]]
           then
-            [[ "$BACKEND_DEPLOYED_VERSION" != "${{ matrix.backend-docker-image }}" ]]
+            [[ "$HASURA_DEPLOYED_VERSION" != "${{ matrix.hasura-docker-image }}" ]]
           else
-            [[ "$BACKEND_DEPLOYED_VERSION" == "${{ matrix.backend-docker-image }}" ]]
+            [[ "$HASURA_DEPLOYED_VERSION" == "${{ matrix.hasura-docker-image }}" ]]
           fi
 
       - name: Stop Kind
