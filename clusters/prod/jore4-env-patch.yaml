@@ -1,15 +1,9 @@
-# Patches the jore4 services to add/customize some environment variables
+# Patches jore4 services to add/customize some environment variables
 
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: ConfigMap
 metadata:
-  name: jore4-backend
+  name: jore4-hasura-env
   namespace: hsl-jore4
-spec:
-  template:
-    spec:
-      containers:
-        - name: jore4-backend-image
-          env:
-            - name: EXAMPLE_ENV_VARIABLE
-              value: "bar"
+data:
+  HASURA_GRAPHQL_ENABLE_CONSOLE: "false"

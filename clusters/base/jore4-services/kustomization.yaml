@@ -3,5 +3,5 @@ kind: Kustomization
 resources:
   - ./jore4-namespace.yaml
   - ./jore4-ingress.yaml
-  - ./jore4-backend.yaml
+  - ./jore4-hasura.yaml
   - ./jore4-frontend.yaml
