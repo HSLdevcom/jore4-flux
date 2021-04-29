@@ -6,7 +6,7 @@ metadata:
   name: jore4-frontend
   namespace: hsl-jore4
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: jore4-frontend

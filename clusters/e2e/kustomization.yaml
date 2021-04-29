@@ -1,9 +1,24 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+
+# make sure that we only have a single instance of each service
+replicas:
+  - name: jore4-frontend
+    count: 1
+  - name: jore4-hasura
+    count: 1
+
 resources:
   - ../base/jore4-services
   - ./jore4-local-secrets.yaml
   - ./jore4-test-database.yaml
+
 patchesStrategicMerge:
+  - ./jore4-secrets-patch.yaml
   - ./jore4-env-patch.yaml
-  - ./jore4-ingress-patch.yaml
+
+patches:
+  # patch every Ingress to use the proper keyvault and hostname
+  - path: jore4-ingress-patch.yaml
+    target:
+      kind: Ingress
