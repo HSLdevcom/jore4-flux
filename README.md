@@ -240,8 +240,9 @@ understand better what's happening here, check the
 1. check that Flux prerequisites are OK in the cluster `flux check --pre`
 
 1. generate custom resource definitions for setting up Flux system in kubernetes (monitoring
-   controllers)
-   `flux install --network-policy=false --export > crd/flux-crd.yaml`
+   controllers). Use the `--version` parameter to specify which version to generate CRDs for.
+   Available versions are found from [here](https://github.com/fluxcd/flux2/releases)
+   `flux install --network-policy=false --export --version 0.13.2 > crd/flux-crd.yaml`
 
 1. generate a manifest for this git repository to have `dev` branch monitored as a "source":
 
