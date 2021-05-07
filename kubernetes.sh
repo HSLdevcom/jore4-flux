@@ -1,6 +1,9 @@
 #!/bin/bash
 
-set -eu
+set -euo pipefail
+
+# List of the allowed stages
+AZURE_STAGES=("playg" "dev" "test" "prod")
 
 function az_login {
   echo "Logging in the $1 environment"
@@ -16,13 +19,18 @@ function check_context {
 
   CURRENT_CONTEXT=$(kubectl config current-context)
 
-  [[ "$CURRENT_CONTEXT" == "hsl-jore4-$1-cluster" ]] || {
-    echo >&2 "You are currently logged in to the context '$CURRENT_CONTEXT'!"
-    echo >&2 "You should first log in to $1 context to continue."
+  if [[ " ${AZURE_STAGES[*]} " =~ $1 ]]; then
+    if [[ "$CURRENT_CONTEXT" != "hsl-jore4-$1-cluster" ]]; then
+      echo >&2 "You are currently logged in to the context '$CURRENT_CONTEXT'!"
+      echo >&2 "You should first log in to $1 context to continue."
+      exit 1
+    else
+      echo "$1 context is active, no need to login"
+    fi
+  else
+    echo "Unknown stage: '$1'"
     exit 1
-  }
-
-  echo "$1 context is active, no need to login"
+  fi
 }
 
 function deploy_CRDs {
