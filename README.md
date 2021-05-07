@@ -29,6 +29,9 @@ Flux configuration for the jore4 Kubernetes deployment
     - [Pods](#pods)
     - [Uninstall](#uninstall)
     - [Flux Monitoring](#flux-monitoring)
+- [Use in end-to-end tests](#use-in-end-to-end-tests)
+  - [Setting up Kind cluster locally](#setting-up-kind-cluster-locally)
+  - [Differences between AKS and Kind](#differences-between-aks-and-kind)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -326,3 +329,47 @@ there's a wrong version deployed:
 1. may also see that the new kubernetes configuration got applied, but some pods fail to start. Find
    the misbehaving pod with `kubectl get pods -A` and check its logs with
    `kubectl logs <pod-name> --namespace <pod-namespace>` (or use Lens)
+
+## Use in end-to-end tests
+
+To run the cluster locally in kubernetes, we are using
+[kind](https://kind.sigs.k8s.io/docs/user/quick-start#installation).
+
+### Setting up Kind cluster locally
+
+To start Kind, execute `./kindcluster.sh kind:start`, to stop, run `./kindcluster.sh stop`.
+This will create a cluster called `kind-jore4-local-cluster` that works pretty much the same as the
+AKS Kubernetes service. To fine-tune its settings, edit the `kind-cluster.yaml` file. More
+information about the available settings [here](https://kind.sigs.k8s.io/docs/user/configuration/).
+
+You may use the same `./kindcluster.sh deploy:*` commands to deploy CRDs and applications to Kind as
+with the AKS. To start the cluster for end-to-end testing, just execute:
+
+```
+./kindcluster.sh kind:start
+./kindcluster.sh deploy:crd
+./kindcluster.sh deploy:cluster --cluster=clusters/e2e
+```
+
+Or simply:
+
+```
+./kindcluster.sh start --cluster=clusters/e2e
+```
+
+This will start up the JORE4 cluster that's defined in `clusters/e2e` directory. It will run on
+`http://localhost:8000`
+
+We don't use Flux to set up the applications within the Kind Kubernetes as it would just slow things
+down. Instead, the resources are deployed directly.
+
+### Differences between AKS and Kind
+
+- Kind is still in early development, many Kubernetes features won't work.
+- Azure's `AGIC ingress controller` is only intended for AKS, we are using `nginx` as a substitute
+  in Kind.
+- Kind allows you to
+  [map a directory](https://kind.sigs.k8s.io/docs/user/configuration/#extra-mounts) from you machine
+  to the cluster as a volume.
+- We don't have a `key-vault` locally, so instead of using the `secret store CSI driver`, we'll
+  have to map the secrets to the pods directly as files from the host machine
