@@ -39,7 +39,7 @@ jobs:
         run: |
           # In pull requests
           BRANCH_NAME="${GITHUB_HEAD_REF}"
-          [ ${BRANCH_NAME} = "" ] && {
+          [ ${BRANCH_NAME} == "" ] && {
             # In branch pushes
             BRANCH_NAME="$(echo "${GITHUB_REF}" | cut -d '/' -f 3-)"
           }
