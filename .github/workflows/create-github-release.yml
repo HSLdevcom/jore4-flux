@@ -6,7 +6,7 @@ on:
       - "e2e-v*"
 
 jobs:
-  build:
+  create-release:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
@@ -17,7 +17,6 @@ jobs:
 
       - name: Create release
         run: |
-          echo tag: ${RELEASE_VERSION}
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
           gh release create ${RELEASE_VERSION} --notes "test release"
           gh release upload ${RELEASE_VERSION} kindcluster.sh kind-cluster.yaml

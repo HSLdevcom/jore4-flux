@@ -1,6 +1,8 @@
 #!/bin/bash
 
-set -eu
+set -euo pipefail
+
+E2E_SCRIPTS_VERSION="e2e-v1"
 
 echo "Creating temporary directory for cluster definition"
 tmp_dir=$(mktemp -d e2e-kustomize-XXXXXXXXXX)
@@ -13,7 +15,7 @@ cleanup() {
 trap cleanup EXIT
 
 echo "Downloading helper script"
-curl https://raw.githubusercontent.com/HSLdevcom/jore4-flux/main/kindcluster.sh --output "$tmp_dir/kindcluster.sh"
+curl https://github.com/HSLdevcom/jore4-flux/releases/download/$E2E_SCRIPTS_VERSION/kindcluster.sh --output "$tmp_dir/kindcluster.sh"
 chmod +x "$tmp_dir/kindcluster.sh"
 
 # Loading the base e2e cluster definition, then patch it:
@@ -60,7 +62,7 @@ echo "Testing that cluster definition builds correctly"
 kustomize build "$tmp_dir"
 
 echo "Downloading Kind config"
-curl https://raw.githubusercontent.com/HSLdevcom/jore4-flux/main/kind-cluster.yaml --output "$tmp_dir/kind-cluster.yaml"
+curl https://github.com/HSLdevcom/jore4-flux/releases/download/$E2E_SCRIPTS_VERSION/kind-cluster.yaml --output "$tmp_dir/kind-cluster.yaml"
 
 echo "Starting Kind and deploying the cluster"
 "$tmp_dir/kindcluster.sh" start --kindconfig="$tmp_dir/kind-cluster.yaml" --cluster="$tmp_dir"
