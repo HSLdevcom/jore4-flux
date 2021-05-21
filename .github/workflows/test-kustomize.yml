@@ -9,25 +9,25 @@ jobs:
   test-kustomizations:
     name: Test whether all kustomizations build without issues
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        cluster:
+          - "./clusters/dev"
+          - "./clusters/test"
+          - "./clusters/prod"
+          - "./clusters/playg"
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Run Kustomization build for DEV
-        uses: karancode/kustomize-github-action@902f7f5048dfbd46ca1aeb06aeaf3ac2fd381143
-        with:
-          kustomize_version: "4.0.4"
-          kustomize_build_dir: "./clusters/dev"
-
-      - name: Run Kustomization build for TEST
-        uses: karancode/kustomize-github-action@902f7f5048dfbd46ca1aeb06aeaf3ac2fd381143
-        with:
-          kustomize_version: "4.0.4"
-          kustomize_build_dir: "./clusters/test"
-
-      - name: Run Kustomization build for PROD
-        uses: karancode/kustomize-github-action@902f7f5048dfbd46ca1aeb06aeaf3ac2fd381143
-        with:
-          kustomize_version: "4.0.4"
-          kustomize_build_dir: "./clusters/prod"
+      - name: Run Kustomization build for cluster
+        env:
+          KUSTOMIZE_VERSION: 4.0.4
+          KUSTOMIZE_BUILD_DIR: ${{ matrix.cluster }}
+        run: |
+          curl -L "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz" \
+              | tar -xz \
+              > ./kustomize \
+            && chmod u+x ./kustomize \
+            && ./kustomize build ${KUSTOMIZE_BUILD_DIR}
