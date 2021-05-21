@@ -27,3 +27,37 @@ jobs:
 
       - name: Stop Kind
         run: "./kindcluster.sh stop"
+
+  test-remote-e2e-setup:
+    name: Test whether e2e cluster can be set up remotely, with a script
+    runs-on: ubuntu-20.04
+
+    steps:
+      # note that we don't checkout code in this job to make sure that the workspace is empty!
+
+      - name: Extract branch name to env variable
+        run: |
+          # In pull requests
+          BRANCH_NAME="${GITHUB_HEAD_REF}"
+          [ ${BRANCH_NAME} = "" ] && {
+            # In branch pushes
+            BRANCH_NAME="$(echo "${GITHUB_REF}" | cut -d '/' -f 3-)"
+          }
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> "${GITHUB_ENV}"
+
+      - name: dbg
+        run: printenv
+
+      - name: Setup e2e cluster with the remote script
+        run: "curl https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${BRANCH_NAME}/remotecluster.sh | bash"
+
+      - name: Verify that application is up and running
+        run: |
+          for i in {1..20}; do
+            curl --fail http://localhost:8000 --output /dev/null --silent && break
+            sleep 5
+            echo $i
+          done
+
+      - name: Stop Kind
+        run: "curl https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${BRANCH_NAME}/kindcluster.sh | bash - stop"
