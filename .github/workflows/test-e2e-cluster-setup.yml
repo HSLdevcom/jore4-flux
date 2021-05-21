@@ -60,4 +60,4 @@ jobs:
           done
 
       - name: Stop Kind
-        run: "curl https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${BRANCH_NAME}/kindcluster.sh | bash - stop"
+        run: "curl https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${BRANCH_NAME}/kindcluster.sh | bash -s -- stop"
