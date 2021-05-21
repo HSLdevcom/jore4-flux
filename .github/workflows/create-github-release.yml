@@ -1,0 +1,21 @@
+name: Create e2e github release
+
+on:
+  push:
+    tags:
+      - "e2e-v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Create release
+        env:
+          RELEASE_VERSION: ${GITHUB_REF#refs/tags/}
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+          gh release create ${RELEASE_VERSION} --notes "test release"
+          gh release upload ${RELEASE_VERSION} kindcluster.sh kind-cluster.yaml
