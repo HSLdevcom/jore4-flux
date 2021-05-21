@@ -7,7 +7,7 @@ on:
 
 jobs:
   test-local-e2e-setup:
-    name: Test whether e2e cluster can be set up locally, from the repository
+    name: e2e setup locally
     runs-on: ubuntu-20.04
 
     steps:
@@ -29,11 +29,13 @@ jobs:
         run: "./kindcluster.sh stop"
 
   test-remote-e2e-setup:
-    name: Test whether e2e cluster can be set up remotely, with a script
+    name: e2e setup remotely
     runs-on: ubuntu-20.04
 
     steps:
       # note that we don't checkout code in this job to make sure that the workspace is empty!
+      - name: Extract branch name to env variable
+        run: ls -la
 
       - name: Extract branch name to env variable
         run: |
@@ -44,9 +46,6 @@ jobs:
             BRANCH_NAME="$(echo "${GITHUB_REF}" | cut -d '/' -f 3-)"
           }
           echo "BRANCH_NAME=${BRANCH_NAME}" >> "${GITHUB_ENV}"
-
-      - name: dbg
-        run: printenv
 
       - name: Setup e2e cluster with the remote script
         run: "curl https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${BRANCH_NAME}/remotecluster.sh | bash"
