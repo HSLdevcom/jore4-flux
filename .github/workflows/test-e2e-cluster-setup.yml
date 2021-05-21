@@ -6,7 +6,7 @@ on:
     branches: [master]
 
 jobs:
-  test-local-e2e-setup:
+  local-e2e-setup:
     name: e2e setup locally
     runs-on: ubuntu-20.04
 
@@ -28,14 +28,14 @@ jobs:
       - name: Stop Kind
         run: "./kindcluster.sh stop"
 
-  test-remote-e2e-setup:
+  remote-e2e-setup:
     name: e2e setup remotely
     runs-on: ubuntu-20.04
 
     steps:
       # note that we don't checkout code in this job to make sure that the workspace is empty!
-      - name: Extract branch name to env variable
-        run: ls -la
+      - name: Verifying that current workspace is empty
+        run: '[ -z "$(ls -A)" ]'
 
       - name: Extract branch name to env variable
         run: |
