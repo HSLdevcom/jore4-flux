@@ -31,6 +31,7 @@ Flux configuration for the jore4 Kubernetes deployment
     - [Flux Monitoring](#flux-monitoring)
 - [Use in end-to-end tests](#use-in-end-to-end-tests)
   - [Setting up Kind cluster locally](#setting-up-kind-cluster-locally)
+  - [Setting up Kind cluster remotely](#setting-up-kind-cluster-remotely)
   - [Differences between AKS and Kind](#differences-between-aks-and-kind)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -362,6 +363,27 @@ This will start up the JORE4 cluster that's defined in `clusters/e2e` directory.
 
 We don't use Flux to set up the applications within the Kind Kubernetes as it would just slow things
 down. Instead, the resources are deployed directly.
+
+### Setting up Kind cluster remotely
+
+In the root directory, there's a `remotecluster.sh` that downloads the necessary configuration files
+and helper scripts from the `jore4-flux` repository from the `e2e` branch and instructs
+`kindcluster.sh` to deploy the e2e cluster to Kind. The `e2e` branch follows the same logic as the
+[Deployment Strategy](#deployment-strategy) describes.
+
+Just download the `remotecluster.sh` and execute it on your machine to have the full setup done. You
+may also execute it directly with:
+
+```
+curl https://raw.githubusercontent.com/HSLdevcom/jore4-flux/e2e/remotecluster.sh | bash
+```
+
+The script recognizes take the following environment variables as parameters:
+
+- `FRONTEND_DOCKER_IMAGE`: redefines which frontend docker image should be used instead of the e2e
+  cluster default. E.g `FRONTEND_DOCKER_IMAGE="hsldevcom/jore4-ui:latest"`
+- `BACKEND_DOCKER_IMAGE`: redefines which backend docker image should be used instead of the e2e
+  cluster default. E.g `FRONTEND_DOCKER_IMAGE="hsldevcom/jore4-backend:latest"`
 
 ### Differences between AKS and Kind
 
