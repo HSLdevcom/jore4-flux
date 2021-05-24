@@ -31,6 +31,8 @@ Flux configuration for the jore4 Kubernetes deployment
     - [Flux Monitoring](#flux-monitoring)
 - [Use in end-to-end tests](#use-in-end-to-end-tests)
   - [Setting up Kind cluster locally](#setting-up-kind-cluster-locally)
+  - [Setting up Kind cluster remotely](#setting-up-kind-cluster-remotely)
+  - [Development of Kind cluster](#development-of-kind-cluster)
   - [Differences between AKS and Kind](#differences-between-aks-and-kind)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -362,6 +364,42 @@ This will start up the JORE4 cluster that's defined in `clusters/e2e` directory.
 
 We don't use Flux to set up the applications within the Kind Kubernetes as it would just slow things
 down. Instead, the resources are deployed directly.
+
+### Setting up Kind cluster remotely
+
+To set up and run the Kind cluster remotely, from e.g. a github action instead of your local workdir,
+there is a `remotecluster.sh` script in the repo root that downloads the necessary configuration
+files and helper scripts from the `jore4-flux` repository from the `e2e` branch and instructs
+`kindcluster.sh` to deploy the e2e cluster to Kind. The `e2e` branch follows the same logic as the
+[Deployment Strategy](#deployment-strategy) describes.
+
+Just download the `remotecluster.sh` and execute it on your machine to have the full setup done. You
+may also execute it directly with:
+
+```
+curl https://raw.githubusercontent.com/HSLdevcom/jore4-flux/e2e/remotecluster.sh | bash
+```
+
+The script recognizes the following environment variables as parameters:
+
+- `FRONTEND_DOCKER_IMAGE`: redefines which frontend docker image should be used instead of the e2e
+  cluster default. E.g `FRONTEND_DOCKER_IMAGE="hsldevcom/jore4-ui:latest"`
+- `BACKEND_DOCKER_IMAGE`: redefines which backend docker image should be used instead of the e2e
+  cluster default. E.g `FRONTEND_DOCKER_IMAGE="hsldevcom/jore4-backend:latest"`
+
+To stop and remove the cluster, call `kind delete clusters jore4-local-cluster`. This will delete
+the docker container(s) where Kind is running and free up all resources. Currently we are not using
+volume mappings, so there's no need to clean up any directories either.
+
+### Development of Kind cluster
+
+When making changes to the Kind cluster setup, modify `kind-cluster.yaml` as described
+[here](https://kind.sigs.k8s.io/docs/user/configuration). You have to delete and rerun the Kind
+cluster for the changes to take effect.
+
+Otherwise, if you make changes in the Kubernetes cluster resources themselves (under `clusters/e2e`),
+you may reapply the changes by calling `kindcluster.sh` again. `remotecluster.sh` loads resources
+from the `e2e` branch, so cannot be tested locally.
 
 ### Differences between AKS and Kind
 
