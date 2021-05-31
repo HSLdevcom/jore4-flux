@@ -1,0 +1,22 @@
+name: Security Analysis on IaC and Kubernetes
+
+on:
+  push:
+  pull_request:
+    branches: [master]
+
+jobs:
+  test-checkov:
+    name: Run Checkov
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run Checkov
+        id: checkov
+        uses: bridgecrewio/checkov-action@v3
+        with:
+          directory: /
+          log_level: DEBUG # optional: set log level. Default WARNING
