@@ -18,9 +18,9 @@ nodes:
     extraPortMappings:
       # frontend
       - containerPort: 80
-        hostPort: 8000
+        hostPort: 3300
         protocol: TCP
       # postgresql
       - containerPort: 30432
-        hostPort: 6432
+        hostPort: 3002
         protocol: TCP

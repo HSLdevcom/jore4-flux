@@ -361,8 +361,8 @@ Or simply:
 
 This will start up the JORE4 cluster that's defined in `clusters/e2e` directory.
 
-- The UI runs on `http://localhost:8000`
-- The postgresql database is exposed on `localhost:6432` (credentials are defined in
+- The UI runs on `http://localhost:3300`
+- The postgresql database is exposed on `localhost:3002` (credentials are defined in
   `clusters/e2e/jore4-local-secrets.yaml`)
 
 We don't use Flux to set up the applications within the Kind Kubernetes as it would just slow things
@@ -403,6 +403,10 @@ cluster for the changes to take effect.
 Otherwise, if you make changes in the Kubernetes cluster resources themselves (under `clusters/e2e`),
 you may reapply the changes by calling `kindcluster.sh` again. `remotecluster.sh` loads resources
 from the `e2e` branch, so cannot be tested locally.
+
+### Architecture and port mapping in Kind cluster
+
+![Architecture and port mapping](docs/kindcluster.png)
 
 ### Differences between AKS and Kind
 
