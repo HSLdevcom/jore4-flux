@@ -38,5 +38,5 @@ spec:
     - protocol: TCP
       port: 5432
       targetPort: 5432
-      # explicitly expose this port to the node
+      # explicitly expose this port to the node. Must be between 30000 and 32767
       nodePort: 30432
