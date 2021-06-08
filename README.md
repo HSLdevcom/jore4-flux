@@ -33,6 +33,7 @@ Flux configuration for the jore4 Kubernetes deployment
   - [Setting up Kind cluster locally](#setting-up-kind-cluster-locally)
   - [Setting up Kind cluster remotely](#setting-up-kind-cluster-remotely)
   - [Development of Kind cluster](#development-of-kind-cluster)
+  - [Architecture and port mapping in Kind cluster](#architecture-and-port-mapping-in-kind-cluster)
   - [Differences between AKS and Kind](#differences-between-aks-and-kind)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -403,6 +404,10 @@ cluster for the changes to take effect.
 Otherwise, if you make changes in the Kubernetes cluster resources themselves (under `clusters/e2e`),
 you may reapply the changes by calling `kindcluster.sh` again. `remotecluster.sh` loads resources
 from the `e2e` branch, so cannot be tested locally.
+
+### Architecture and port mapping in Kind cluster
+
+![Architecture and port mapping](docs/kindcluster.png)
 
 ### Differences between AKS and Kind
 

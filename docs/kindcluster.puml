@@ -1,0 +1,57 @@
+@startuml
+
+skinparam componentStyle rectangle
+
+actor User
+interface "3300" as KIND_UI_PORT
+interface "3002" as KIND_PSQL_PORT
+
+component "Kind cluster" as KIND_CLUSTER {
+  interface "30432" as NODE_PSQL_PORT
+  interface "80" as NODE_UI_PORT
+
+  component "Node1 (control plane)" as NODE1 {
+    interface "5432" as POD_PSQL_PORT
+    interface "80" as POD_UI_PORT
+    interface "8080" as POD_HASURA_PORT
+    interface "80" as INGRESS_UI_PORT
+
+    component [Ingress]
+    component [PostgreSQL pod]
+    component [Hasura pod]
+    component [UI pod]
+
+    POD_PSQL_PORT -- [PostgreSQL pod]
+    POD_UI_PORT -- [UI pod]
+    POD_HASURA_PORT -- [Hasura pod]
+    INGRESS_UI_PORT -- [Ingress]
+
+    [Ingress] ..> POD_UI_PORT
+    [Ingress] ..> POD_HASURA_PORT
+  }
+
+  NODE_PSQL_PORT -- NODE1
+  NODE_UI_PORT -- NODE1
+
+  ' hidden arrows for aligning elements
+  NODE1 .[hidden].> POD_PSQL_PORT
+  NODE1 .[hidden].> INGRESS_UI_PORT
+
+  NODE_PSQL_PORT .[#blue].> POD_PSQL_PORT
+  NODE_UI_PORT .[#blue].> INGRESS_UI_PORT
+}
+
+KIND_PSQL_PORT -- KIND_CLUSTER
+KIND_UI_PORT -- KIND_CLUSTER
+
+' hidden arrows for aligning elements
+KIND_CLUSTER .[hidden].> NODE_PSQL_PORT
+KIND_CLUSTER .[hidden].> NODE_UI_PORT
+
+KIND_PSQL_PORT .[#blue].> NODE_PSQL_PORT
+KIND_UI_PORT .[#blue].> NODE_UI_PORT
+
+User ..> KIND_PSQL_PORT
+User ..> KIND_UI_PORT
+
+@enduml
