@@ -1,0 +1,42 @@
+# Provides a test database for local testing
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jore4-test-database
+  namespace: hsl-jore4
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jore4-test-database
+  template:
+    metadata:
+      labels:
+        app: jore4-test-database
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: jore4-test-database-image
+          image: "postgis/postgis:12-3.1-alpine"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: jore4-test-database-env
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jore4-test-database
+  namespace: hsl-jore4
+spec:
+  type: NodePort
+  selector:
+    app: jore4-test-database
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+      # explicitly expose this port to the node. Must be between 30000 and 32767
+      nodePort: 30432

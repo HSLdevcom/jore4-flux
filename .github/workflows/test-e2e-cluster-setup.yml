@@ -17,10 +17,18 @@ jobs:
       - name: Start Kind
         run: "./kindcluster.sh start --cluster=clusters/e2e"
 
-      - name: Verify that application is up and running
+      - name: Verify that UI is up and running
         run: |
           for i in {1..20}; do
-            curl --fail http://localhost:8000 --output /dev/null --silent && break
+            curl --fail http://localhost:3300 --output /dev/null --silent && break
+            sleep 5
+            echo $i
+          done
+
+      - name: Verify that postgresql is up and running
+        run: |
+          for i in {1..20}; do
+            pg_isready -h localhost -p 3002 && break
             sleep 5
             echo $i
           done
@@ -67,10 +75,18 @@ jobs:
           BACKEND_DOCKER_IMAGE: ${{ matrix.backend-docker-image }}
         run: "curl https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${BRANCH_NAME}/remotecluster.sh | bash"
 
-      - name: Verify that application is up and running
+      - name: Verify that UI is up and running
         run: |
           for i in {1..20}; do
-            curl --fail http://localhost:8000 --output /dev/null --silent && break
+            curl --fail http://localhost:3300 --output /dev/null --silent && break
+            sleep 5
+            echo $i
+          done
+
+      - name: Verify that postgresql is up and running
+        run: |
+          for i in {1..20}; do
+            pg_isready -h localhost -p 3002 && break
             sleep 5
             echo $i
           done

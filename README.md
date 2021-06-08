@@ -359,8 +359,11 @@ Or simply:
 ./kindcluster.sh start --cluster=clusters/e2e
 ```
 
-This will start up the JORE4 cluster that's defined in `clusters/e2e` directory. It will run on
-`http://localhost:8000`
+This will start up the JORE4 cluster that's defined in `clusters/e2e` directory.
+
+- The UI runs on `http://localhost:3300`
+- The postgresql database is exposed on `localhost:3002` (credentials are defined in
+  `clusters/e2e/jore4-local-secrets.yaml`)
 
 We don't use Flux to set up the applications within the Kind Kubernetes as it would just slow things
 down. Instead, the resources are deployed directly.
