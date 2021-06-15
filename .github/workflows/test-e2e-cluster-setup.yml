@@ -73,6 +73,8 @@ jobs:
           # change some docker images to use a different version
           FRONTEND_DOCKER_IMAGE: ${{ matrix.frontend-docker-image }}
           BACKEND_DOCKER_IMAGE: ${{ matrix.backend-docker-image }}
+          # make sure we are testing the remotecluster.sh against the current branch
+          E2E_SCRIPTS_VERSION: ${{ env.BRANCH_NAME }}
         run: "curl https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${BRANCH_NAME}/remotecluster.sh | bash"
 
       - name: Verify that UI is up and running

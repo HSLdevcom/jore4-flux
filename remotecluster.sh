@@ -3,7 +3,8 @@
 set -euo pipefail
 
 # the ref/branch where the e2e cluster scripts can be found from
-E2E_SCRIPTS_VERSION="e2e"
+E2E_SCRIPTS_VERSION=${E2E_SCRIPTS_VERSION:-e2e}
+echo "E2E_SCRIPTS_VERSION=$E2E_SCRIPTS_VERSION"
 
 echo "Creating temporary directory for cluster definition"
 tmp_dir=$(mktemp -d e2e-kustomize-XXXXXXXXXX)
@@ -16,7 +17,7 @@ cleanup() {
 trap cleanup EXIT
 
 echo "Downloading helper script"
-curl https://raw.githubusercontent.com/HSLdevcom/jore4-flux/$E2E_SCRIPTS_VERSION/kindcluster.sh --output "$tmp_dir/kindcluster.sh"
+curl "https://raw.githubusercontent.com/HSLdevcom/jore4-flux/$E2E_SCRIPTS_VERSION/kindcluster.sh" --output "$tmp_dir/kindcluster.sh"
 chmod u+x "$tmp_dir/kindcluster.sh"
 
 # Loading the base e2e cluster definition, then patch it:
@@ -60,7 +61,7 @@ patchesStrategicMerge:
 EOT
 
 echo "Downloading Kind config"
-curl https://raw.githubusercontent.com/HSLdevcom/jore4-flux/$E2E_SCRIPTS_VERSION/kind-cluster.yaml --output "$tmp_dir/kind-cluster.yaml"
+curl "https://raw.githubusercontent.com/HSLdevcom/jore4-flux/$E2E_SCRIPTS_VERSION/kind-cluster.yaml" --output "$tmp_dir/kind-cluster.yaml"
 
 echo "Starting Kind and deploying the cluster"
 "$tmp_dir/kindcluster.sh" start --kindconfig="$tmp_dir/kind-cluster.yaml" --cluster="$tmp_dir"
