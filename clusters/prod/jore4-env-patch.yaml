@@ -7,3 +7,14 @@ metadata:
   namespace: hsl-jore4
 data:
   HASURA_GRAPHQL_ENABLE_CONSOLE: "false"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jore4-auth-env
+  namespace: hsl-jore4
+data:
+  SELF_PUBLIC_BASE_URL: "https://jore.hsl.fi"
+  LOGINPAGE_URL: "https://jore.hsl.fi"
+  LOGOUTPAGE_URL: "https://jore.hsl.fi"
+  OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
