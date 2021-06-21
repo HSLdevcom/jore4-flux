@@ -32,3 +32,10 @@ spec:
                 name: jore4-hasura
                 port:
                   number: 8080
+          - path: /api/auth/*
+            pathType: Prefix
+            backend:
+              service:
+                name: jore4-auth
+                port:
+                  number: 8080

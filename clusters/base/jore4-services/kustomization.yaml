@@ -5,3 +5,4 @@ resources:
   - ./jore4-ingress.yaml
   - ./jore4-hasura.yaml
   - ./jore4-frontend.yaml
+  - ./jore4-auth.yaml
