@@ -7,6 +7,8 @@ replicas:
     count: 1
   - name: jore4-hasura
     count: 1
+  - name: jore4-auth
+    count: 1
 
 resources:
   - ../base/jore4-services
@@ -16,9 +18,4 @@ resources:
 patchesStrategicMerge:
   - ./jore4-secrets-patch.yaml
   - ./jore4-env-patch.yaml
-
-patches:
-  # patch every Ingress to use the proper keyvault and hostname
-  - path: jore4-ingress-patch.yaml
-    target:
-      kind: Ingress
+  - ./jore4-ingress-patch.yaml
