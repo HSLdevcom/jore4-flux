@@ -1,0 +1,21 @@
+name: Generate yaml
+
+on:
+  push:
+  pull_request:
+    branches: [master]
+
+jobs:
+  verify-doctoc:
+    name: Verifies whether generated yamls have been updated
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run yaml generation
+        run: ./development.sh generate
+
+      - name: Verify that generate command made no changes, so yamls are up to date
+        run: '[ -z "$(git status --porcelain)" ]'

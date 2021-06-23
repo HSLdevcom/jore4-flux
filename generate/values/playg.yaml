@@ -1,0 +1,13 @@
+stage: playg
+ingress:
+  hostname: playg.jore.hsl.fi
+services:
+  hasura:
+    env:
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "false"
+  auth:
+    env:
+      SELF_PUBLIC_BASE_URL: "https://playg.jore.hsl.fi"
+      LOGINPAGE_URL: "https://playg.jore.hsl.fi"
+      LOGOUTPAGE_URL: "https://playg.jore.hsl.fi"
+      OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"

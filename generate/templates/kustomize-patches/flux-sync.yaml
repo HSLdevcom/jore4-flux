@@ -1,6 +1,6 @@
-# This is a generated file, all modifications will be overwritten!
+#{{/* add comment that result yaml was generated */}} This is a generated file, all modifications will be overwritten!
 
-# Sets up monitoring of jore4-flux repository ./clusters/test folder
+# Sets up monitoring of jore4-flux repository ./clusters/{{ .Values.stage }} folder
 
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
@@ -10,7 +10,7 @@ metadata:
 spec:
   interval: 1m
   ref:
-    branch: "test"
+    branch: "{{ .Values.stage }}"
   url: https://github.com/HSLdevcom/jore4-flux
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
@@ -20,7 +20,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1m
-  path: "./clusters/test"
+  path: "./clusters/{{ .Values.stage }}"
   prune: true
   sourceRef:
     kind: GitRepository

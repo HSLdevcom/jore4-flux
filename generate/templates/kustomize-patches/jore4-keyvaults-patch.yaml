@@ -1,4 +1,4 @@
-# This is a generated file, all modifications will be overwritten!
+#{{/* add comment that result yaml was generated */}} This is a generated file, all modifications will be overwritten!
 
 # Patches the secret provider mapping to tell what keyvault to find the secrets from
 
@@ -9,4 +9,4 @@ metadata:
   name: <ignored>
 spec:
   parameters:
-    keyvaultName: "hsl-jore4-playg-vault"
+    keyvaultName: "hsl-jore4-{{ .Values.stage }}-vault"
