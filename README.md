@@ -23,6 +23,7 @@ Flux configuration for the jore4 Kubernetes deployment
     - [CRDs](#crds)
     - [Base Resource Templates](#base-resource-templates)
     - [Cluster Definitions](#cluster-definitions)
+    - [YAML templates](#yaml-templates)
   - [Generate Flux configurations](#generate-flux-configurations)
   - [Troubleshooting](#troubleshooting)
     - [Testing Kustomize](#testing-kustomize)
@@ -226,6 +227,21 @@ The actual cluster definitons can be found from `clusters/dev`, `clusters/test` 
   form the `dev` environment
 
 Deploy the `dev` cluster with `./kubernetes.sh deploy:cluster dev`
+
+To make sure that all stages' cluster definitions are the same (except of course the stage-specific
+configurations), we are [generating the yamls](#yaml-templates)
+
+#### YAML templates
+
+We are using [gomplate](https://docs.gomplate.ca/) to render yaml templates. This is the same tool
+that Helm uses to render its charts, we are also aiming to keep a similar directory structure to
+support switching to Helm easy in case the need emerges in the future.
+
+For now, we are only aiming to replace Kustomize patches' manual editing with yaml generation. In
+the future, we could generate the whole kubernetes manifest for each stage's cluster. It's also
+possible to generate a docker-compose.yaml file from the same values for local development.
+
+To rerender all yaml templates, run `./development.sh generate`
 
 ### Generate Flux configurations
 

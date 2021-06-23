@@ -1,3 +1,5 @@
+# This is a generated file, all modifications will be overwritten!
+
 # Sets up monitoring of jore4-flux repository ./clusters/playg folder
 
 apiVersion: source.toolkit.fluxcd.io/v1beta1
@@ -8,7 +10,7 @@ metadata:
 spec:
   interval: 1m
   ref:
-    branch: playg
+    branch: "playg"
   url: https://github.com/HSLdevcom/jore4-flux
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
@@ -18,7 +20,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1m
-  path: ./clusters/playg
+  path: "./clusters/playg"
   prune: true
   sourceRef:
     kind: GitRepository

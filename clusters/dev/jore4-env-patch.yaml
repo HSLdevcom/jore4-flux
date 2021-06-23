@@ -1,3 +1,5 @@
+# This is a generated file, all modifications will be overwritten!
+
 # Patches jore4 services to add/customize some environment variables
 
 apiVersion: v1
@@ -14,7 +16,7 @@ metadata:
   name: jore4-auth-env
   namespace: hsl-jore4
 data:
-  SELF_PUBLIC_BASE_URL: "https://dev.jore.hsl.fi"
   LOGINPAGE_URL: "https://dev.jore.hsl.fi"
   LOGOUTPAGE_URL: "https://dev.jore.hsl.fi"
   OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
+  SELF_PUBLIC_BASE_URL: "https://dev.jore.hsl.fi"

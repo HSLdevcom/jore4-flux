@@ -1,8 +1,10 @@
+# This is a generated file, all modifications will be overwritten!
+
 # Patches the jore4 ingress to tell where to find the certificate from and what is the hostname
 
 - op: replace
   path: /metadata/annotations/appgw.ingress.kubernetes.io~1appgw-ssl-certificate
-  value: hsl-jore4-playg-cert
+  value: "hsl-jore4-playg-cert"
 - op: replace
   path: /spec/rules/0/host
-  value: playg.jore.hsl.fi
+  value: "playg.jore.hsl.fi"
