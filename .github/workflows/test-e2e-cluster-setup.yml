@@ -35,6 +35,35 @@ jobs:
       - name: Stop Kind
         run: "./kindcluster.sh stop"
 
+  compose-e2e-setup:
+    name: e2e setup locally with docker-compose
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Start docker-compose
+        run: "docker-compose -f clusters/docker-compose/docker-compose.yml up -d"
+
+      - name: Verify that UI is up and running
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3300 --output /dev/null --silent && break"
+
+      - name: Verify that postgresql is up and running
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "pg_isready -h localhost -p 3002 && break"
+
+      - name: Verify that hasura is up and running
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3300/graphql/healthz --output /dev/null --silent && break"
+
+      - name: Stop Kind
+        run: "./kindcluster.sh stop"
+
   remote-e2e-setup:
     name: e2e setup remotely
     runs-on: ubuntu-20.04
