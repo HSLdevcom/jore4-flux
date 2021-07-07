@@ -1,21 +1,18 @@
+# This is a generated file, all modifications will be overwritten!
+
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-# make sure that we only have a single instance of each service
-replicas:
-  - name: jore4-frontend
-    count: 1
-  - name: jore4-hasura
-    count: 1
-  - name: jore4-auth
-    count: 1
-
 resources:
-  - ../base/jore4-services
-  - ./jore4-local-secrets.yaml
-  - ./jore4-test-database.yaml
+  - ./jore4-namespace.yaml
+  - ./flux-sync.yaml
+  - ./jore4-ingress.yaml
 
-patchesStrategicMerge:
-  - ./jore4-secrets-patch.yaml
-  - ./jore4-env-patch.yaml
-  - ./jore4-ingress-patch.yaml
+  - ./jore4-auth.yaml
+
+  - ./jore4-hasura.yaml
+
+  - ./jore4-testdb.yaml
+
+  - ./jore4-ui.yaml
+

@@ -1,0 +1,47 @@
+# This is a generated file, all modifications will be overwritten!
+
+# Describes the jore4 ingress
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jore4-ingress
+  namespace: hsl-jore4
+  annotations:
+
+    # overwrite ingress class to use nginx instead of AGIC
+    kubernetes.io/ingress.class: nginx
+    # rewrite url to regex capture group no 2 (e.g. /api/graphql/XXX -> /XXX within the container)
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+
+
+spec:
+  rules:
+    # only listen to requests from this host
+    - host: ""
+      http:
+        paths:
+          - path: "/()(.*)"
+            pathType: Prefix
+            backend:
+              service:
+                name: "jore4-ui"
+                port:
+                  number: 80
+
+          - path: "/api/graphql(/|$)(.*)"
+            pathType: Prefix
+            backend:
+              service:
+                name: "jore4-hasura"
+                port:
+                  number: 8080
+
+          - path: "/api/auth(/|$)(.*)"
+            pathType: Prefix
+            backend:
+              service:
+                name: "jore4-auth"
+                port:
+                  number: 8080
+

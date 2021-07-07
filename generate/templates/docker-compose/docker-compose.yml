@@ -1,0 +1,71 @@
+---
+version: "3.8"
+services:
+{{- range $name, $srv := .Values.microServices }}
+  {{ $name }}:
+    container_name: "{{ $srv.serviceName }}"
+    image: "{{ $srv.dockerImage }}"
+    restart: "unless-stopped"
+    networks:
+      - jore4
+  {{- if (index $srv "env") }}
+    environment:
+    {{- range $key, $value := $srv.env }}
+      {{ $key }}: "{{ $value }}"
+    {{- end }}
+  {{- end }}
+  {{- if (index $srv "ports") }}
+    ports:
+    {{- range $index, $port := $srv.ports}}
+      - "127.0.0.1:{{ $port.localPort }}:{{ $port.containerPort }}"
+    {{- end}}
+  {{- end }}
+  {{- if (index $srv "localSecrets") }}
+    secrets:
+      {{- range $key, $value := .localSecrets }}
+      - {{ $key }}
+      {{- end }}
+  {{- end }}
+{{ end }}
+  proxy:
+    container_name: proxy
+    image: nginx:alpine
+    restart: "unless-stopped"
+    networks:
+      - jore4
+    ports:
+      - 3301:80
+    command: |
+      bash -c 'bash -s <<EOF
+        cat > /etc/nginx/nginx.conf <<EON
+{{ tmpl.Exec "templates/nginx.conf" . | strings.Indent "          " }}
+      EON
+      nginx
+      EOF'
+
+networks:
+  jore4:
+
+secrets:
+{{- range $name, $srv := .Values.microServices }}
+  {{- if (index $srv "localSecrets") }}
+  {{- range $key, $value := .localSecrets }}
+  {{ $key }}:
+    file: ./secrets/{{ $key }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+
+#   proxy:
+#     container_name: proxy
+#     image: nginx:alpine
+#     restart: "unless-stopped"
+#     depends_on:
+#       - auth
+#       - ui
+#     volumes:
+#       - $PWD/nginx-proxy/default.conf:/etc/nginx/conf.d/default.conf:ro
+#     networks:
+#       - jore4
+#     ports:
+#       - 3301:80

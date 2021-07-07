@@ -7,10 +7,6 @@ resources:
   - ./jore4-namespace.yaml
   - ./flux-sync.yaml
   - ./jore4-ingress.yaml
-
-  - ./jore4-auth.yaml
-
-  - ./jore4-hasura.yaml
-
-  - ./jore4-ui.yaml
-
+{{ range $microService, $value := .Values.microServices }}
+  - ./jore4-{{ $microService }}.yaml
+{{ end }}

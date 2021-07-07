@@ -2,14 +2,22 @@
 
 set -eu
 
-function generate_kustomize_patches {
-  echo "Generating Kustomize patches with gomplate"
+function generate_kubernetes_manifests {
+  echo "Generating Kubernetes manifests with gomplate"
 
-  GOMPLATE_CMD="docker run --rm -v $(pwd):/tmp hairyhenderson/gomplate@sha256:8e46d887a73ef5d90fde1f1a7d679fa94cf9f6dfc686b0b1a581858faffb1e16"
-  $GOMPLATE_CMD --input-dir /tmp/generate/templates/kustomize-patches --output-dir /tmp/clusters/playg --context Values=/tmp/generate/values/playg.yaml
-  $GOMPLATE_CMD --input-dir /tmp/generate/templates/kustomize-patches --output-dir /tmp/clusters/dev --context Values=/tmp/generate/values/dev.yaml
-  $GOMPLATE_CMD --input-dir /tmp/generate/templates/kustomize-patches --output-dir /tmp/clusters/test --context Values=/tmp/generate/values/test.yaml
-  $GOMPLATE_CMD --input-dir /tmp/generate/templates/kustomize-patches --output-dir /tmp/clusters/prod --context Values=/tmp/generate/values/prod.yaml
+  GOMPLATE_CMD="docker run --rm -v $(pwd):/tmp hairyhenderson/gomplate@sha256:8e46d887a73ef5d90fde1f1a7d679fa94cf9f6dfc686b0b1a581858faffb1e16 --template templates=/tmp/generate/templates/resources/ -c \"Values=merge:common|env\" -d \"common=/tmp/generate/values/common.yaml\""
+  $GOMPLATE_CMD --input-dir /tmp/generate/templates/kubernetes --output-dir /tmp/clusters/e2e -d "env=/tmp/generate/values/e2e.yaml"
+  $GOMPLATE_CMD --input-dir /tmp/generate/templates/kubernetes --output-dir /tmp/clusters/playg -d "env=/tmp/generate/values/playg.yaml"
+  $GOMPLATE_CMD --input-dir /tmp/generate/templates/kubernetes --output-dir /tmp/clusters/dev -d "env=/tmp/generate/values/dev.yaml"
+  $GOMPLATE_CMD --input-dir /tmp/generate/templates/kubernetes --output-dir /tmp/clusters/test -d "env=/tmp/generate/values/test.yaml"
+  $GOMPLATE_CMD --input-dir /tmp/generate/templates/kubernetes --output-dir /tmp/clusters/prod -d "env=/tmp/generate/values/prod.yaml"
+
+  echo "Generating docker-compose file with gomplate"
+  $GOMPLATE_CMD --input-dir /tmp/generate/templates/docker-compose --output-dir /tmp/clusters/docker-compose -d "env=/tmp/generate/values/e2e.yaml"
+
+  echo "Creating secrets for docker-compose"
+  cat "0838619941439007" > ./clusters/docker-compose/secrets/oidc-client-id
+  cat "9uV5p45F6IZQubCErBiquZYaL7Wm2AWM" > ./clusters/docker-compose/secrets/oidc-client-secret
 }
 
 function super_linter {
@@ -44,7 +52,7 @@ function usage {
 
 case $1 in
 generate)
-  generate_kustomize_patches
+  generate_kubernetes_manifests
   ;;
 
 lint)

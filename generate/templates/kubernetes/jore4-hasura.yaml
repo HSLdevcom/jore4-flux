@@ -1,0 +1,4 @@
+#{{/* add comment that result yaml was generated */}} This is a generated file, all modifications will be overwritten!
+
+# Describes the default environment variables, secrets the deployment template and the service for jore4 hasura instance
+{{/**/}}{{ tmpl.Exec "templates/microservice.yaml" .Values.microServices.hasura }}
