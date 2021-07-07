@@ -40,6 +40,20 @@ function generate_manifests {
       -d "env=/tmp/generate/values/$STAGE.yaml" \
       -c "Values=merge:env|common"
   done
+
+  echo "Generating docker-compose file and secrets with gomplate"
+
+  $GOMPLATE_CMD \
+    --input-dir "$TEMPLATES_DIR/docker-compose" \
+    --output-dir "$OUTPUT_DIR/docker-compose" \
+    -d "compose=/tmp/generate/values/compose.yaml" \
+    -d "env=/tmp/generate/values/e2e.yaml" \
+    -c "Values=merge:env|compose|common"
+
+  # echo "Creating secrets for docker-compose"
+  # mkdir -p ./clusters/docker-compose/secrets
+  # echo "0838619941439007" > ./clusters/docker-compose/secrets/oidc-client-id
+  # echo "9uV5p45F6IZQubCErBiquZYaL7Wm2AWM" > ./clusters/docker-compose/secrets/oidc-client-secret
 }
 
 function super_linter {
