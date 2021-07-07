@@ -10,7 +10,12 @@ function generate_kustomize_patches {
   $GOMPLATE_CMD --input-dir /tmp/generate/templates/kustomize-patches --output-dir /tmp/clusters/dev --context Values=/tmp/generate/values/dev.yaml
   $GOMPLATE_CMD --input-dir /tmp/generate/templates/kustomize-patches --output-dir /tmp/clusters/test --context Values=/tmp/generate/values/test.yaml
   $GOMPLATE_CMD --input-dir /tmp/generate/templates/kustomize-patches --output-dir /tmp/clusters/prod --context Values=/tmp/generate/values/prod.yaml
+  $GOMPLATE_CMD --template templates=/tmp/generate/templates/resources/ --input-dir /tmp/generate/templates/kubernetes --output-dir /tmp/clusters/playg -c "Values=merge:common|env" -d "common=/tmp/generate/values/common.yaml" -d "env=/tmp/generate/values/playg.yaml"
+  $GOMPLATE_CMD --template templates=/tmp/generate/templates/resources/ --input-dir /tmp/generate/templates/kubernetes --output-dir /tmp/clusters/dev -c "Values=merge:common|env" -d "common=/tmp/generate/values/common.yaml" -d "env=/tmp/generate/values/dev.yaml"
+  $GOMPLATE_CMD --template templates=/tmp/generate/templates/resources/ --input-dir /tmp/generate/templates/kubernetes --output-dir /tmp/clusters/test -c "Values=merge:common|env" -d "common=/tmp/generate/values/common.yaml" -d "env=/tmp/generate/values/test.yaml"
+  $GOMPLATE_CMD --template templates=/tmp/generate/templates/resources/ --input-dir /tmp/generate/templates/kubernetes --output-dir /tmp/clusters/prod -c "Values=merge:common|env" -d "common=/tmp/generate/values/common.yaml" -d "env=/tmp/generate/values/prod.yaml"
 }
+
 
 function super_linter {
   echo "Running Super-Linter"

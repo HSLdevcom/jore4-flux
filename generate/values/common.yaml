@@ -1,0 +1,19 @@
+services:
+  auth:
+    serviceName: "auth"
+    dockerImage: "hsldevcom/jore4-auth:dockerize--bf95d6d8b7bacfd6b990b2e9d55e4f6a1554879b"
+    podSpec:
+      ports:
+        - containerPort: 8080
+      livenessProbe:
+        httpGet:
+          path: /actuator/health
+          port: 8080
+      readinessProbe:
+        httpGet:
+          path: /actuator/health
+          port: 8080
+    env:
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+      API_PATH_PREFIX: ""
+      API_PATH_PREFIX_PUBLIC: "/api/auth"

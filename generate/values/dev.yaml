@@ -11,3 +11,4 @@ services:
       LOGINPAGE_URL: "https://dev.jore.hsl.fi"
       LOGOUTPAGE_URL: "https://dev.jore.hsl.fi"
       OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
+    secretMappings:

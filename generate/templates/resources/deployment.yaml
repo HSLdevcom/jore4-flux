@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jore4-auth
+  namespace: hsl-jore4
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "jore4-{{.serviceName}}"
+  template:
+    metadata:
+      labels:
+        app: "jore4-{{.serviceName}}"
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: "jore4-{{.serviceName}}-image"
+          image: "{{.dockerImage}}"
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: "jore4-{{.serviceName}}-env"
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+{{/* copy pod-specific configuration directly */}}{{ .podSpec | data.ToYAML | strings.Indent "          "}}
+      volumes:
+        - name: secrets-store-inline
+          # <extend>: may come from csi (key-vault) or configmap (local dev) source
