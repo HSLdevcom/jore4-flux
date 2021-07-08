@@ -1,19 +1,4 @@
 #{{/* add comment that result yaml was generated */}} This is a generated file, all modifications will be overwritten!
 
-# Describes the default environment variables, the deployment template and the service for jore4 auth backend instance
-{{/**/}}{{ tmpl.Exec "templates/configmap-env.yaml" .Values.services.auth }}
----
-{{/**/}}{{ tmpl.Exec "templates/deployment.yaml" .Values.services.auth }}
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: jore4-auth
-  namespace: hsl-jore4
-spec:
-  selector:
-    app: jore4-auth
-  ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 8080
+# Describes the default environment variables, secrets the deployment template and the service for jore4 auth backend instance
+{{/**/}}{{ tmpl.Exec "templates/microservice.yaml" .Values.microServices.auth }}
