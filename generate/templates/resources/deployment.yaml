@@ -31,7 +31,7 @@ spec:
               readOnly: true
 {{- /* copying pod-specific configuration directly */}}
 {{- if (index . "podSpec") }}
-{{- .podSpec | data.ToYAML | strings.Indent "          "}}
+{{ .podSpec | data.ToYAML | strings.Indent "          "}}
 {{- end }}
       volumes:
 {{- if (index . "localSecrets") }}
