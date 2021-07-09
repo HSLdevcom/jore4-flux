@@ -29,7 +29,7 @@ spec:
                 name: "jore4-auth-env"
           volumeMounts:
             - name: secrets-store-inline
-              mountPath: "/mnt/secrets-store"
+              mountPath: "/run/secrets"
               readOnly: true
           livenessProbe:
             httpGet:
@@ -81,7 +81,7 @@ data:
   LOGINPAGE_URL: "http://localhost:3300"
   LOGOUTPAGE_URL: "http://localhost:3300"
   OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
-  SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+  SECRET_STORE_BASE_PATH: "/run/secrets"
   SELF_PUBLIC_BASE_URL: "http://localhost:3300"
 
 

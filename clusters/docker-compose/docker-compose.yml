@@ -13,7 +13,7 @@ services:
       LOGINPAGE_URL: "http://localhost:3300"
       LOGOUTPAGE_URL: "http://localhost:3300"
       OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
-      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+      SECRET_STORE_BASE_PATH: "/run/secrets"
       SELF_PUBLIC_BASE_URL: "http://localhost:3300"
     ports:
       - "127.0.0.1:3200:8080"
@@ -33,9 +33,15 @@ services:
       HASURA_GRAPHQL_METADATA_DIR: "/hasura-metadata"
       HASURA_GRAPHQL_MIGRATIONS_DIR: "/hasura-migrations"
       HASURA_GRAPHQL_MIGRATIONS_SERVER_TIMEOUT: "60"
-      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+      SECRET_STORE_BASE_PATH: "/run/secrets"
     ports:
       - "127.0.0.1:3201:8080"
+    secrets:
+      - db-hostname
+      - db-name
+      - db-password
+      - db-username
+      - hasura-admin-secret
 
   testdb:
     container_name: "testdb"
@@ -68,8 +74,8 @@ services:
     ports:
       - 3301:80
     command: |
-      bash -c 'bash -s <<EOF
-        cat > /etc/nginx/nginx.conf <<EON
+      sh -c 'sh -s <<EOF
+        cat > /etc/nginx/conf.d/default.conf <<EON
           # based on https://gist.github.com/JarenGlover/d7ffab312ea756834218
 
           server {
@@ -114,17 +120,13 @@ secrets:
     file: ./secrets/oidc-client-id
   oidc-client-secret:
     file: ./secrets/oidc-client-secret
-
-#   proxy:
-#     container_name: proxy
-#     image: nginx:alpine
-#     restart: "unless-stopped"
-#     depends_on:
-#       - auth
-#       - ui
-#     volumes:
-#       - $PWD/nginx-proxy/default.conf:/etc/nginx/conf.d/default.conf:ro
-#     networks:
-#       - jore4
-#     ports:
-#       - 3301:80
+  db-hostname:
+    file: ./secrets/db-hostname
+  db-name:
+    file: ./secrets/db-name
+  db-password:
+    file: ./secrets/db-password
+  db-username:
+    file: ./secrets/db-username
+  hasura-admin-secret:
+    file: ./secrets/hasura-admin-secret

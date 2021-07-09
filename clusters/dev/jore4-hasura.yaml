@@ -29,7 +29,7 @@ spec:
                 name: "jore4-hasura-env"
           volumeMounts:
             - name: secrets-store-inline
-              mountPath: "/mnt/secrets-store"
+              mountPath: "/run/secrets"
               readOnly: true
           livenessProbe:
             httpGet:
@@ -109,6 +109,6 @@ data:
   HASURA_GRAPHQL_METADATA_DIR: "/hasura-metadata"
   HASURA_GRAPHQL_MIGRATIONS_DIR: "/hasura-migrations"
   HASURA_GRAPHQL_MIGRATIONS_SERVER_TIMEOUT: "60"
-  SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+  SECRET_STORE_BASE_PATH: "/run/secrets"
 
 

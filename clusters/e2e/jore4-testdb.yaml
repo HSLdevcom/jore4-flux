@@ -30,7 +30,7 @@ spec:
                 name: "jore4-testdb-env"
           volumeMounts:
             - name: secrets-store-inline
-              mountPath: "/mnt/secrets-store"
+              mountPath: "/run/secrets"
               readOnly: true
       volumes:
         - name: secrets-store-inline

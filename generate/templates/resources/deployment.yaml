@@ -27,7 +27,7 @@ spec:
                 name: "jore4-{{.serviceName}}-env"
           volumeMounts:
             - name: secrets-store-inline
-              mountPath: "/mnt/secrets-store"
+              mountPath: "/run/secrets"
               readOnly: true
 {{- /* copying pod-specific configuration directly */}}
 {{- if (index . "podSpec") }}

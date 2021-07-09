@@ -19,6 +19,12 @@ microServices:
   hasura:
     env:
       HASURA_GRAPHQL_ENABLE_CONSOLE: "false"
+    localSecrets:
+      db-hostname: testdb
+      db-name: postgres
+      db-username: postgres
+      db-password: postgres
+      hasura-admin-secret: hasura
   auth:
     env:
       SELF_PUBLIC_BASE_URL: "http://localhost:3300"

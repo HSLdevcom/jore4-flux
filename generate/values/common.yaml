@@ -16,7 +16,7 @@ microServices:
           path: /actuator/health
           port: 8080
     env:
-      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+      SECRET_STORE_BASE_PATH: "/run/secrets"
       API_PATH_PREFIX: ""
       API_PATH_PREFIX_PUBLIC: "/api/auth"
     secretMappings:
@@ -38,7 +38,7 @@ microServices:
           path: /healthz
           port: 8080
     env:
-      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+      SECRET_STORE_BASE_PATH: "/run/secrets"
       HASURA_GRAPHQL_MIGRATIONS_DIR: "/hasura-migrations"
       HASURA_GRAPHQL_METADATA_DIR: "/hasura-metadata"
       HASURA_GRAPHQL_ENABLE_CONSOLE: "false"

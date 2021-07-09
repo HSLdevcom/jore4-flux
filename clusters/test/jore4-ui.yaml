@@ -29,7 +29,7 @@ spec:
                 name: "jore4-ui-env"
           volumeMounts:
             - name: secrets-store-inline
-              mountPath: "/mnt/secrets-store"
+              mountPath: "/run/secrets"
               readOnly: true
           livenessProbe:
             httpGet:
