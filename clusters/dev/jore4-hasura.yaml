@@ -30,7 +30,8 @@ spec:
           volumeMounts:
             - name: secrets-store-inline
               mountPath: "/mnt/secrets-store"
-              readOnly: true          livenessProbe:
+              readOnly: true
+          livenessProbe:
             httpGet:
               path: /healthz
               port: 8080

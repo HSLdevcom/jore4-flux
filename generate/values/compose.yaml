@@ -1,0 +1,7 @@
+microServices:
+  auth:
+    env:
+      SECRET_STORE_BASE_PATH: "/run/secrets"
+  hasura:
+    env:
+      SECRET_STORE_BASE_PATH: "/run/secrets"

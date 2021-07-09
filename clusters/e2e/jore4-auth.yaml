@@ -30,7 +30,8 @@ spec:
           volumeMounts:
             - name: secrets-store-inline
               mountPath: "/mnt/secrets-store"
-              readOnly: true          livenessProbe:
+              readOnly: true
+          livenessProbe:
             httpGet:
               path: /actuator/health
               port: 8080
@@ -77,10 +78,10 @@ metadata:
 data:
   API_PATH_PREFIX: ""
   API_PATH_PREFIX_PUBLIC: "/api/auth"
-  LOGINPAGE_URL: "http://localhost:3300"
-  LOGOUTPAGE_URL: "http://localhost:3300"
+  LOGINPAGE_URL: "http://localhost:3301"
+  LOGOUTPAGE_URL: "http://localhost:3301"
   OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
   SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
-  SELF_PUBLIC_BASE_URL: "http://localhost:3300"
+  SELF_PUBLIC_BASE_URL: "http://localhost:3301"
 
 

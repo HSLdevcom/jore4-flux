@@ -24,13 +24,7 @@ spec:
           imagePullPolicy: Always
           ports:
           - containerPort: 80
-          envFrom:
-            - configMapRef:
-                name: "jore4-ui-env"
-          volumeMounts:
-            - name: secrets-store-inline
-              mountPath: "/mnt/secrets-store"
-              readOnly: true          livenessProbe:
+          livenessProbe:
             httpGet:
               path: /
               port: 80
@@ -39,13 +33,6 @@ spec:
               path: /
               port: 80
 
-      volumes:
-        - name: secrets-store-inline
-          csi:
-            driver: secrets-store.csi.k8s.io
-            readOnly: true
-            volumeAttributes:
-              secretProviderClass: "jore4-ui-secret-mapping"
 
 ---
 apiVersion: v1

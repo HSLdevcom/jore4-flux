@@ -2,22 +2,46 @@
 
 set -eu
 
-function generate_kubernetes_manifests {
+function generate_manifests {
   echo "Generating Kubernetes manifests with gomplate"
 
-  GOMPLATE_CMD="docker run --rm -v $(pwd):/tmp hairyhenderson/gomplate@sha256:8e46d887a73ef5d90fde1f1a7d679fa94cf9f6dfc686b0b1a581858faffb1e16 --template templates=/tmp/generate/templates/resources/ -c \"Values=merge:common|env\" -d \"common=/tmp/generate/values/common.yaml\""
-  $GOMPLATE_CMD --input-dir /tmp/generate/templates/kubernetes --output-dir /tmp/clusters/e2e -d "env=/tmp/generate/values/e2e.yaml"
-  $GOMPLATE_CMD --input-dir /tmp/generate/templates/kubernetes --output-dir /tmp/clusters/playg -d "env=/tmp/generate/values/playg.yaml"
-  $GOMPLATE_CMD --input-dir /tmp/generate/templates/kubernetes --output-dir /tmp/clusters/dev -d "env=/tmp/generate/values/dev.yaml"
-  $GOMPLATE_CMD --input-dir /tmp/generate/templates/kubernetes --output-dir /tmp/clusters/test -d "env=/tmp/generate/values/test.yaml"
-  $GOMPLATE_CMD --input-dir /tmp/generate/templates/kubernetes --output-dir /tmp/clusters/prod -d "env=/tmp/generate/values/prod.yaml"
+  GOMPLATE_CMD="docker run --rm -v $(pwd):/tmp hairyhenderson/gomplate@sha256:8e46d887a73ef5d90fde1f1a7d679fa94cf9f6dfc686b0b1a581858faffb1e16 \
+    --template templates=/tmp/generate/templates/resources/ \
+    -d common=/tmp/generate/values/common.yaml"
+  TEMPLATES_DIR="/tmp/generate/templates"
+  OUTPUT_DIR="/tmp/clusters"
+  STAGES=("playg" "dev" "test" "prod" "e2e")
 
-  echo "Generating docker-compose file with gomplate"
-  $GOMPLATE_CMD --input-dir /tmp/generate/templates/docker-compose --output-dir /tmp/clusters/docker-compose -d "env=/tmp/generate/values/e2e.yaml"
+  # generate manifests for each stage
+  for STAGE in "${STAGES[@]}"
+  do
+    $GOMPLATE_CMD \
+    --input-dir "$TEMPLATES_DIR/kubernetes-all" \
+    --output-dir "/tmp/clusters/$STAGE" \
+    -d "env=/tmp/generate/values/$STAGE.yaml" \
+    -c "Values=merge:env|common"
+  done
 
-  echo "Creating secrets for docker-compose"
-  cat "0838619941439007" > ./clusters/docker-compose/secrets/oidc-client-id
-  cat "9uV5p45F6IZQubCErBiquZYaL7Wm2AWM" > ./clusters/docker-compose/secrets/oidc-client-secret
+  # generate additions to e2e stage (e.g. test databases)
+  $GOMPLATE_CMD \
+    --input-dir "$TEMPLATES_DIR/kubernetes-e2e-only" \
+    --output-dir "$OUTPUT_DIR/e2e" \
+    -d "env=/tmp/generate/values/e2e.yaml" \
+    -c "Values=merge:env|common"
+
+  echo "Generating docker-compose file and secrets with gomplate"
+
+  # mkdir -p ./clusters/docker-compose/secrets
+  $GOMPLATE_CMD \
+    --input-dir "$TEMPLATES_DIR/docker-compose" \
+    --output-dir "$OUTPUT_DIR/docker-compose" \
+    -d "compose=/tmp/generate/values/compose.yaml" \
+    -d "env=/tmp/generate/values/e2e.yaml" \
+    -c "Values=merge:env|compose|common"
+
+  # echo "Creating secrets for docker-compose"
+  # echo "0838619941439007" > ./clusters/docker-compose/secrets/oidc-client-id
+  # echo "9uV5p45F6IZQubCErBiquZYaL7Wm2AWM" > ./clusters/docker-compose/secrets/oidc-client-secret
 }
 
 function super_linter {
@@ -37,7 +61,7 @@ function usage {
   Usage $0 <command>
 
   generate
-    Generates Kustomize patches for playg, dev, test and prod stages using gomplate yaml templates.
+    Generates Kubernetes and docker-compose manifests for all stages using gomplate yaml templates.
 
   lint
     Runs Github's Super-Linter for the whole codebase to lint all files.
@@ -52,7 +76,7 @@ function usage {
 
 case $1 in
 generate)
-  generate_kubernetes_manifests
+  generate_manifests
   ;;
 
 lint)
