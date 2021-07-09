@@ -5,6 +5,7 @@ kind: Kustomization
 
 resources:
   - ./jore4-namespace.yaml
+  - ./jore4-limit-range.yaml
   - ./flux-sync.yaml
   - ./jore4-ingress.yaml
 {{ range $microService, $value := .Values.microServices }}
