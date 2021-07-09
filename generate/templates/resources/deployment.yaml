@@ -19,9 +19,9 @@ spec:
           image: "{{.dockerImage}}"
           imagePullPolicy: Always
           ports:
-{{ range $index, $port := .ports }}
+{{- range $index, $port := .ports }}
           - containerPort: {{ $port.containerPort }}
-{{ end }}
+{{- end }}
           envFrom:
             - configMapRef:
                 name: "jore4-{{.serviceName}}-env"
@@ -29,20 +29,20 @@ spec:
             - name: secrets-store-inline
               mountPath: "/mnt/secrets-store"
               readOnly: true
-{{/* copying pod-specific configuration directly */}}
-{{ if (index . "podSpec") }}
-{{ .podSpec | data.ToYAML | strings.Indent "          "}}
-{{ end }}
+{{- /* copying pod-specific configuration directly */}}
+{{- if (index . "podSpec") }}
+{{- .podSpec | data.ToYAML | strings.Indent "          "}}
+{{- end }}
       volumes:
-{{ if (index . "localSecrets") }}
+{{- if (index . "localSecrets") }}
         - name: secrets-store-inline
           configMap:
             name: jore4-{{.serviceName}}-local-secrets
-{{ else }}
+{{- else }}
         - name: secrets-store-inline
           csi:
             driver: secrets-store.csi.k8s.io
             readOnly: true
             volumeAttributes:
               secretProviderClass: "jore4-{{.serviceName}}-secret-mapping"
-{{ end }}
+{{- end }}

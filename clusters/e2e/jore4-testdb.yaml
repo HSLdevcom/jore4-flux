@@ -2,18 +2,6 @@
 
 # Describes the default environment variables, secrets the deployment template and the service for jore4 e2e test database instance
 
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: "jore4-testdb-env"
-  namespace: hsl-jore4
-data:
-  POSTGRES_DB: "jore4e2e"
-  POSTGRES_PASSWORD: "postgres"
-  POSTGRES_USER: "postgres"
-
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -36,9 +24,7 @@ spec:
           image: "postgis/postgis:12-3.1-alpine"
           imagePullPolicy: Always
           ports:
-
           - containerPort: 5432
-
           envFrom:
             - configMapRef:
                 name: "jore4-testdb-env"
@@ -46,17 +32,13 @@ spec:
             - name: secrets-store-inline
               mountPath: "/mnt/secrets-store"
               readOnly: true
-
-
       volumes:
-
         - name: secrets-store-inline
           csi:
             driver: secrets-store.csi.k8s.io
             readOnly: true
             volumeAttributes:
               secretProviderClass: "jore4-testdb-secret-mapping"
-
 
 ---
 apiVersion: v1
@@ -68,16 +50,21 @@ spec:
   selector:
     app: jore4-testdb
   ports:
-
     - protocol: TCP
       port: 5432
       targetPort: 5432
-
       nodePort: 30432
 
-
-
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "jore4-testdb-env"
+  namespace: hsl-jore4
+data:
+  POSTGRES_DB: "jore4e2e"
+  POSTGRES_PASSWORD: "postgres"
+  POSTGRES_USER: "postgres"
 
 
 

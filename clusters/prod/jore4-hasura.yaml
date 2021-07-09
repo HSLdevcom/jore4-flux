@@ -1,21 +1,6 @@
 # This is a generated file, all modifications will be overwritten!
 
 # Describes the default environment variables, secrets the deployment template and the service for jore4 hasura instance
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: "jore4-hasura-env"
-  namespace: hsl-jore4
-data:
-  HASURA_GRAPHQL_ENABLE_CONSOLE: "false"
-  HASURA_GRAPHQL_ENABLE_TELEMETRY: "false"
-  HASURA_GRAPHQL_METADATA_DIR: "/hasura-metadata"
-  HASURA_GRAPHQL_MIGRATIONS_DIR: "/hasura-migrations"
-  HASURA_GRAPHQL_MIGRATIONS_SERVER_TIMEOUT: "60"
-  SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
-
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -38,19 +23,14 @@ spec:
           image: "hsldevcom/jore4-hasura:fix-metadata--613b29c2d4c6f0ef1cf6f258ab3071b780fa23bd"
           imagePullPolicy: Always
           ports:
-
           - containerPort: 8080
-
           envFrom:
             - configMapRef:
                 name: "jore4-hasura-env"
           volumeMounts:
             - name: secrets-store-inline
               mountPath: "/mnt/secrets-store"
-              readOnly: true
-
-
-          livenessProbe:
+              readOnly: true          livenessProbe:
             httpGet:
               path: /healthz
               port: 8080
@@ -59,16 +39,13 @@ spec:
               path: /healthz
               port: 8080
 
-
       volumes:
-
         - name: secrets-store-inline
           csi:
             driver: secrets-store.csi.k8s.io
             readOnly: true
             volumeAttributes:
               secretProviderClass: "jore4-hasura-secret-mapping"
-
 
 ---
 apiVersion: v1
@@ -80,15 +57,11 @@ spec:
   selector:
     app: jore4-hasura
   ports:
-
     - protocol: TCP
       port: 8080
       targetPort: 8080
 
-
-
 ---
-
 apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
 kind: SecretProviderClass
 metadata:
@@ -123,5 +96,18 @@ spec:
           objectAlias: db-hostname
           objectType: secret
 
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "jore4-hasura-env"
+  namespace: hsl-jore4
+data:
+  HASURA_GRAPHQL_ENABLE_CONSOLE: "false"
+  HASURA_GRAPHQL_ENABLE_TELEMETRY: "false"
+  HASURA_GRAPHQL_METADATA_DIR: "/hasura-metadata"
+  HASURA_GRAPHQL_MIGRATIONS_DIR: "/hasura-migrations"
+  HASURA_GRAPHQL_MIGRATIONS_SERVER_TIMEOUT: "60"
+  SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
 
 

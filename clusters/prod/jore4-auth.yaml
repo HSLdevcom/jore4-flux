@@ -1,22 +1,6 @@
 # This is a generated file, all modifications will be overwritten!
 
 # Describes the default environment variables, secrets the deployment template and the service for jore4 auth backend instance
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: "jore4-auth-env"
-  namespace: hsl-jore4
-data:
-  API_PATH_PREFIX: ""
-  API_PATH_PREFIX_PUBLIC: "/api/auth"
-  LOGINPAGE_URL: "https://jore.hsl.fi"
-  LOGOUTPAGE_URL: "https://jore.hsl.fi"
-  OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
-  SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
-  SELF_PUBLIC_BASE_URL: "https://jore.hsl.fi"
-
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -39,19 +23,14 @@ spec:
           image: "hsldevcom/jore4-auth:dockerize--bf95d6d8b7bacfd6b990b2e9d55e4f6a1554879b"
           imagePullPolicy: Always
           ports:
-
           - containerPort: 8080
-
           envFrom:
             - configMapRef:
                 name: "jore4-auth-env"
           volumeMounts:
             - name: secrets-store-inline
               mountPath: "/mnt/secrets-store"
-              readOnly: true
-
-
-          livenessProbe:
+              readOnly: true          livenessProbe:
             httpGet:
               path: /actuator/health
               port: 8080
@@ -60,16 +39,13 @@ spec:
               path: /actuator/health
               port: 8080
 
-
       volumes:
-
         - name: secrets-store-inline
           csi:
             driver: secrets-store.csi.k8s.io
             readOnly: true
             volumeAttributes:
               secretProviderClass: "jore4-auth-secret-mapping"
-
 
 ---
 apiVersion: v1
@@ -81,15 +57,11 @@ spec:
   selector:
     app: jore4-auth
   ports:
-
     - protocol: TCP
       port: 8080
       targetPort: 8080
 
-
-
 ---
-
 apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
 kind: SecretProviderClass
 metadata:
@@ -112,5 +84,19 @@ spec:
           objectAlias: oidc-client-secret
           objectType: secret
 
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "jore4-auth-env"
+  namespace: hsl-jore4
+data:
+  API_PATH_PREFIX: ""
+  API_PATH_PREFIX_PUBLIC: "/api/auth"
+  LOGINPAGE_URL: "https://jore.hsl.fi"
+  LOGOUTPAGE_URL: "https://jore.hsl.fi"
+  OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
+  SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+  SELF_PUBLIC_BASE_URL: "https://jore.hsl.fi"
 
 

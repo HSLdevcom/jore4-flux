@@ -5,6 +5,7 @@ microServices:
     dockerImage: "hsldevcom/jore4-auth:dockerize--bf95d6d8b7bacfd6b990b2e9d55e4f6a1554879b"
     ports:
       - containerPort: 8080
+        localPort: 3200
     podSpec:
       livenessProbe:
         httpGet:
@@ -26,6 +27,7 @@ microServices:
     dockerImage: "hsldevcom/jore4-hasura:fix-metadata--613b29c2d4c6f0ef1cf6f258ab3071b780fa23bd"
     ports:
       - containerPort: 8080
+        localPort: 3201
     podSpec:
       livenessProbe:
         httpGet:
@@ -53,6 +55,7 @@ microServices:
     dockerImage: "hsldevcom/jore4-ui:fix-docker-css--72224fc7574d8fb4486b43d8abc6afcf1b7f14c6"
     ports:
       - containerPort: 80
+        localPort: 3302
     podSpec:
       livenessProbe:
         httpGet:

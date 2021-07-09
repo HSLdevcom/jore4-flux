@@ -1,13 +1,15 @@
-{{ if (index . "env") }}
-{{/**/}}{{ tmpl.Exec "templates/configmap-env.yaml" . }}
-{{ end }}
 ---
 {{/**/}}{{ tmpl.Exec "templates/deployment.yaml" . }}
 ---
 {{/**/}}{{ tmpl.Exec "templates/service.yaml" . }}
+{{- if (index . "localSecrets") }}
 ---
-{{ if (index . "localSecrets") }}
 {{/**/}}{{ tmpl.Exec "templates/configmap-local-secrets.yaml" . }}
-{{ else if (index . "secretMappings") }}
+{{- else if (index . "secretMappings") }}
+---
 {{/**/}}{{ tmpl.Exec "templates/secret-provider-class.yaml" . }}
-{{ end }}
+{{- end }}
+{{- if (index . "env") }}
+---
+{{/**/}}{{ tmpl.Exec "templates/configmap-env.yaml" . }}
+{{- end }}

@@ -1,7 +1,6 @@
 # This is a generated file, all modifications will be overwritten!
 
 # Describes the default environment variables, secrets the deployment template and the service for jore4 UI instance
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -24,19 +23,14 @@ spec:
           image: "hsldevcom/jore4-ui:fix-docker-css--72224fc7574d8fb4486b43d8abc6afcf1b7f14c6"
           imagePullPolicy: Always
           ports:
-
           - containerPort: 80
-
           envFrom:
             - configMapRef:
                 name: "jore4-ui-env"
           volumeMounts:
             - name: secrets-store-inline
               mountPath: "/mnt/secrets-store"
-              readOnly: true
-
-
-          livenessProbe:
+              readOnly: true          livenessProbe:
             httpGet:
               path: /
               port: 80
@@ -45,16 +39,13 @@ spec:
               path: /
               port: 80
 
-
       volumes:
-
         - name: secrets-store-inline
           csi:
             driver: secrets-store.csi.k8s.io
             readOnly: true
             volumeAttributes:
               secretProviderClass: "jore4-ui-secret-mapping"
-
 
 ---
 apiVersion: v1
@@ -66,13 +57,8 @@ spec:
   selector:
     app: jore4-ui
   ports:
-
     - protocol: TCP
       port: 80
       targetPort: 80
-
-
-
----
 
 

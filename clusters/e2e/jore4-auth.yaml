@@ -1,22 +1,6 @@
 # This is a generated file, all modifications will be overwritten!
 
 # Describes the default environment variables, secrets the deployment template and the service for jore4 auth backend instance
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: "jore4-auth-env"
-  namespace: hsl-jore4
-data:
-  API_PATH_PREFIX: ""
-  API_PATH_PREFIX_PUBLIC: "/api/auth"
-  LOGINPAGE_URL: "http://localhost:3300"
-  LOGOUTPAGE_URL: "http://localhost:3300"
-  OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
-  SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
-  SELF_PUBLIC_BASE_URL: "http://localhost:3300"
-
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -39,19 +23,14 @@ spec:
           image: "hsldevcom/jore4-auth:dockerize--bf95d6d8b7bacfd6b990b2e9d55e4f6a1554879b"
           imagePullPolicy: Always
           ports:
-
           - containerPort: 8080
-
           envFrom:
             - configMapRef:
                 name: "jore4-auth-env"
           volumeMounts:
             - name: secrets-store-inline
               mountPath: "/mnt/secrets-store"
-              readOnly: true
-
-
-          livenessProbe:
+              readOnly: true          livenessProbe:
             httpGet:
               path: /actuator/health
               port: 8080
@@ -60,13 +39,10 @@ spec:
               path: /actuator/health
               port: 8080
 
-
       volumes:
-
         - name: secrets-store-inline
           configMap:
             name: jore4-auth-local-secrets
-
 
 ---
 apiVersion: v1
@@ -78,15 +54,11 @@ spec:
   selector:
     app: jore4-auth
   ports:
-
     - protocol: TCP
       port: 8080
       targetPort: 8080
 
-
-
 ---
-
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -96,5 +68,19 @@ data:
   oidc-client-id: "0838619941439007"
   oidc-client-secret: "9uV5p45F6IZQubCErBiquZYaL7Wm2AWM"
 
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "jore4-auth-env"
+  namespace: hsl-jore4
+data:
+  API_PATH_PREFIX: ""
+  API_PATH_PREFIX_PUBLIC: "/api/auth"
+  LOGINPAGE_URL: "http://localhost:3300"
+  LOGOUTPAGE_URL: "http://localhost:3300"
+  OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
+  SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+  SELF_PUBLIC_BASE_URL: "http://localhost:3300"
 
 

@@ -35,6 +35,7 @@ microServices:
     ports:
       - containerPort: 5432
         nodePort: 30432
+        localPort: 6432
     env:
       POSTGRES_DB: jore4e2e
       POSTGRES_USER: postgres

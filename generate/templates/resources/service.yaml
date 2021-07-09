@@ -7,11 +7,11 @@ spec:
   selector:
     app: jore4-{{.serviceName}}
   ports:
-{{ range $index, $port := .ports }}
+{{- range $index, $port := .ports }}
     - protocol: TCP
       port: {{ $port.containerPort }}
       targetPort: {{ $port.containerPort }}
-{{ if (index $port "nodePort") }}
+  {{- if (index $port "nodePort") }}
       nodePort: {{ $port.nodePort }}
-{{ end }}
-{{ end }}
+  {{- end }}
+{{- end }}

@@ -8,6 +8,19 @@ services:
     restart: "unless-stopped"
     networks:
       - jore4
+    environment:
+      API_PATH_PREFIX: ""
+      API_PATH_PREFIX_PUBLIC: "/api/auth"
+      LOGINPAGE_URL: "http://localhost:3300"
+      LOGOUTPAGE_URL: "http://localhost:3300"
+      OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+      SELF_PUBLIC_BASE_URL: "http://localhost:3300"
+    ports:
+      - "127.0.0.1:3200:8080"
+    secrets:
+      - oidc-client-id
+      - oidc-client-secret
 
   hasura:
     container_name: "hasura"
@@ -15,6 +28,15 @@ services:
     restart: "unless-stopped"
     networks:
       - jore4
+    environment:
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "false"
+      HASURA_GRAPHQL_ENABLE_TELEMETRY: "false"
+      HASURA_GRAPHQL_METADATA_DIR: "/hasura-metadata"
+      HASURA_GRAPHQL_MIGRATIONS_DIR: "/hasura-migrations"
+      HASURA_GRAPHQL_MIGRATIONS_SERVER_TIMEOUT: "60"
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+    ports:
+      - "127.0.0.1:3201:8080"
 
   testdb:
     container_name: "testdb"
@@ -22,6 +44,12 @@ services:
     restart: "unless-stopped"
     networks:
       - jore4
+    environment:
+      POSTGRES_DB: "jore4e2e"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_USER: "postgres"
+    ports:
+      - "127.0.0.1:6432:5432"
 
   ui:
     container_name: "ui"
@@ -29,50 +57,35 @@ services:
     restart: "unless-stopped"
     networks:
       - jore4
-
----
-  ui:
-    container_name: ui
-    image: hsldevcom/jore4-ui:fix-docker-css--72224fc7574d8fb4486b43d8abc6afcf1b7f14c6
-    restart: "unless-stopped"
     ports:
       - "127.0.0.1:3302:80"
-    networks:
-      - jore4
 
-  auth:
-    container_name: auth
-    build: .
-    restart: "unless-stopped"
-    networks:
-      - jore4
-    ports:
-      - "127.0.0.1:3200:8080"
-    environment:
-      API_PATH_PREFIX: "/api"
-      API_PATH_PREFIX_PUBLIC: "/api/auth"
-      SECRET_STORE_BASE_PATH: "/run/secrets"
-      SELF_PUBLIC_BASE_URL: "http://localhost:3301"
-      LOGINPAGE_URL: "http://localhost:3301"
-      LOGOUTPAGE_URL: "http://localhost:3301"
-      OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
-    secrets:
-      - oidc-client-id
-      - oidc-client-secret
 
   proxy:
     container_name: proxy
     image: nginx:alpine
     restart: "unless-stopped"
-    depends_on:
-      - auth
-      - ui
-    volumes:
-      - $PWD/nginx-proxy/default.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
       - jore4
     ports:
       - 3301:80
+    command: |
+      bash -c 'bash -s <<EOF
+        cat > /etc/nginx/nginx.conf <<EON
+          # based on https://gist.github.com/JarenGlover/d7ffab312ea756834218
+
+          server {
+              listen 80 default_server;
+              listen [::]:80 default_server;
+
+              location / {
+                  proxy_pass http://ui:80;
+              }
+          }
+
+      EON
+      nginx
+      EOF'
 
 networks:
   jore4:
@@ -82,3 +95,56 @@ secrets:
     file: ./secrets/oidc-client-id
   oidc-client-secret:
     file: ./secrets/oidc-client-secret
+
+# ---
+#   ui:
+#     container_name: ui
+#     image: hsldevcom/jore4-ui:fix-docker-css--72224fc7574d8fb4486b43d8abc6afcf1b7f14c6
+#     restart: "unless-stopped"
+#     ports:
+#       - "127.0.0.1:3302:80"
+#     networks:
+#       - jore4
+
+#   auth:
+#     container_name: auth
+#     build: .
+#     restart: "unless-stopped"
+#     networks:
+#       - jore4
+#     ports:
+#       - "127.0.0.1:3200:8080"
+#     environment:
+#       API_PATH_PREFIX: "/api"
+#       API_PATH_PREFIX_PUBLIC: "/api/auth"
+#       SECRET_STORE_BASE_PATH: "/run/secrets"
+#       SELF_PUBLIC_BASE_URL: "http://localhost:3301"
+#       LOGINPAGE_URL: "http://localhost:3301"
+#       LOGOUTPAGE_URL: "http://localhost:3301"
+#       OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
+#     secrets:
+#       - oidc-client-id
+#       - oidc-client-secret
+
+#   proxy:
+#     container_name: proxy
+#     image: nginx:alpine
+#     restart: "unless-stopped"
+#     depends_on:
+#       - auth
+#       - ui
+#     volumes:
+#       - $PWD/nginx-proxy/default.conf:/etc/nginx/conf.d/default.conf:ro
+#     networks:
+#       - jore4
+#     ports:
+#       - 3301:80
+
+# networks:
+#   jore4:
+
+# secrets:
+#   oidc-client-id:
+#     file: ./secrets/oidc-client-id
+#   oidc-client-secret:
+#     file: ./secrets/oidc-client-secret
