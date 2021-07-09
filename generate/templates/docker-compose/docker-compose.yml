@@ -1,7 +1,7 @@
 ---
 version: "3.8"
 services:
-{{ range $name, $srv := .Values.microServices }}
+{{- range $name, $srv := .Values.microServices }}
   {{ $name }}:
     container_name: "{{ $srv.serviceName }}"
     image: "{{ $srv.dockerImage }}"
@@ -27,7 +27,6 @@ services:
       {{- end }}
   {{- end }}
 {{ end }}
-
   proxy:
     container_name: proxy
     image: nginx:alpine
@@ -57,36 +56,6 @@ secrets:
   {{- end }}
 {{- end }}
 
-# ---
-#   ui:
-#     container_name: ui
-#     image: hsldevcom/jore4-ui:fix-docker-css--72224fc7574d8fb4486b43d8abc6afcf1b7f14c6
-#     restart: "unless-stopped"
-#     ports:
-#       - "127.0.0.1:3302:80"
-#     networks:
-#       - jore4
-
-#   auth:
-#     container_name: auth
-#     build: .
-#     restart: "unless-stopped"
-#     networks:
-#       - jore4
-#     ports:
-#       - "127.0.0.1:3200:8080"
-#     environment:
-#       API_PATH_PREFIX: "/api"
-#       API_PATH_PREFIX_PUBLIC: "/api/auth"
-#       SECRET_STORE_BASE_PATH: "/run/secrets"
-#       SELF_PUBLIC_BASE_URL: "http://localhost:3301"
-#       LOGINPAGE_URL: "http://localhost:3301"
-#       LOGOUTPAGE_URL: "http://localhost:3301"
-#       OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
-#     secrets:
-#       - oidc-client-id
-#       - oidc-client-secret
-
 #   proxy:
 #     container_name: proxy
 #     image: nginx:alpine
@@ -100,12 +69,3 @@ secrets:
 #       - jore4
 #     ports:
 #       - 3301:80
-
-# networks:
-#   jore4:
-
-# secrets:
-#   oidc-client-id:
-#     file: ./secrets/oidc-client-id
-#   oidc-client-secret:
-#     file: ./secrets/oidc-client-secret

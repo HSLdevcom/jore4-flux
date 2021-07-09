@@ -6,5 +6,3 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: hsl-jore4
----
-
