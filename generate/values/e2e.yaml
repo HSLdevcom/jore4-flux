@@ -27,9 +27,9 @@ microServices:
       hasura-admin-secret: hasura
   auth:
     env:
-      SELF_PUBLIC_BASE_URL: "http://localhost:3300"
-      LOGINPAGE_URL: "http://localhost:3300"
-      LOGOUTPAGE_URL: "http://localhost:3300"
+      SELF_PUBLIC_BASE_URL: "http://localhost:3301"
+      LOGINPAGE_URL: "http://localhost:3301"
+      LOGOUTPAGE_URL: "http://localhost:3301"
       OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
     secretMappings: ""
     localSecrets:
