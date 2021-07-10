@@ -35,14 +35,15 @@ services:
       - jore4
     ports:
       - 3301:80
+{{/* directly writing default.conf to the container to make the docker-compose file portable */}}
     command: |
-      sh -c 'sh -s <<EOF
-        cat > /etc/nginx/conf.d/default.conf <<EON
-{{ tmpl.Exec "templates/nginx.conf" . | strings.Indent "          " }}
-      EON
+      sh -c "sh -s <<EOF
+      cat > /etc/nginx/conf.d/default.conf <<'EOT'
+{{tmpl.Exec "templates/nginx.conf" . | strings.Indent "        "}}
+      EOT
       cat /etc/nginx/conf.d/default.conf
-      nginx
-      EOF'
+      nginx -g 'daemon off;'
+      EOF"
 
 networks:
   jore4:
