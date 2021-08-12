@@ -86,36 +86,32 @@ services:
         server {
             listen 80 default_server;
 
-            location ~ /api/auth(/|\\$$)(.*) {
-                add_header X-uri2 "auth";
+        should use gomplate here
 
+            location ~ /api/auth(/|\\$$)(.*) {
                 # container expects api calls through / path
                 # rewrite /api/auth(/|\\$$)(.*) /\\$$2 break;
 
                 # requests to the API will be proxy_pass to the backend API infra
-                # read this -> http://en.wikipedia.org/wiki/X-Forwarded-For
+                # http://en.wikipedia.org/wiki/X-Forwarded-For
                 proxy_set_header X-Forwarded-For \\$$proxy_add_x_forwarded_for;
 
-                # pass the host header from the client to help with redirects
+                # pass some headers from the client to help with redirects
                 proxy_set_header Host \\$$http_host;
                 proxy_set_header Upgrade \\$$http_upgrade;
                 proxy_set_header Connection "upgrade";
+                proxy_set_header X-Real-IP \\$$remote_addr;
 
-                # stops nginx from doing something silly
-                proxy_redirect off;
-
-                # proxy_pass to backend
+                # setting the resolver to docker DNS (127.0.0.11) and upstream as a variable
+                # will enable nginx not to crash in case service is not running
+                # proxy_pass to backend /\\$$2 url
                 resolver 127.0.0.11 valid=30s;
                 set \\$$upstream_auth auth:8080;
                 proxy_pass http://\\$$upstream_auth/\\$$2;
-
-                # send the IP address and remote server address for security
-                proxy_set_header X-Real-IP \\$$remote_addr;
+                proxy_redirect off;
             }
 
             location ~ /api/graphql(/|\\$$)(.*) {
-                add_header X-uri3 "graphql";
-
                 # container expects api calls through / path
                 # rewrite ^/api/graphql/(.*) /\\$$1;
 
@@ -142,8 +138,6 @@ services:
 
             # non-API calls should be handled by UI
             location ~ ^/(?!api) {
-                add_header X-uri1 "ui";
-
                 resolver 127.0.0.11 valid=30s;
                 set \\$$upstream_ui ui:80;
                 proxy_pass http://\\$$upstream_ui;
