@@ -25,24 +25,28 @@ spec:
           envFrom:
             - configMapRef:
                 name: "jore4-{{.serviceName}}-env"
+{{- if (or (index . "localSecrets") (index . "secretMappings"))}}
           volumeMounts:
             - name: secrets-store-inline
               mountPath: "/run/secrets"
               readOnly: true
+{{- end }}
 {{- /* copying pod-specific configuration directly */}}
 {{- if (index . "podSpec") }}
 {{ .podSpec | data.ToYAML | strings.Indent "          "}}
 {{- end }}
+{{- if (or (index . "localSecrets") (index . "secretMappings"))}}
       volumes:
-{{- if (index . "localSecrets") }}
+  {{- if (index . "localSecrets") }}
         - name: secrets-store-inline
           configMap:
             name: jore4-{{.serviceName}}-local-secrets
-{{- else }}
+  {{- else }}
         - name: secrets-store-inline
           csi:
             driver: secrets-store.csi.k8s.io
             readOnly: true
             volumeAttributes:
               secretProviderClass: "jore4-{{.serviceName}}-secret-mapping"
+  {{- end }}
 {{- end }}

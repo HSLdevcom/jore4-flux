@@ -28,17 +28,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: "jore4-testdb-env"
-          volumeMounts:
-            - name: secrets-store-inline
-              mountPath: "/run/secrets"
-              readOnly: true
-      volumes:
-        - name: secrets-store-inline
-          csi:
-            driver: secrets-store.csi.k8s.io
-            readOnly: true
-            volumeAttributes:
-              secretProviderClass: "jore4-testdb-secret-mapping"
 
 ---
 apiVersion: v1
