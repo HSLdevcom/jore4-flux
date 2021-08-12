@@ -24,9 +24,6 @@ spec:
           imagePullPolicy: Always
           ports:
           - containerPort: 80
-          envFrom:
-            - configMapRef:
-                name: "jore4-ui-env"
           livenessProbe:
             httpGet:
               path: /

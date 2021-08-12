@@ -22,9 +22,11 @@ spec:
 {{- range $index, $port := .ports }}
           - containerPort: {{ $port.containerPort }}
 {{- end }}
+{{- if (index . "env") }}
           envFrom:
             - configMapRef:
                 name: "jore4-{{.serviceName}}-env"
+{{- end }}
 {{- if (or (index . "localSecrets") (index . "secretMappings"))}}
           volumeMounts:
             - name: secrets-store-inline
