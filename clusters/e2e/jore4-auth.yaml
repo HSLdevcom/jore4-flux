@@ -1,0 +1,88 @@
+# This is a generated file, all modifications will be overwritten!
+
+# Describes the default environment variables, secrets the deployment template and the service for jore4 auth backend instance
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jore4-auth
+  namespace: hsl-jore4
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "jore4-auth"
+  template:
+    metadata:
+      labels:
+        app: "jore4-auth"
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: "jore4-auth-image"
+          image: "hsldevcom/jore4-auth:dockerize--bf95d6d8b7bacfd6b990b2e9d55e4f6a1554879b"
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: "jore4-auth-env"
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+
+      volumes:
+        - name: secrets-store-inline
+          configMap:
+            name: jore4-auth-local-secrets
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jore4-auth
+  namespace: hsl-jore4
+spec:
+  type: ClusterIP
+  selector:
+    app: jore4-auth
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "jore4-auth-local-secrets"
+  namespace: hsl-jore4
+data:
+  oidc-client-id: "0838619941439007"
+  oidc-client-secret: "9uV5p45F6IZQubCErBiquZYaL7Wm2AWM"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "jore4-auth-env"
+  namespace: hsl-jore4
+data:
+  API_PATH_PREFIX: ""
+  API_PATH_PREFIX_PUBLIC: "/api/auth"
+  LOGINPAGE_URL: "http://localhost:3301"
+  LOGOUTPAGE_URL: "http://localhost:3301"
+  OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
+  SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+  SELF_PUBLIC_BASE_URL: "http://localhost:3301"
+
+

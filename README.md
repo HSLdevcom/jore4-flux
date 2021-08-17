@@ -21,7 +21,6 @@ Flux configuration for the jore4 Kubernetes deployment
 - [Development](#development)
   - [Cluster Directory Structure](#cluster-directory-structure)
     - [CRDs](#crds)
-    - [Base Resource Templates](#base-resource-templates)
     - [Cluster Definitions](#cluster-definitions)
     - [YAML templates](#yaml-templates)
   - [Generate Flux configurations](#generate-flux-configurations)
@@ -202,20 +201,9 @@ The cluster uses the following Custom Resource Definitions (~ Kubernetes plugins
 To be able to create special resources (like secret provider mapping), you need to deploy the
 CRDs first with `./kubernetes.sh deploy:crd <stage>`
 
-#### Base Resource Templates
-
-The base resource templates can be found from `clusters/base`.
-
-`jore4-services` defines the basic Kubernetes services for jore4: hasura, frontend
-and ingress. The ingress defines how the HTTP requests are mapped to the Kubernetes pods.
-
-`jore4-secret-bindings` defines the resources required for mapping Azure key-vault secrets to
-the jore4 services. This is in a separate directory, because in some cases (e.g. for running
-the cluster locally) we want to map secrets using different volumes - like local files
-
 #### Cluster Definitions
 
-The actual cluster definitons can be found from `clusters/dev`, `clusters/test` and
+The cluster definitons can be found from `clusters/dev`, `clusters/test` and
 `clusters/prod`. For example, `dev` includes the following:
 
 - `flux-sync.yaml` tells Flux what repository (`jore4-flux`), branch (`dev`) and folder
@@ -229,7 +217,7 @@ The actual cluster definitons can be found from `clusters/dev`, `clusters/test` 
 Deploy the `dev` cluster with `./kubernetes.sh deploy:cluster dev`
 
 To make sure that all stages' cluster definitions are the same (except of course the stage-specific
-configurations), we are [generating the yamls](#yaml-templates)
+configurations), we are [generating the yamls](#yaml-templates) with gomplate
 
 #### YAML templates
 
@@ -237,11 +225,20 @@ We are using [gomplate](https://docs.gomplate.ca/) to render yaml templates. Thi
 that Helm uses to render its charts, we are also aiming to keep a similar directory structure to
 support switching to Helm easy in case the need emerges in the future.
 
-For now, we are only aiming to replace Kustomize patches' manual editing with yaml generation. In
-the future, we could generate the whole kubernetes manifest for each stage's cluster. It's also
-possible to generate a docker-compose.yaml file from the same values for local development.
+The templates are found from `/generate/templates`:
 
-To rerender all yaml templates, run `./development.sh generate`
+- `resources`: individual resource definition template pieces (e.g. deployment, service, configmap)
+  from which other bigger templates are building
+- `kubernetes-all`: templates that all clusters should render (e2e, playg, dev, test, prod)
+- `kubernetes-e2e`: templates that e2e cluster should additionally render (e.g. for mocking the db)
+
+We are generating the Kubernetes manifests for each stage's cluster. To rerender all yaml templates,
+run `./development.sh generate`
+
+The substituted values can be found from `/generate/values`:
+
+- `common.yaml`: general definition/configuration of all microservices, with default values
+- `e2e|playg|dev|test|prod.yaml`: stage-specific overwrites of the common defaults
 
 ### Generate Flux configurations
 
@@ -402,10 +399,12 @@ curl https://raw.githubusercontent.com/HSLdevcom/jore4-flux/e2e/remotecluster.sh
 
 The script recognizes the following environment variables as parameters:
 
-- `FRONTEND_DOCKER_IMAGE`: redefines which frontend docker image should be used instead of the e2e
-  cluster default. E.g `FRONTEND_DOCKER_IMAGE="hsldevcom/jore4-ui:latest"`
+- `UI_DOCKER_IMAGE`: redefines which UI docker image should be used instead of the e2e
+  cluster default. E.g `UI_DOCKER_IMAGE="hsldevcom/jore4-ui:latest"`
 - `HASURA_DOCKER_IMAGE`: redefines which hasura docker image should be used instead of the e2e
-  cluster default. E.g `FRONTEND_DOCKER_IMAGE="hsldevcom/jore4-hasura:latest"`
+  cluster default. E.g `HASURA_DOCKER_IMAGE="hsldevcom/jore4-hasura:latest"`
+- `AUTH_DOCKER_IMAGE`: redefines which auth backend docker image should be used instead of the e2e
+  cluster default. E.g `AUTH_DOCKER_IMAGE="hsldevcom/jore4-auth:latest"`
 
 To stop and remove the cluster, call `kind delete clusters jore4-local-cluster`. This will delete
 the docker container(s) where Kind is running and free up all resources. Currently we are not using

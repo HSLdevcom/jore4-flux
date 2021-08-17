@@ -2,20 +2,50 @@
 
 set -eu
 
-function generate_kustomize_patches {
-  echo "Generating Kustomize patches with gomplate"
+function generate_manifests {
+  echo "Generating Kubernetes manifests with gomplate"
 
-  GOMPLATE_CMD="docker run --rm -v $(pwd):/tmp hairyhenderson/gomplate@sha256:8e46d887a73ef5d90fde1f1a7d679fa94cf9f6dfc686b0b1a581858faffb1e16"
-  $GOMPLATE_CMD --input-dir /tmp/generate/templates/kustomize-patches --output-dir /tmp/clusters/playg --context Values=/tmp/generate/values/playg.yaml
-  $GOMPLATE_CMD --input-dir /tmp/generate/templates/kustomize-patches --output-dir /tmp/clusters/dev --context Values=/tmp/generate/values/dev.yaml
-  $GOMPLATE_CMD --input-dir /tmp/generate/templates/kustomize-patches --output-dir /tmp/clusters/test --context Values=/tmp/generate/values/test.yaml
-  $GOMPLATE_CMD --input-dir /tmp/generate/templates/kustomize-patches --output-dir /tmp/clusters/prod --context Values=/tmp/generate/values/prod.yaml
+  GOMPLATE_CMD="docker run --rm -v $(pwd):/tmp hairyhenderson/gomplate@sha256:8e46d887a73ef5d90fde1f1a7d679fa94cf9f6dfc686b0b1a581858faffb1e16 \
+    --template templates=/tmp/generate/templates/resources/ \
+    -d common=/tmp/generate/values/common.yaml"
+  TEMPLATES_DIR="/tmp/generate/templates"
+  OUTPUT_DIR="/tmp/clusters"
+  AZURE_STAGES=("playg" "dev" "test" "prod")
+  LOCAL_STAGES=("e2e")
+  ALL_STAGES=("${AZURE_STAGES[@]}" "${LOCAL_STAGES[@]}")
+
+  # generate default manifests for all stages
+  for STAGE in "${ALL_STAGES[@]}"; do
+    $GOMPLATE_CMD \
+      --input-dir "$TEMPLATES_DIR/kubernetes-all" \
+      --output-dir "/tmp/clusters/$STAGE" \
+      -d "env=/tmp/generate/values/$STAGE.yaml" \
+      -c "Values=merge:env|common"
+  done
+
+  # generate additions to azure stages (e.g. flux sync)
+  for STAGE in "${AZURE_STAGES[@]}"; do
+    $GOMPLATE_CMD \
+      --input-dir "$TEMPLATES_DIR/kubernetes-azure-only" \
+      --output-dir "$OUTPUT_DIR/$STAGE" \
+      -d "env=/tmp/generate/values/$STAGE.yaml" \
+      -c "Values=merge:env|common"
+  done
+
+  # generate additions to local stages (e.g. test databases)
+  for STAGE in "${LOCAL_STAGES[@]}"; do
+    $GOMPLATE_CMD \
+      --input-dir "$TEMPLATES_DIR/kubernetes-local-only" \
+      --output-dir "$OUTPUT_DIR/$STAGE" \
+      -d "env=/tmp/generate/values/$STAGE.yaml" \
+      -c "Values=merge:env|common"
+  done
 }
 
 function super_linter {
   echo "Running Super-Linter"
 
-  docker run --rm -e RUN_LOCAL=true -e VALIDATE_KUBERNETES_KUBEVAL=false -e VALIDATE_JSCPD=false -v "$(pwd)":/tmp/lint github/super-linter:v4
+  docker run --rm -e RUN_LOCAL=true -e VALIDATE_KUBERNETES_KUBEVAL=false -e VALIDATE_JSCPD=false -e VALIDATE_GITHUB_ACTIONS=false -v "$(pwd)":/tmp/lint github/super-linter:v4
 }
 
 function toc {
@@ -29,7 +59,7 @@ function usage {
   Usage $0 <command>
 
   generate
-    Generates Kustomize patches for playg, dev, test and prod stages using gomplate yaml templates.
+    Generates Kubernetes and docker-compose manifests for all stages using gomplate yaml templates.
 
   lint
     Runs Github's Super-Linter for the whole codebase to lint all files.
@@ -44,7 +74,7 @@ function usage {
 
 case $1 in
 generate)
-  generate_kustomize_patches
+  generate_manifests
   ;;
 
 lint)

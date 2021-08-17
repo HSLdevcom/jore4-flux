@@ -31,4 +31,4 @@ jobs:
               | tar -xz \
               > ./kustomize \
             && chmod u+x ./kustomize \
-            && ./kustomize build ${KUSTOMIZE_BUILD_DIR}
+            && ./kustomize build "${KUSTOMIZE_BUILD_DIR}"
