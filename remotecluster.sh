@@ -21,9 +21,9 @@ curl "https://raw.githubusercontent.com/HSLdevcom/jore4-flux/$E2E_SCRIPTS_VERSIO
 chmod u+x "$tmp_dir/kindcluster.sh"
 
 # Loading the base e2e cluster definition, then patch it:
-# - UI_DOCKER_IMAGE env variable is defined, the frontend image in the Kind cluster will be
+# - UI_DOCKER_IMAGE env variable is defined, the ui image in the Kind cluster will be
 # replaced with image in the value, e.g. UI_DOCKER_IMAGE="hsldevcom/jore4-ui:abc"
-# - HASURA_DOCKER_IMAGE env variable is defined, the frontend image in the Kind cluster will be
+# - HASURA_DOCKER_IMAGE env variable is defined, the hasura image in the Kind cluster will be
 # replaced with image in the value, e.g. HASURA_DOCKER_IMAGE="hsldevcom/jore4-hasura:def"
 # - AUTH_DOCKER_IMAGE env variable is defined, the auth backend image in the Kind cluster will be
 # replaced with image in the value, e.g. AUTH_DOCKER_IMAGE="hsldevcom/jore4-auth:ghi"
