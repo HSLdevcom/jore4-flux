@@ -1,5 +1,12 @@
 tenantId: "572a41dd-c389-4f0a-b256-aefd1bf149d7"
 fluxSyncEnabled: true
+limitRanges:
+  memory:
+    default: 512Mi
+    defaultRequest: 256Mi
+  cpu:
+    default: 1
+    defaultRequest: 0.5
 microServices:
   auth:
     serviceName: "auth"

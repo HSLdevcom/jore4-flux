@@ -5,6 +5,7 @@ kind: Kustomization
 
 resources:
   - ./jore4-namespace.yaml
+  - ./jore4-limit-range.yaml
   - ./jore4-ingress.yaml
   - ./jore4-auth.yaml
   - ./jore4-hasura.yaml

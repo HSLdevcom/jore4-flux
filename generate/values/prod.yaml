@@ -1,4 +1,11 @@
 stage: prod
+limitRanges:
+  memory:
+    default: 1024Mi
+    defaultRequest: 512Mi
+  cpu:
+    default: 2
+    defaultRequest: 1
 ingress:
   type: agic
   hostname: jore.hsl.fi
