@@ -219,6 +219,9 @@ Deploy the `dev` cluster with `./kubernetes.sh deploy:cluster dev`
 To make sure that all stages' cluster definitions are the same (except of course the stage-specific
 configurations), we are [generating the yamls](#yaml-templates) with gomplate
 
+Clusters have [LimitRange](https://kubernetes.io/docs/concepts/policy/limit-range/) defined to avoid
+memory/CPU leaks for misbehaving containers.
+
 #### YAML templates
 
 We are using [gomplate](https://docs.gomplate.ca/) to render yaml templates. This is the same tool
