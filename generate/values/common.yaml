@@ -1,0 +1,67 @@
+tenantId: "572a41dd-c389-4f0a-b256-aefd1bf149d7"
+microServices:
+  auth:
+    serviceName: "auth"
+    dockerImage: "hsldevcom/jore4-auth:dockerize--bf95d6d8b7bacfd6b990b2e9d55e4f6a1554879b"
+    ports:
+      - containerPort: 8080
+        localPort: 3200
+    podSpec:
+      livenessProbe:
+        httpGet:
+          path: /actuator/health
+          port: 8080
+      readinessProbe:
+        httpGet:
+          path: /actuator/health
+          port: 8080
+    env:
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+      API_PATH_PREFIX: ""
+      API_PATH_PREFIX_PUBLIC: "/api/auth"
+    secretMappings:
+      hsl-jore4-auth-oidc-client-id: oidc-client-id
+      hsl-jore4-auth-oidc-client-secret: oidc-client-secret
+  hasura:
+    serviceName: "hasura"
+    dockerImage: "hsldevcom/jore4-hasura:fix-metadata--613b29c2d4c6f0ef1cf6f258ab3071b780fa23bd"
+    ports:
+      - containerPort: 8080
+        localPort: 3201
+    podSpec:
+      livenessProbe:
+        httpGet:
+          path: /healthz
+          port: 8080
+      readinessProbe:
+        httpGet:
+          path: /healthz
+          port: 8080
+    env:
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+      HASURA_GRAPHQL_MIGRATIONS_DIR: "/hasura-migrations"
+      HASURA_GRAPHQL_METADATA_DIR: "/hasura-metadata"
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "false"
+      HASURA_GRAPHQL_ENABLE_TELEMETRY: "false"
+      HASURA_GRAPHQL_MIGRATIONS_SERVER_TIMEOUT: "60"
+    secretMappings:
+      hsl-jore4-public-db-hostname: db-hostname
+      hsl-jore4-public-db-database: db-name
+      hsl-jore4-db-admin-username: db-username
+      hsl-jore4-db-admin-password: db-password
+      hsl-jore4-hasura-admin-secret: hasura-admin-secret
+  ui:
+    serviceName: "ui"
+    dockerImage: "hsldevcom/jore4-ui:fix-docker-css--72224fc7574d8fb4486b43d8abc6afcf1b7f14c6"
+    ports:
+      - containerPort: 80
+        localPort: 3302
+    podSpec:
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 80
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 80

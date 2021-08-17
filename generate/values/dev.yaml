@@ -1,7 +1,18 @@
 stage: dev
 ingress:
+  type: agic
   hostname: dev.jore.hsl.fi
-services:
+  routes:
+    - path: /
+      serviceName: jore4-ui
+      servicePort: 80
+    - path: /api/graphql/*
+      serviceName: jore4-hasura
+      servicePort: 8080
+    - path: /api/auth/*
+      serviceName: jore4-auth
+      servicePort: 8080
+microServices:
   hasura:
     env:
       HASURA_GRAPHQL_ENABLE_CONSOLE: "false"

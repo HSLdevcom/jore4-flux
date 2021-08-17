@@ -1,0 +1,48 @@
+stage: e2e
+ingress:
+  type: nginx
+  hostname: ""
+  routes:
+    # note the first () will be an empty capture group
+    - path: /()(.*)
+      serviceName: jore4-ui
+      servicePort: 80
+    # note the (/|$) allows the url to terminate after "graphql" or continue with a "/"
+    - path: /api/graphql(/|$)(.*)
+      serviceName: jore4-hasura
+      servicePort: 8080
+    # note the (/|$) allows the url to terminate after "auth" or continue with a "/"
+    - path: /api/auth(/|$)(.*)
+      serviceName: jore4-auth
+      servicePort: 8080
+microServices:
+  hasura:
+    env:
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "false"
+    localSecrets:
+      db-hostname: testdb
+      db-name: postgres
+      db-username: postgres
+      db-password: postgres
+      hasura-admin-secret: hasura
+  auth:
+    env:
+      SELF_PUBLIC_BASE_URL: "http://localhost:3301"
+      LOGINPAGE_URL: "http://localhost:3301"
+      LOGOUTPAGE_URL: "http://localhost:3301"
+      OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
+    secretMappings: ""
+    localSecrets:
+      oidc-client-id: "0838619941439007"
+      oidc-client-secret: "9uV5p45F6IZQubCErBiquZYaL7Wm2AWM"
+  testdb:
+    serviceName: "testdb"
+    dockerImage: "postgis/postgis:12-3.1-alpine"
+    ports:
+      - containerPort: 5432
+        nodePort: 30432
+        localPort: 6432
+    env:
+      POSTGRES_DB: jore4e2e
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
