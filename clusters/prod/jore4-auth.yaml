@@ -20,7 +20,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: "jore4-auth-image"
-          image: "hsldevcom/jore4-auth:dockerize--bf95d6d8b7bacfd6b990b2e9d55e4f6a1554879b"
+          image: "hsldevcom/jore4-auth:auth-webhook-deployment--703a022cfd5f3ad3384f6c5715b3806bce275e88"
           imagePullPolicy: Always
           ports:
           - containerPort: 8080
@@ -85,6 +85,22 @@ spec:
           objectName: hsl-jore4-auth-oidc-client-secret
           objectAlias: oidc-client-secret
           objectType: secret
+        - |
+          objectName: hsl-jore4-db-auth-password
+          objectAlias: db-password
+          objectType: secret
+        - |
+          objectName: hsl-jore4-db-auth-username
+          objectAlias: db-username
+          objectType: secret
+        - |
+          objectName: hsl-jore4-public-db-database
+          objectAlias: db-name
+          objectType: secret
+        - |
+          objectName: hsl-jore4-public-db-hostname
+          objectAlias: db-hostname
+          objectType: secret
 
 ---
 apiVersion: v1
@@ -95,6 +111,7 @@ metadata:
 data:
   API_PATH_PREFIX: ""
   API_PATH_PREFIX_PUBLIC: "/api/auth"
+  DB_SESSION_SCHEMA: "auth_session"
   LOGINPAGE_URL: "https://jore.hsl.fi"
   LOGOUTPAGE_URL: "https://jore.hsl.fi"
   OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"

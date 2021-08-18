@@ -11,7 +11,7 @@ microServices:
   auth:
     serviceName: "auth"
     serviceType: "ClusterIP"
-    dockerImage: "hsldevcom/jore4-auth:dockerize--bf95d6d8b7bacfd6b990b2e9d55e4f6a1554879b"
+    dockerImage: "hsldevcom/jore4-auth:auth-webhook-deployment--703a022cfd5f3ad3384f6c5715b3806bce275e88"
     ports:
       - containerPort: 8080
         localPort: 3200
@@ -28,13 +28,18 @@ microServices:
       SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
       API_PATH_PREFIX: ""
       API_PATH_PREFIX_PUBLIC: "/api/auth"
+      DB_SESSION_SCHEMA: "auth_session"
     secretMappings:
       hsl-jore4-auth-oidc-client-id: oidc-client-id
       hsl-jore4-auth-oidc-client-secret: oidc-client-secret
+      hsl-jore4-public-db-hostname: db-hostname
+      hsl-jore4-public-db-database: db-name
+      hsl-jore4-db-auth-username: db-username
+      hsl-jore4-db-auth-password: db-password
   hasura:
     serviceName: "hasura"
     serviceType: "ClusterIP"
-    dockerImage: "hsldevcom/jore4-hasura:fix-metadata--613b29c2d4c6f0ef1cf6f258ab3071b780fa23bd"
+    dockerImage: "hsldevcom/jore4-hasura:auth-webhook-deployment--94205d9f3669545134cda6553e5dc820f2df825f"
     ports:
       - containerPort: 8080
         localPort: 3201
@@ -54,12 +59,15 @@ microServices:
       HASURA_GRAPHQL_ENABLE_CONSOLE: "false"
       HASURA_GRAPHQL_ENABLE_TELEMETRY: "false"
       HASURA_GRAPHQL_MIGRATIONS_SERVER_TIMEOUT: "60"
+      HASURA_GRAPHQL_AUTH_HOOK: "http://jore4-auth:8080/public/v1/hasura/webhook"
+      HASURA_GRAPHQL_AUTH_HOOK_MODE: "GET"
     secretMappings:
       hsl-jore4-public-db-hostname: db-hostname
       hsl-jore4-public-db-database: db-name
       hsl-jore4-db-admin-username: db-username
       hsl-jore4-db-admin-password: db-password
       hsl-jore4-hasura-admin-secret: hasura-admin-secret
+      hsl-jore4-db-auth-username: db-auth-username
   ui:
     serviceName: "ui"
     serviceType: "ClusterIP"
