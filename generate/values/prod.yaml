@@ -5,7 +5,7 @@ limitRanges:
     defaultRequest: 512Mi
   cpu:
     default: 2
-    defaultRequest: 1
+    defaultRequest: 0.1
 ingress:
   type: agic
   hostname: jore.hsl.fi

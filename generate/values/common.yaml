@@ -6,7 +6,7 @@ limitRanges:
     defaultRequest: 256Mi
   cpu:
     default: 1
-    defaultRequest: 0.5
+    defaultRequest: 0.1
 microServices:
   auth:
     serviceName: "auth"
