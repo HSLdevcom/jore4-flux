@@ -44,7 +44,7 @@ function deploy_CRDs {
 
   helm repo add csi-secrets-store-provider-azure https://raw.githubusercontent.com/Azure/secrets-store-csi-driver-provider-azure/master/charts
   helm repo update
-  helm upgrade --install csi-secrets-store csi-secrets-store-provider-azure/csi-secrets-store-provider-azure --namespace secret-store --create-namespace --version "0.0.18"
+  helm upgrade --install csi-secrets-store csi-secrets-store-provider-azure/csi-secrets-store-provider-azure --namespace secret-store --create-namespace --version "0.0.20"
 }
 
 function deploy_cluster {
