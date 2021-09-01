@@ -3,13 +3,9 @@ name: Test e2e docker-compose setup
 on:
   push:
   pull_request:
-    branches: [master]
+    branches: [main]
 
 jobs:
-  release:
-    name: create release package from docker-compose config, nginx.conf and secrets
-    runs-on: ubuntu-20.04
-
   e2e-docker-compose-setup:
     name: e2e setup with docker-compose
     runs-on: ubuntu-20.04
@@ -19,8 +15,10 @@ jobs:
         include:
           # start all services
           - services: ""
-          # start only ui, auth backend and hasura
+          # start only ui, auth backend and hasura, no ingress proxy
           - services: "ui auth hasura"
+          # start only ui, auth backend, with ingress proxy
+          - services: "ui auth proxy"
 
     steps:
       # note that we don't checkout code in this job to make sure that the script works from an empty workspace!

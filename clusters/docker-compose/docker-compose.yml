@@ -13,16 +13,16 @@ services:
       LOGINPAGE_URL: "http://localhost:3301"
       LOGOUTPAGE_URL: "http://localhost:3301"
       OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
-      SECRET_STORE_BASE_PATH: "/run/secrets"
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
       SELF_PUBLIC_BASE_URL: "http://localhost:3301"
     ports:
       - "127.0.0.1:3200:8080"
     secrets:
       - source: auth-oidc-client-id
-        target: oidc-client-id
+        target: /mnt/secrets-store/oidc-client-id
         # target: /mnt/secret-store/$key?
       - source: auth-oidc-client-secret
-        target: oidc-client-secret
+        target: /mnt/secrets-store/oidc-client-secret
         # target: /mnt/secret-store/$key?
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -39,24 +39,24 @@ services:
       HASURA_GRAPHQL_METADATA_DIR: "/hasura-metadata"
       HASURA_GRAPHQL_MIGRATIONS_DIR: "/hasura-migrations"
       HASURA_GRAPHQL_MIGRATIONS_SERVER_TIMEOUT: "60"
-      SECRET_STORE_BASE_PATH: "/run/secrets"
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
     ports:
       - "127.0.0.1:3201:8080"
     secrets:
       - source: hasura-db-hostname
-        target: db-hostname
+        target: /mnt/secrets-store/db-hostname
         # target: /mnt/secret-store/$key?
       - source: hasura-db-name
-        target: db-name
+        target: /mnt/secrets-store/db-name
         # target: /mnt/secret-store/$key?
       - source: hasura-db-password
-        target: db-password
+        target: /mnt/secrets-store/db-password
         # target: /mnt/secret-store/$key?
       - source: hasura-db-username
-        target: db-username
+        target: /mnt/secrets-store/db-username
         # target: /mnt/secret-store/$key?
       - source: hasura-hasura-admin-secret
-        target: hasura-admin-secret
+        target: /mnt/secrets-store/hasura-admin-secret
         # target: /mnt/secret-store/$key?
     extra_hosts:
       - "host.docker.internal:host-gateway"

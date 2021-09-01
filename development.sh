@@ -51,9 +51,8 @@ function generate_manifests {
   $GOMPLATE_CMD \
     --input-dir "$TEMPLATES_DIR/docker-compose" \
     --output-dir "$OUTPUT_DIR/docker-compose" \
-    -d "compose=/tmp/generate/values/compose.yaml" \
     -d "env=/tmp/generate/values/e2e.yaml" \
-    -c "Values=merge:env|compose|common"
+    -c "Values=merge:env|common"
 }
 
 function super_linter {

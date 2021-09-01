@@ -24,7 +24,7 @@ services:
     secrets:
       {{- range $key, $value := .localSecrets }}
       - source: {{ $name }}-{{ $key }}
-        target: {{ $key }}
+        target: /mnt/secrets-store/{{ $key }}
         # target: /mnt/secret-store/$key?
       {{- end }}
     extra_hosts:

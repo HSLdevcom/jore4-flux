@@ -440,3 +440,12 @@ from the `e2e` branch, so cannot be tested locally.
   to the cluster as a volume.
 - We don't have a `key-vault` locally, so instead of using the `secret store CSI driver`, we'll
   have to map the secrets to the pods directly as files from the host machine
+
+## Docker-compose
+
+- needs docker 20.x
+- should test if can reach a the service on the host on Mac as well
+- script to download and unzip latest version
+- how to run all
+- how to run only few services
+- how to overwrite some values
