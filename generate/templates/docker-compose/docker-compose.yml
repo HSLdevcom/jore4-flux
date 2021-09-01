@@ -52,9 +52,9 @@ secrets:
   {{- if (index $srv "localSecrets") }}
   {{- range $key, $value := .localSecrets }}
   {{ $name }}-{{ $key }}:
-    file: ./secrets/{{ $key }}
+    file: ./secret-{{ $key }}
   {{- /* also creating the secret files on the fly */}}
-  {{- file.Write (print "/tmp/clusters/docker-compose/secrets/" $key) $value }}
+  {{- file.Write (print "/tmp/clusters/docker-compose/secret-" $key) $value }}
   {{- end }}
   {{- end }}
 {{- end }}

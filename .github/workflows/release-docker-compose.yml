@@ -24,5 +24,5 @@ jobs:
         run: |
           echo release version: ${RELEASE_VERSION}
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
-          gh release create ${RELEASE_VERSION} --notes "test release"
+          gh release create ${RELEASE_VERSION} --notes "docker-compose config with nginx.conf and secrets"
           gh release upload ${RELEASE_VERSION} clusters/docker-compose/**
