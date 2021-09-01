@@ -23,8 +23,12 @@ services:
   {{- if (index $srv "localSecrets") }}
     secrets:
       {{- range $key, $value := .localSecrets }}
-      - {{ $key }}
+      - source: {{ $name }}-{{ $key }}
+        target: {{ $key }}
+        # target: /mnt/secret-store/$key?
       {{- end }}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   {{- end }}
 {{ end }}
   proxy:
@@ -35,15 +39,10 @@ services:
       - jore4
     ports:
       - 3301:80
-{{/* directly writing default.conf to the container to make the docker-compose file portable */}}
-    command: |
-      sh -c "sh -s <<EOF
-      cat > /etc/nginx/conf.d/default.conf <<'EOT'
-{{tmpl.Exec "templates/nginx.conf" . | strings.Indent "        "}}
-      EOT
-      cat /etc/nginx/conf.d/default.conf
-      nginx -g 'daemon off;'
-      EOF"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+{{- /* rendering nginx.conf to a file that will be mapped as a volume */}}
+{{- file.Write "/tmp/clusters/docker-compose/nginx.conf" (tmpl.Exec "templates/nginx.conf") }}
 
 networks:
   jore4:
@@ -52,7 +51,7 @@ secrets:
 {{- range $name, $srv := .Values.microServices }}
   {{- if (index $srv "localSecrets") }}
   {{- range $key, $value := .localSecrets }}
-  {{ $key }}:
+  {{ $name }}-{{ $key }}:
     file: ./secrets/{{ $key }}
   {{- /* also creating the secret files on the fly */}}
   {{- file.Write (print "/tmp/clusters/docker-compose/secrets/" $key) $value }}

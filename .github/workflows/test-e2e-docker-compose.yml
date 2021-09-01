@@ -1,0 +1,101 @@
+name: Test e2e docker-compose setup
+
+on:
+  push:
+  pull_request:
+    branches: [master]
+
+jobs:
+  release:
+    name: create release package from docker-compose config, nginx.conf and secrets
+    runs-on: ubuntu-20.04
+
+  e2e-docker-compose-setup:
+    name: e2e setup with docker-compose
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        include:
+          # start all services
+          - services: ""
+          # start only ui, auth backend and hasura
+          - services: "ui auth hasura"
+
+    steps:
+      # note that we don't checkout code in this job to make sure that the script works from an empty workspace!
+      - name: Verifying that current workspace is empty
+        run: '[ -z "$(ls -A)" ]'
+
+      - name: Extract branch name to env variable
+        run: |
+          # In pull requests
+          BRANCH_NAME="${GITHUB_HEAD_REF}"
+          [[ ${BRANCH_NAME} == "" ]] && {
+            # In branch pushes
+            BRANCH_NAME="$(echo "${GITHUB_REF}" | cut -d '/' -f 3-)"
+          }
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> "${GITHUB_ENV}"
+
+      - name: Setup e2e cluster with the remote script
+        env:
+          # change some docker images to use a different version
+          UI_DOCKER_IMAGE: ${{ matrix.ui-docker-image }}
+          HASURA_DOCKER_IMAGE: ${{ matrix.hasura-docker-image }}
+          AUTH_DOCKER_IMAGE: ${{ matrix.auth-docker-image }}
+          # make sure we are testing the remotecluster.sh against the current branch
+          E2E_SCRIPTS_VERSION: ${{ env.BRANCH_NAME }}
+        run: |
+          curl "https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${BRANCH_NAME}/remotecluster.sh" | bash
+
+      - name: Verify that UI is up and running
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3300 --output /dev/null --silent"
+
+      - name: Verify that postgresql is up and running
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "pg_isready -h localhost -p 3002"
+
+      - name: Verify that hasura is up and running
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3300/graphql/healthz --output /dev/null --silent"
+
+      - name: Testing that the correct version got deployed from UI
+        # if matrix.ui-docker-image is defined should use that, otherwise use default
+        run: |
+          UI_DEPLOYED_VERSION=$(kubectl get deployment jore4-ui --namespace hsl-jore4 --output jsonpath='{.spec.template.spec.containers[0].image}')
+          if [[ "${{ matrix.ui-docker-image }}" == "" ]]
+          then
+            [[ "$UI_DEPLOYED_VERSION" != "${{ matrix.ui-docker-image }}" ]]
+          else
+            [[ "$UI_DEPLOYED_VERSION" == "${{ matrix.ui-docker-image }}" ]]
+          fi
+
+      - name: Testing that the correct version got deployed from hasura
+        # if matrix.hasura-docker-image is defined should use that, otherwise use default
+        run: |
+          HASURA_DEPLOYED_VERSION=$(kubectl get deployment jore4-hasura --namespace hsl-jore4 --output jsonpath='{.spec.template.spec.containers[0].image}')
+          if [[ "${{ matrix.hasura-docker-image }}" == "" ]]
+          then
+            [[ "$HASURA_DEPLOYED_VERSION" != "${{ matrix.hasura-docker-image }}" ]]
+          else
+            [[ "$HASURA_DEPLOYED_VERSION" == "${{ matrix.hasura-docker-image }}" ]]
+          fi
+
+      - name: Testing that the correct version got deployed from auth backend
+        # if matrix.auth-docker-image is defined should use that, otherwise use default
+        run: |
+          AUTH_DEPLOYED_VERSION=$(kubectl get deployment jore4-auth --namespace hsl-jore4 --output jsonpath='{.spec.template.spec.containers[0].image}')
+          if [[ "${{ matrix.auth-docker-image }}" == "" ]]
+          then
+            [[ "$AUTH_DEPLOYED_VERSION" != "${{ matrix.auth-docker-image }}" ]]
+          else
+            [[ "$AUTH_DEPLOYED_VERSION" == "${{ matrix.auth-docker-image }}" ]]
+          fi
+
+      - name: Stop Kind
+        run: |
+          curl "https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${BRANCH_NAME}/kindcluster.sh" | bash -s -- stop

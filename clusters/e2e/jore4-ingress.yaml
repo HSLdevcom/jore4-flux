@@ -19,7 +19,7 @@ spec:
     - host: ""
       http:
         paths:
-          - path: "/()(.*)"
+          - path: "^/(?!api)()(.*)$"
             pathType: Prefix
             backend:
               service:

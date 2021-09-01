@@ -3,13 +3,18 @@
 set -eu
 
 function generate_manifests {
+  OUTPUT_DIR="/tmp/clusters"
+
+  echo "Cleanup generated manifests"
+  rm -rf "$OUTPUT_DIR"
+
   echo "Generating Kubernetes manifests with gomplate"
 
   GOMPLATE_CMD="docker run --rm -v $(pwd):/tmp hairyhenderson/gomplate@sha256:8e46d887a73ef5d90fde1f1a7d679fa94cf9f6dfc686b0b1a581858faffb1e16 \
     --template templates=/tmp/generate/templates/resources/ \
     -d common=/tmp/generate/values/common.yaml"
   TEMPLATES_DIR="/tmp/generate/templates"
-  OUTPUT_DIR="/tmp/clusters"
+
   AZURE_STAGES=("playg" "dev" "test" "prod")
   LOCAL_STAGES=("e2e")
   ALL_STAGES=("${AZURE_STAGES[@]}" "${LOCAL_STAGES[@]}")
@@ -49,11 +54,6 @@ function generate_manifests {
     -d "compose=/tmp/generate/values/compose.yaml" \
     -d "env=/tmp/generate/values/e2e.yaml" \
     -c "Values=merge:env|compose|common"
-
-  # echo "Creating secrets for docker-compose"
-  # mkdir -p ./clusters/docker-compose/secrets
-  # echo "0838619941439007" > ./clusters/docker-compose/secrets/oidc-client-id
-  # echo "9uV5p45F6IZQubCErBiquZYaL7Wm2AWM" > ./clusters/docker-compose/secrets/oidc-client-secret
 }
 
 function super_linter {

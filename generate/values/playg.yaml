@@ -4,13 +4,13 @@ ingress:
   hostname: playg.jore.hsl.fi
   routes:
     - path: /
-      serviceName: jore4-ui
+      serviceName: ui
       servicePort: 80
     - path: /api/graphql/*
-      serviceName: jore4-hasura
+      serviceName: hasura
       servicePort: 8080
     - path: /api/auth/*
-      serviceName: jore4-auth
+      serviceName: auth
       servicePort: 8080
 microServices:
   hasura:

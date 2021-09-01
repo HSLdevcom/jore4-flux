@@ -4,17 +4,19 @@ ingress:
   type: nginx
   hostname: ""
   routes:
-    # note the first () will be an empty capture group
-    - path: /()(.*)
-      serviceName: jore4-ui
+    # note that all these are rewritten to /$2 (so using the second regexp capture group without prefix)
+
+    # note the negative lookahead (?!api) is not a capture group in nginx regexp so we use an empty one ()
+    - path: ^/(?!api)()(.*)$
+      serviceName: ui
       servicePort: 80
     # note the (/|$) allows the url to terminate after "graphql" or continue with a "/"
     - path: /api/graphql(/|$)(.*)
-      serviceName: jore4-hasura
+      serviceName: hasura
       servicePort: 8080
     # note the (/|$) allows the url to terminate after "auth" or continue with a "/"
     - path: /api/auth(/|$)(.*)
-      serviceName: jore4-auth
+      serviceName: auth
       servicePort: 8080
 microServices:
   hasura:
