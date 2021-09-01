@@ -444,7 +444,8 @@ from the `e2e` branch, so cannot be tested locally.
 ## Docker-compose
 
 - needs docker 20.x
-- should test if can reach a the service on the host on Mac as well
+- should show how to run service on the host and point at it (test if it works on Max)
+- should show how to map current working dir into docker context
 - script to download and unzip latest version
 - how to run all
 - how to run only few services

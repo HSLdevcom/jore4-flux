@@ -99,16 +99,16 @@ networks:
 
 secrets:
   auth-oidc-client-id:
-    file: ./secret-oidc-client-id
+    file: ./secret-auth-oidc-client-id
   auth-oidc-client-secret:
-    file: ./secret-oidc-client-secret
+    file: ./secret-auth-oidc-client-secret
   hasura-db-hostname:
-    file: ./secret-db-hostname
+    file: ./secret-hasura-db-hostname
   hasura-db-name:
-    file: ./secret-db-name
+    file: ./secret-hasura-db-name
   hasura-db-password:
-    file: ./secret-db-password
+    file: ./secret-hasura-db-password
   hasura-db-username:
-    file: ./secret-db-username
+    file: ./secret-hasura-db-username
   hasura-hasura-admin-secret:
-    file: ./secret-hasura-admin-secret
+    file: ./secret-hasura-hasura-admin-secret
