@@ -2,12 +2,11 @@ name: Docker-compose release
 
 on:
   push:
-  pull_request:
-    branches: [main]
+    branches: [e2e]
 
 jobs:
   release:
-    name: Create release package from docker-compose config, nginx.conf and secrets
+    name: Create release package from docker-compose config and dependencies
     runs-on: ubuntu-20.04
 
     steps:
