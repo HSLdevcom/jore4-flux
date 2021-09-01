@@ -21,6 +21,9 @@ jobs:
       - name: Create release
         env:
           RELEASE_VERSION: e2e-docker-compose
+        # 1. create a zip of the docker-compose config + dependencies
+        # 2. delete and recreate github release
+        # 3. append the zip package and also the individual files (just in case) to the release
         run: |
           echo "Release version: ${RELEASE_VERSION}"
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
