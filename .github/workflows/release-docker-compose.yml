@@ -1,0 +1,25 @@
+name: Docker-compose release
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+jobs:
+  release:
+    name: Create release package from docker-compose config, nginx.conf and secrets
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      - name: Create release
+        run: |
+          echo tag: ${RELEASE_VERSION}
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+          gh release create ${RELEASE_VERSION} --notes "test release"
+          gh release upload ${RELEASE_VERSION} clusters/docker-compose/**
