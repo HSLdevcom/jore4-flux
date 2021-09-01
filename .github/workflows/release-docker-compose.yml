@@ -24,6 +24,8 @@ jobs:
         run: |
           echo "Release version: ${RELEASE_VERSION}"
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+          zip -j e2e-docker-compose.zip clusters/docker-compose/*
           gh release delete ${RELEASE_VERSION} || echo "There in no previous github release with the name '${RELEASE_VERSION}'"
           gh release create ${RELEASE_VERSION} --notes "docker-compose config with nginx.conf and secrets"
           gh release upload ${RELEASE_VERSION} clusters/docker-compose/**
+          gh release upload ${RELEASE_VERSION} e2e-docker-compose.zip
