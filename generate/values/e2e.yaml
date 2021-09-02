@@ -26,6 +26,7 @@ microServices:
       db-username: postgres
       db-password: postgres
       hasura-admin-secret: hasura
+      db-auth-username: postgres
   auth:
     env:
       SELF_PUBLIC_BASE_URL: "http://localhost:3301"
@@ -36,6 +37,10 @@ microServices:
     localSecrets:
       oidc-client-id: "0838619941439007"
       oidc-client-secret: "9uV5p45F6IZQubCErBiquZYaL7Wm2AWM"
+      db-hostname: jore4-testdb
+      db-name: postgres
+      db-username: postgres
+      db-password: postgres
   testdb:
     serviceName: "testdb"
     serviceType: "NodePort"
