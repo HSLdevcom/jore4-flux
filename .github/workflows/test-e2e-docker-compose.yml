@@ -1,0 +1,56 @@
+name: Test e2e docker-compose setup
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+jobs:
+  e2e-docker-compose-setup:
+    name: e2e setup with docker-compose
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        include:
+          # start all services
+          - services: [""]
+          # start only ui, auth backend and hasura, no ingress proxy
+          - services: ["jore4-ui", "jore4-auth", "jore4-hasura", "jore4-testdb"]
+          # start only ui, auth backend, with ingress proxy
+          - services: ["jore4-ui", "jore4-auth", "proxy"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Retrieve branch name
+        uses: HSLdevcom/jore4-tools/github-actions/extract-metadata@extract-metadata-v1
+
+      - name: Setup docker-compose with the parameterized services
+        run: |
+          docker-compose -f clusters/docker-compose/docker-compose.yml up -d ${{ join(matrix.services, ' ') }}
+
+      - name: Verify that UI is up and running
+        if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-ui') }}
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3300 --output /dev/null --silent"
+
+      - name: Verify that postgresql is up and running
+        if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-testdb') }}
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "pg_isready -h localhost -p 6432"
+
+      - name: Verify that hasura is up and running
+        if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-hasura') }}
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3300/api/graphql/healthz --output /dev/null --silent"
+
+      - name: Verify that auth backend is up and running
+        if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-auth') }}
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3300/api/auth/actuator/health --output /dev/null --silent"
