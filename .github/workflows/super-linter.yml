@@ -3,7 +3,7 @@ name: Super-Linter
 on:
   push:
   pull_request:
-    branches: [master]
+    branches: [main]
 
 jobs:
   # general linter for many languages and tools
