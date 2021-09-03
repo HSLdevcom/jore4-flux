@@ -3,23 +3,29 @@
 set -eu
 
 function generate_manifests {
+  echo "Cleanup generated manifests"
+  rm -rf ./clusters
+
   echo "Generating Kubernetes manifests with gomplate"
 
-  GOMPLATE_CMD="docker run --rm -v $(pwd):/tmp hairyhenderson/gomplate@sha256:8e46d887a73ef5d90fde1f1a7d679fa94cf9f6dfc686b0b1a581858faffb1e16 \
-    --template templates=/tmp/generate/templates/resources/ \
-    -d common=/tmp/generate/values/common.yaml"
   TEMPLATES_DIR="/tmp/generate/templates"
+  VALUES_DIR="/tmp/generate/values"
   OUTPUT_DIR="/tmp/clusters"
+
   AZURE_STAGES=("playg" "dev" "test" "prod")
   LOCAL_STAGES=("e2e")
   ALL_STAGES=("${AZURE_STAGES[@]}" "${LOCAL_STAGES[@]}")
+
+  GOMPLATE_CMD="docker run --rm -v $(pwd):/tmp hairyhenderson/gomplate@sha256:8e46d887a73ef5d90fde1f1a7d679fa94cf9f6dfc686b0b1a581858faffb1e16 \
+    --template templates=$TEMPLATES_DIR/resources/ \
+    -d common=$VALUES_DIR/common.yaml"
 
   # generate default manifests for all stages
   for STAGE in "${ALL_STAGES[@]}"; do
     $GOMPLATE_CMD \
       --input-dir "$TEMPLATES_DIR/kubernetes-all" \
-      --output-dir "/tmp/clusters/$STAGE" \
-      -d "env=/tmp/generate/values/$STAGE.yaml" \
+      --output-dir "$OUTPUT_DIR/$STAGE" \
+      -d "env=$VALUES_DIR/$STAGE.yaml" \
       -c "Values=merge:env|common"
   done
 
@@ -28,7 +34,7 @@ function generate_manifests {
     $GOMPLATE_CMD \
       --input-dir "$TEMPLATES_DIR/kubernetes-azure-only" \
       --output-dir "$OUTPUT_DIR/$STAGE" \
-      -d "env=/tmp/generate/values/$STAGE.yaml" \
+      -d "env=$VALUES_DIR/$STAGE.yaml" \
       -c "Values=merge:env|common"
   done
 
@@ -37,9 +43,17 @@ function generate_manifests {
     $GOMPLATE_CMD \
       --input-dir "$TEMPLATES_DIR/kubernetes-local-only" \
       --output-dir "$OUTPUT_DIR/$STAGE" \
-      -d "env=/tmp/generate/values/$STAGE.yaml" \
+      -d "env=$VALUES_DIR/$STAGE.yaml" \
       -c "Values=merge:env|common"
   done
+
+  echo "Generating docker-compose file and secrets with gomplate"
+
+  $GOMPLATE_CMD \
+    --input-dir "$TEMPLATES_DIR/docker-compose" \
+    --output-dir "$OUTPUT_DIR/docker-compose" \
+    -d "env=$VALUES_DIR/e2e.yaml" \
+    -c "Values=merge:env|common"
 }
 
 function super_linter {

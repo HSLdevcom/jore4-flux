@@ -84,10 +84,10 @@ data:
   API_PATH_PREFIX: ""
   API_PATH_PREFIX_PUBLIC: "/api/auth"
   DB_SESSION_SCHEMA: "auth_session"
-  LOGINPAGE_URL: "http://localhost:3301"
-  LOGOUTPAGE_URL: "http://localhost:3301"
+  LOGINPAGE_URL: "http://localhost:3300"
+  LOGOUTPAGE_URL: "http://localhost:3300"
   OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
   SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
-  SELF_PUBLIC_BASE_URL: "http://localhost:3301"
+  SELF_PUBLIC_BASE_URL: "http://localhost:3300"
 
 
