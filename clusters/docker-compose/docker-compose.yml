@@ -1,0 +1,132 @@
+# This is a generated file, all modifications will be overwritten!
+
+---
+version: "3.8"
+services:
+  jore4-auth:
+    container_name: "auth"
+    image: "hsldevcom/jore4-auth:auth-webhook-deployment--703a022cfd5f3ad3384f6c5715b3806bce275e88"
+    restart: "unless-stopped"
+    networks:
+      - jore4
+    environment:
+      API_PATH_PREFIX: ""
+      API_PATH_PREFIX_PUBLIC: "/api/auth"
+      DB_SESSION_SCHEMA: "auth_session"
+      LOGINPAGE_URL: "http://localhost:3300"
+      LOGOUTPAGE_URL: "http://localhost:3300"
+      OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+      SELF_PUBLIC_BASE_URL: "http://localhost:3300"
+    ports:
+      - "127.0.0.1:3200:8080"
+    secrets:
+      - source: auth-db-hostname
+        target: /mnt/secrets-store/db-hostname
+      - source: auth-db-name
+        target: /mnt/secrets-store/db-name
+      - source: auth-db-password
+        target: /mnt/secrets-store/db-password
+      - source: auth-db-username
+        target: /mnt/secrets-store/db-username
+      - source: auth-oidc-client-id
+        target: /mnt/secrets-store/oidc-client-id
+      - source: auth-oidc-client-secret
+        target: /mnt/secrets-store/oidc-client-secret
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  jore4-hasura:
+    container_name: "hasura"
+    image: "hsldevcom/jore4-hasura:auth-webhook-deployment--94205d9f3669545134cda6553e5dc820f2df825f"
+    restart: "unless-stopped"
+    networks:
+      - jore4
+    environment:
+      HASURA_GRAPHQL_AUTH_HOOK: "http://jore4-auth:8080/public/v1/hasura/webhook"
+      HASURA_GRAPHQL_AUTH_HOOK_MODE: "GET"
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "false"
+      HASURA_GRAPHQL_ENABLE_TELEMETRY: "false"
+      HASURA_GRAPHQL_METADATA_DIR: "/hasura-metadata"
+      HASURA_GRAPHQL_MIGRATIONS_DIR: "/hasura-migrations"
+      HASURA_GRAPHQL_MIGRATIONS_SERVER_TIMEOUT: "60"
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+    ports:
+      - "127.0.0.1:3201:8080"
+    secrets:
+      - source: hasura-db-auth-username
+        target: /mnt/secrets-store/db-auth-username
+      - source: hasura-db-hostname
+        target: /mnt/secrets-store/db-hostname
+      - source: hasura-db-name
+        target: /mnt/secrets-store/db-name
+      - source: hasura-db-password
+        target: /mnt/secrets-store/db-password
+      - source: hasura-db-username
+        target: /mnt/secrets-store/db-username
+      - source: hasura-hasura-admin-secret
+        target: /mnt/secrets-store/hasura-admin-secret
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  jore4-testdb:
+    container_name: "testdb"
+    image: "postgis/postgis:12-3.1-alpine"
+    restart: "unless-stopped"
+    networks:
+      - jore4
+    environment:
+      POSTGRES_DB: "jore4e2e"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_USER: "postgres"
+    ports:
+      - "127.0.0.1:6432:5432"
+
+  jore4-ui:
+    container_name: "ui"
+    image: "hsldevcom/jore4-ui:fix-docker-css--72224fc7574d8fb4486b43d8abc6afcf1b7f14c6"
+    restart: "unless-stopped"
+    networks:
+      - jore4
+    ports:
+      - "127.0.0.1:3302:80"
+
+  proxy:
+    container_name: proxy
+    image: nginx:alpine
+    restart: "unless-stopped"
+    networks:
+      - jore4
+    ports:
+      - "127.0.0.1:3300:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+
+networks:
+  jore4:
+
+secrets:
+  auth-db-hostname:
+    file: ./secret-auth-db-hostname
+  auth-db-name:
+    file: ./secret-auth-db-name
+  auth-db-password:
+    file: ./secret-auth-db-password
+  auth-db-username:
+    file: ./secret-auth-db-username
+  auth-oidc-client-id:
+    file: ./secret-auth-oidc-client-id
+  auth-oidc-client-secret:
+    file: ./secret-auth-oidc-client-secret
+  hasura-db-auth-username:
+    file: ./secret-hasura-db-auth-username
+  hasura-db-hostname:
+    file: ./secret-hasura-db-hostname
+  hasura-db-name:
+    file: ./secret-hasura-db-name
+  hasura-db-password:
+    file: ./secret-hasura-db-password
+  hasura-db-username:
+    file: ./secret-hasura-db-username
+  hasura-hasura-admin-secret:
+    file: ./secret-hasura-hasura-admin-secret

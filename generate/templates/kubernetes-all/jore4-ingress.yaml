@@ -33,7 +33,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: "{{ $value.serviceName }}"
+                name: "jore4-{{ $value.serviceName }}"
                 port:
                   number: {{ $value.servicePort }}
 {{ end }}

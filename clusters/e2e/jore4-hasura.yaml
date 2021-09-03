@@ -68,7 +68,7 @@ metadata:
   namespace: hsl-jore4
 data:
   db-auth-username: "postgres"
-  db-hostname: "testdb"
+  db-hostname: "jore4-testdb"
   db-name: "postgres"
   db-password: "postgres"
   db-username: "postgres"
