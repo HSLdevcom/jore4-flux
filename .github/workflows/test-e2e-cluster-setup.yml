@@ -20,6 +20,8 @@ jobs:
       - name: Verify that UI is up and running
         uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
         with:
+          # Kind cluster takes long time to start
+          retries: 50
           command: "curl --fail http://localhost:3300 --output /dev/null --silent"
 
       - name: Verify that postgresql is up and running
@@ -31,6 +33,11 @@ jobs:
         uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
         with:
           command: "curl --fail http://localhost:3300/graphql/healthz --output /dev/null --silent"
+
+      - name: Verify that auth backend is up and running
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3300/api/auth/actuator/health --output /dev/null --silent"
 
       - name: Stop Kind
         run: "./kindcluster.sh stop"
@@ -61,14 +68,12 @@ jobs:
         run: '[ -z "$(ls -A)" ]'
 
       - name: Extract branch name to env variable
+        uses: HSLdevcom/jore4-tools/github-actions/extract-metadata@extract-metadata-v1
+
+      - name: Set e2e script version to be tested
         run: |
-          # In pull requests
-          BRANCH_NAME="${GITHUB_HEAD_REF}"
-          [[ ${BRANCH_NAME} == "" ]] && {
-            # In branch pushes
-            BRANCH_NAME="$(echo "${GITHUB_REF}" | cut -d '/' -f 3-)"
-          }
-          echo "BRANCH_NAME=${BRANCH_NAME}" >> "${GITHUB_ENV}"
+          # make sure we are testing the remotecluster.sh against the current branch
+          echo "E2E_SCRIPTS_VERSION=${{ env.BRANCH_NAME }}" >> "${GITHUB_ENV}"
 
       - name: Setup e2e cluster with the remote script
         env:
@@ -76,14 +81,14 @@ jobs:
           UI_DOCKER_IMAGE: ${{ matrix.ui-docker-image }}
           HASURA_DOCKER_IMAGE: ${{ matrix.hasura-docker-image }}
           AUTH_DOCKER_IMAGE: ${{ matrix.auth-docker-image }}
-          # make sure we are testing the remotecluster.sh against the current branch
-          E2E_SCRIPTS_VERSION: ${{ env.BRANCH_NAME }}
         run: |
-          curl "https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${BRANCH_NAME}/remotecluster.sh" | bash
+          curl "https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${E2E_SCRIPTS_VERSION}/remotecluster.sh" | bash
 
       - name: Verify that UI is up and running
         uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
         with:
+          # Kind cluster takes long time to start
+          retries: 50
           command: "curl --fail http://localhost:3300 --output /dev/null --silent"
 
       - name: Verify that postgresql is up and running
@@ -95,6 +100,11 @@ jobs:
         uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
         with:
           command: "curl --fail http://localhost:3300/graphql/healthz --output /dev/null --silent"
+
+      - name: Verify that auth backend is up and running
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3300/api/auth/actuator/health --output /dev/null --silent"
 
       - name: Testing that the correct version got deployed from UI
         # if matrix.ui-docker-image is defined should use that, otherwise use default
@@ -131,4 +141,4 @@ jobs:
 
       - name: Stop Kind
         run: |
-          curl "https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${BRANCH_NAME}/kindcluster.sh" | bash -s -- stop
+          curl "https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${E2E_SCRIPTS_VERSION}/kindcluster.sh" | bash -s -- stop

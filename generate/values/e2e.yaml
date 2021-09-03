@@ -1,5 +1,13 @@
 stage: e2e
 fluxSyncEnabled: false
+limitRanges:
+  # github runners have limited CPU and memory
+  memory:
+    default: 512Mi
+    defaultRequest: 128Mi
+  cpu:
+    default: 1
+    defaultRequest: 0.05
 ingress:
   type: nginx
   hostname: ""
