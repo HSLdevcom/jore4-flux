@@ -19,6 +19,9 @@ ingress:
     - path: /api/auth/*
       serviceName: auth
       servicePort: 8080
+    - path: /api/mbtiles/*
+      serviceName: mbtiles
+      servicePort: 8000
 microServices:
   hasura:
     env:
