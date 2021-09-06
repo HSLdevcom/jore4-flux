@@ -19,14 +19,6 @@ spec:
     - host: ""
       http:
         paths:
-          - path: "/()(.*)"
-            pathType: Prefix
-            backend:
-              service:
-                name: "jore4-ui"
-                port:
-                  number: 80
-
           - path: "/api/graphql(/|$)(.*)"
             pathType: Prefix
             backend:
@@ -42,4 +34,12 @@ spec:
                 name: "jore4-auth"
                 port:
                   number: 8080
+
+          - path: "/()(.*)"
+            pathType: Prefix
+            backend:
+              service:
+                name: "jore4-ui"
+                port:
+                  number: 80
 
