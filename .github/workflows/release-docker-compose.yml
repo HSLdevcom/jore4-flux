@@ -3,7 +3,7 @@ name: Docker-compose release
 on:
   push:
     # release only gets updated in case e2e branch changes
-    branches: [e2e]
+    # branches: [e2e]
 
 jobs:
   release:
@@ -21,14 +21,19 @@ jobs:
       - name: Create release
         env:
           RELEASE_VERSION: e2e-docker-compose
-        # 1. create a tar.gz of the docker-compose config + dependencies
-        # 2. delete and recreate github release
-        # 3. append the tar.gz package and also the individual files (just in case) to the release
         run: |
+          printenv
+
           echo "Release version: ${RELEASE_VERSION}"
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+          # create a tar.gz of the docker-compose config + dependencies
           tar -czvf e2e-docker-compose.tar.gz -C clusters/docker-compose .
+
+          # delete and recreate github release
           gh release delete ${RELEASE_VERSION} || echo "There in no previous github release with the name '${RELEASE_VERSION}'"
           gh release create ${RELEASE_VERSION} --notes "docker-compose config with nginx.conf and secrets"
+
+          # append the tar.gz package and also the individual files (just in case) to the release
           gh release upload ${RELEASE_VERSION} clusters/docker-compose/**
           gh release upload ${RELEASE_VERSION} e2e-docker-compose.tar.gz
