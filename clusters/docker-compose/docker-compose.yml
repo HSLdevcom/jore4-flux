@@ -69,6 +69,17 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+  jore4-mbtiles:
+    container_name: "mbtiles"
+    image: "hsldevcom/jore4-mbtiles-server:main--76d9ca3dcc95c86915b9ebc444c5aeefcc10f050"
+    restart: "unless-stopped"
+    networks:
+      - jore4
+    environment:
+      DR_LINKKI_TILES_URL: "https://jore4storage.blob.core.windows.net/jore4-ui/dr_linkki.mbtiles"
+    ports:
+      - "127.0.0.1:3203:8000"
+
   jore4-testdb:
     container_name: "testdb"
     image: "postgis/postgis:12-3.1-alpine"

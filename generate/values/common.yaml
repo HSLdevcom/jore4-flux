@@ -84,3 +84,21 @@ microServices:
         httpGet:
           path: /
           port: 80
+  mbtiles:
+    serviceName: "mbtiles"
+    serviceType: "ClusterIP"
+    dockerImage: "hsldevcom/jore4-mbtiles-server:main--76d9ca3dcc95c86915b9ebc444c5aeefcc10f050"
+    ports:
+      - containerPort: 8000
+        localPort: 3203
+    podSpec:
+      livenessProbe:
+        httpGet:
+          path: /services
+          port: 8000
+      readinessProbe:
+        httpGet:
+          path: /services
+          port: 8000
+    env:
+      DR_LINKKI_TILES_URL: "https://jore4storage.blob.core.windows.net/jore4-ui/dr_linkki.mbtiles"

@@ -23,6 +23,10 @@ ingress:
     - path: /api/auth(/|$)(.*)
       serviceName: auth
       servicePort: 8080
+    # note the (/|$) allows the url to terminate after "mbtiles" or continue with a "/"
+    - path: /api/mbtiles(/|$)(.*)
+      serviceName: mbtiles
+      servicePort: 8000
     # note the first () will be an empty capture group
     - path: /()(.*)
       serviceName: ui
