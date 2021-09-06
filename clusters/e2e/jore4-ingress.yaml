@@ -35,6 +35,14 @@ spec:
                 port:
                   number: 8080
 
+          - path: "/api/mbtiles(/|$)(.*)"
+            pathType: Prefix
+            backend:
+              service:
+                name: "jore4-mbtiles"
+                port:
+                  number: 8000
+
           - path: "/()(.*)"
             pathType: Prefix
             backend:
