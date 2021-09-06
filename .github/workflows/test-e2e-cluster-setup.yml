@@ -84,6 +84,10 @@ jobs:
         run: |
           curl "https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${E2E_SCRIPTS_VERSION}/remotecluster.sh" | bash
 
+      - name: Debug
+        run: |
+          sleep 60 && kubectl get pods -A
+
       - name: Verify that UI is up and running
         uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
         with:
