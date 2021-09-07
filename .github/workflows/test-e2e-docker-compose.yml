@@ -17,7 +17,7 @@ jobs:
           - services: [""]
           # start only ui, auth backend and hasura, no ingress proxy
           # auth needs testdb for storing session data and hasura to run its migrations
-          - services: ["jore4-ui", "jore4-auth", "jore4-hasura", "jore4-testdb"]
+          - services: ["jore4-ui", "jore4-auth", "jore4-hasura", "jore4-mbtiles", "jore4-testdb"]
           # start only ui, auth backend, with ingress proxy
           - services: ["jore4-ui", "jore4-proxy"]
 
@@ -73,3 +73,15 @@ jobs:
         uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
         with:
           command: "curl --fail http://localhost:3300/api/auth/actuator/health --output /dev/null --silent"
+
+      - name: Verify that mbtiles server is up and running standalone
+        if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-mbtiles') }}
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3203/services --output /dev/null --silent"
+
+      - name: Verify that mbtiles server is up and running through proxy
+        if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-mbtiles') && contains(matrix.services, 'jore4-proxy') }}
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3300/api/mbtiles/services --output /dev/null --silent"
