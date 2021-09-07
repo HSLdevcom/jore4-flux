@@ -23,6 +23,7 @@ Flux configuration for the jore4 Kubernetes deployment
   - [Cluster Definitions](#cluster-definitions)
 - [Development](#development)
   - [Generate Kubernetes and Docker-Compose configurations](#generate-kubernetes-and-docker-compose-configurations)
+  - [Deploying a new microservice](#deploying-a-new-microservice)
   - [Generate Flux configurations](#generate-flux-configurations)
   - [Troubleshooting](#troubleshooting)
     - [Testing Kustomize](#testing-kustomize)
@@ -261,6 +262,31 @@ To rerender all yaml templates for all stages, run `./development.sh generate`
   - docker-compose.yaml: the actual docker-compose config
   - secret-\*: secret files to feed usernames & passwords to the containers
   - nginx.conf: to parameterize the ingress proxy
+
+### Deploying a new microservice
+
+1. Describe the new microservice in `generate/values/common.yaml`. For reference, see how other
+   microservices are created
+1. Create a new service manifest in `generate/templates/kubernetes-all`. If you don't need anything
+   custom additions, you could just copy-paste the template from another microservice and rename relevant parts
+1. If the service has an HTTP endpoint that needs to be accessed externally, create the ingress rule
+   in all environments `generate/values/<dev|e2e|playg|prod|test|...>.yaml`
+1. If there are other customizations to be done to the service (e.g. needs different environment
+   variables in different stages), edit the relevant parts in
+   `generate/values/<dev|e2e|playg|prod|test|...>.yaml`
+1. Generate the manifests using `./development.sh generate`
+1. Test locally that everything works:
+   1. with docker-compose: `docker-compose -f clusters/docker-compose/docker-compose.yml up`
+   1. with Kind: `./kindcluster.sh start --cluster=clusters/e2e`
+   1. with Azure: commit your changes, move `playg` branch to your the commit and wait for Flux to
+      deploy it for you
+1. Testing with CI/CD:
+   1. Kind cluster remote setup: extend the `patchesStrategicMerge` section in `/remotecluster.sh`
+      to allow switching the docker image to another one e2e tests.
+   1. Kind cluster github testing: extend all jobs with your microservice in
+      `.github/workflows/test-e2e-cluster-setup.yml`
+   1. Docker compose github testing: extend all jobs with your microservice in
+      `.github/workflows/test-e2e-docker-compose.yml`
 
 ### Generate Flux configurations
 
