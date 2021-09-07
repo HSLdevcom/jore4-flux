@@ -23,6 +23,7 @@ Flux configuration for the jore4 Kubernetes deployment
   - [Cluster Definitions](#cluster-definitions)
 - [Development](#development)
   - [Generate Kubernetes and Docker-Compose configurations](#generate-kubernetes-and-docker-compose-configurations)
+  - [Deploying a new microservice](#deploying-a-new-microservice)
   - [Generate Flux configurations](#generate-flux-configurations)
   - [Troubleshooting](#troubleshooting)
     - [Testing Kustomize](#testing-kustomize)
@@ -261,6 +262,21 @@ To rerender all yaml templates for all stages, run `./development.sh generate`
   - docker-compose.yaml: the actual docker-compose config
   - secret-\*: secret files to feed usernames & passwords to the containers
   - nginx.conf: to parameterize the ingress proxy
+
+### Deploying a new microservice
+
+1. Describe the new microservice in `generate/values/common.yaml`. For reference, see how other
+   microservices are created
+1. Create a new service manifest in `generate/templates/kubernetes-all`. If you don't need anything
+   custom additions, you could just copy-paste the template from another microservice
+1. If needed, create the ingress rule and other environment-specific customizations in
+   `generate/values/<dev|e2e|playg|prod|test|...>.yaml`
+1. Generate the manifests using `./development.sh generate`
+1. Test that everything works:
+   a) with docker-compose: `docker-compose -f clusters/docker-compose.yaml up`
+   b) with Kind: `./kindcluster start --cluster=clusters/e2e`
+   c) with Azure: commit your changes, move `playg` branch to your the commit and wait for Flux to
+   deploy it for you
 
 ### Generate Flux configurations
 
