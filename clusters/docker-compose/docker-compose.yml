@@ -71,7 +71,7 @@ services:
 
   jore4-mbtiles:
     container_name: "mbtiles"
-    image: "hsldevcom/jore4-mbtiles-server:main--76d9ca3dcc95c86915b9ebc444c5aeefcc10f050"
+    image: "hsldevcom/jore4-mbtiles-server:main--44335e22d65ec4cb2fd76b3869c4fc452f7f6dab"
     restart: "unless-stopped"
     networks:
       - jore4
@@ -95,7 +95,7 @@ services:
 
   jore4-ui:
     container_name: "ui"
-    image: "hsldevcom/jore4-ui:fix-docker-css--72224fc7574d8fb4486b43d8abc6afcf1b7f14c6"
+    image: "hsldevcom/jore4-ui:main--6e0d3f21ceb5e440e96bf65fc4268d66bedc15d5"
     restart: "unless-stopped"
     networks:
       - jore4
