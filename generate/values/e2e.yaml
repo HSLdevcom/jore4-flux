@@ -68,3 +68,34 @@ microServices:
       POSTGRES_DB: jore4e2e
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+  mssqltestdb:
+    serviceName: "mssqltestdb"
+    serviceType: "NodePort"
+    dockerImage: "hsldevcom/jore4-mssql-testdb:schema-only-main--bcc4c828a37f194b9ac416f7fa5de9583cf5b8ce"
+    ports:
+      - containerPort: 1433
+        nodePort: 30433
+        localPort: 1433
+    env:
+      SA_PASSWORD: "P@ssw0rd"
+    podSpec:
+      # the default 512Mi memory limit is not enough for the dockerized mssql database
+      resources:
+        limits:
+          memory: "1024Mi"
+  jore3importer:
+    ports:
+      - containerPort: 8080
+        nodePort: 30434
+        localPort: 3004
+    localSecrets:
+      source-db-hostname: jore4-mssqltestdb
+      source-db-port: 1433
+      source-db-database: jore3testdb
+      source-db-username: "sa"
+      source-db-password: "P@ssw0rd"
+      destination-db-hostname: jore4-testdb
+      destination-db-database: jore4e2e
+      # destination-db-port defaults to 5432
+      destination-db-username: postgres
+      destination-db-password: postgres

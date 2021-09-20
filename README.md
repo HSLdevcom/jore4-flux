@@ -48,6 +48,7 @@ For running the commands in this README, you'll need to following:
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/)
 - [Kustomize](https://kustomize.io/)
 - [Flux](https://fluxcd.io/)
+- [Kind](https://kind.sigs.k8s.io/)
 
 Optionally, you may want to install:
 

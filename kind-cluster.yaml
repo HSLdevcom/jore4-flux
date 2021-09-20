@@ -20,7 +20,17 @@ nodes:
       - containerPort: 80
         hostPort: 3300
         protocol: TCP
+
+      # services that are not accessible through ingress:
       # postgresql
       - containerPort: 30432
         hostPort: 3002
+        protocol: TCP
+      # mssql
+      - containerPort: 30433
+        hostPort: 3003
+        protocol: TCP
+      # jore3 importer
+      - containerPort: 30434
+        hostPort: 3004
         protocol: TCP

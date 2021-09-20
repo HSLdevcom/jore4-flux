@@ -79,7 +79,7 @@ function deploy_cluster {
 }
 
 function kind_start {
-  kind create cluster --name "$KIND_CLUSTER_NAME" --config="$KIND_CONFIG" || echo "Kind cluster is already up and running"
+  kind create cluster --name "$KIND_CLUSTER_NAME" --config="$KIND_CONFIG" --image="kindest/node:v1.20.7" || echo "Kind cluster is already up and running"
 
   # It's necessary to wait for the Kind nodes to be ready before start using them, otherwise the
   # nginx ingress controller won't find the one with the label "ingress-ready"

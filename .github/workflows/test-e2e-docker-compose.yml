@@ -17,9 +17,25 @@ jobs:
           - services: [""]
           # start only ui, auth backend and hasura, no ingress proxy
           # auth needs testdb for storing session data and hasura to run its migrations
-          - services: ["jore4-ui", "jore4-auth", "jore4-hasura", "jore4-mbtiles", "jore4-testdb"]
+          - services:
+              [
+                "jore4-ui",
+                "jore4-auth",
+                "jore4-hasura",
+                "jore4-mbtiles",
+                "jore4-testdb",
+              ]
           # start only ui, auth backend, with ingress proxy
           - services: ["jore4-ui", "jore4-proxy"]
+
+          # start only test databases and jore3 importer + hasura for running migrations
+          - services:
+              [
+                "jore4-testdb",
+                "jore4-hasura",
+                "jore4-mssqltestdb",
+                "jore4-jore3importer",
+              ]
 
     steps:
       - name: Checkout code
@@ -49,6 +65,14 @@ jobs:
         uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
         with:
           command: "pg_isready -h localhost -p 6432"
+
+      - name: Verify that mssql testdb is up and running
+        if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-mssqltestdb') }}
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        env:
+          SA_PASSWORD: "P@ssw0rd"
+        with:
+          command: 'sqlcmd -S 127.0.0.1 -U sa -P "$SA_PASSWORD" -d master -Q "SELECT ''OK'';"'
 
       - name: Verify that hasura is up and running standalone
         if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-hasura') }}
@@ -85,3 +109,9 @@ jobs:
         uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
         with:
           command: "curl --fail http://localhost:3300/api/mbtiles/services --output /dev/null --silent"
+
+      - name: Verify that jore3 importer is up and running standalone
+        if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-jore3importer') }}
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3204/actuator/health --output /dev/null --silent"

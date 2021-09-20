@@ -10,5 +10,6 @@ resources:
   - ./jore4-ingress.yaml
   - ./jore4-auth.yaml
   - ./jore4-hasura.yaml
+  - ./jore4-jore3importer.yaml
   - ./jore4-mbtiles.yaml
   - ./jore4-ui.yaml
