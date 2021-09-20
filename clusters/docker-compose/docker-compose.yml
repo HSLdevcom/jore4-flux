@@ -69,6 +69,38 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+  jore4-jore3importer:
+    container_name: "jore3importer"
+    image: "hsldevcom/jore4-jore3-importer:main--80cb88c8cc768ee9fb647dd58aac7d0036ad0905"
+    restart: "unless-stopped"
+    networks:
+      - jore4
+    environment:
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+    ports:
+      - "127.0.0.1:3004:8080"
+    secrets:
+      - source: jore3importer-destination-db-database
+        target: /mnt/secrets-store/destination-db-database
+      - source: jore3importer-destination-db-hostname
+        target: /mnt/secrets-store/destination-db-hostname
+      - source: jore3importer-destination-db-password
+        target: /mnt/secrets-store/destination-db-password
+      - source: jore3importer-destination-db-username
+        target: /mnt/secrets-store/destination-db-username
+      - source: jore3importer-source-db-database
+        target: /mnt/secrets-store/source-db-database
+      - source: jore3importer-source-db-hostname
+        target: /mnt/secrets-store/source-db-hostname
+      - source: jore3importer-source-db-password
+        target: /mnt/secrets-store/source-db-password
+      - source: jore3importer-source-db-port
+        target: /mnt/secrets-store/source-db-port
+      - source: jore3importer-source-db-username
+        target: /mnt/secrets-store/source-db-username
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
   jore4-mbtiles:
     container_name: "mbtiles"
     image: "hsldevcom/jore4-mbtiles-server:main--44335e22d65ec4cb2fd76b3869c4fc452f7f6dab"
@@ -79,6 +111,17 @@ services:
       DR_LINKKI_TILES_URL: "https://jore4storage.blob.core.windows.net/jore4-ui/dr_linkki.mbtiles"
     ports:
       - "127.0.0.1:3203:8000"
+
+  jore4-mssqltestdb:
+    container_name: "mssqltestdb"
+    image: "hsldevcom/jore4-mssql-testdb:schema-only-main--bcc4c828a37f194b9ac416f7fa5de9583cf5b8ce"
+    restart: "unless-stopped"
+    networks:
+      - jore4
+    environment:
+      SA_PASSWORD: "P@ssw0rd"
+    ports:
+      - "127.0.0.1:1433:1433"
 
   jore4-testdb:
     container_name: "testdb"
@@ -141,3 +184,21 @@ secrets:
     file: ./secret-hasura-db-username
   hasura-hasura-admin-secret:
     file: ./secret-hasura-hasura-admin-secret
+  jore3importer-destination-db-database:
+    file: ./secret-jore3importer-destination-db-database
+  jore3importer-destination-db-hostname:
+    file: ./secret-jore3importer-destination-db-hostname
+  jore3importer-destination-db-password:
+    file: ./secret-jore3importer-destination-db-password
+  jore3importer-destination-db-username:
+    file: ./secret-jore3importer-destination-db-username
+  jore3importer-source-db-database:
+    file: ./secret-jore3importer-source-db-database
+  jore3importer-source-db-hostname:
+    file: ./secret-jore3importer-source-db-hostname
+  jore3importer-source-db-password:
+    file: ./secret-jore3importer-source-db-password
+  jore3importer-source-db-port:
+    file: ./secret-jore3importer-source-db-port
+  jore3importer-source-db-username:
+    file: ./secret-jore3importer-source-db-username
