@@ -22,6 +22,9 @@ ingress:
     - path: /api/mbtiles/*
       serviceName: mbtiles
       servicePort: 8000
+    - path: /api/importer/*
+      serviceName: jore3importer
+      servicePort: 8080
 microServices:
   hasura:
     env:

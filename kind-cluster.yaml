@@ -24,3 +24,7 @@ nodes:
       - containerPort: 30432
         hostPort: 3002
         protocol: TCP
+      # mssql
+      - containerPort: 30433
+        hostPort: 3003
+        protocol: TCP

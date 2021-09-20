@@ -29,6 +29,8 @@ chmod u+x "$tmp_dir/kindcluster.sh"
 # replaced with image in the value, e.g. AUTH_DOCKER_IMAGE="hsldevcom/jore4-auth:ghi"
 # - MBTILES_DOCKER_IMAGE env variable is defined, the mbtiles server image in the Kind cluster will be
 # replaced with image in the value, e.g. MBTILES_DOCKER_IMAGE="hsldevcom/jore4-mbtiles-server:jkl"
+# - IMPORTER_DOCKER_IMAGE env variable is defined, the jore3 importer image in the Kind cluster will be
+# replaced with image in the value, e.g. IMPORTER_DOCKER_IMAGE="hsldevcom/jore4-jore3-importer:mno"
 echo "Customizing cluster definition"
 cat <<EOT >"$tmp_dir/kustomization.yaml"
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -86,6 +88,18 @@ patchesStrategicMerge:
         containers:
         - name: jore4-mbtiles-image
           ${MBTILES_DOCKER_IMAGE:+image: $MBTILES_DOCKER_IMAGE}
+- |-
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: jore4-jore3importer
+    namespace: hsl-jore4
+  spec:
+    template:
+      spec:
+        containers:
+        - name: jore4-jore3importer-image
+          ${IMPORTER_DOCKER_IMAGE:+image: $IMPORTER_DOCKER_IMAGE}
 EOT
 
 echo "Downloading Kind config"

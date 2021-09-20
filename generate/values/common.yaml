@@ -102,3 +102,32 @@ microServices:
           port: 8000
     env:
       DR_LINKKI_TILES_URL: "https://jore4storage.blob.core.windows.net/jore4-ui/dr_linkki.mbtiles"
+  jore3importer:
+    serviceName: "jore3importer"
+    serviceType: "ClusterIP"
+    dockerImage: "hsldevcom/jore4-jore3-importer:main--80cb88c8cc768ee9fb647dd58aac7d0036ad0905"
+    ports:
+      - containerPort: 8080
+        localPort: 3204
+    podSpec:
+      livenessProbe:
+        httpGet:
+          path: /actuator/health
+          port: 8080
+      readinessProbe:
+        httpGet:
+          path: /actuator/health
+          port: 8080
+    env:
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+    secretMappings:
+      hsl-jore3-db-hostname: source-db-hostname
+      hsl-jore3-db-port: source-db-port
+      hsl-jore3-db-database: source-db-database
+      hsl-jore3-db-username: source-db-username
+      hsl-jore3-db-password: source-db-password
+      hsl-jore4-public-db-hostname: destination-db-hostname
+      hsl-jore4-public-db-database: destination-db-database
+      # destination-db-port defaults to 5432
+      hsl-jore4-db-jore3importer-username: destination-db-username
+      hsl-jore4-db-jore3importer-password: destination-db-password

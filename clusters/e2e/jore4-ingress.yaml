@@ -43,6 +43,14 @@ spec:
                 port:
                   number: 8000
 
+          - path: "/api/importer(/|$)(.*)"
+            pathType: Prefix
+            backend:
+              service:
+                name: "jore4-jore3importer"
+                port:
+                  number: 8080
+
           - path: "/()(.*)"
             pathType: Prefix
             backend:

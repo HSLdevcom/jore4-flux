@@ -1,0 +1,89 @@
+# This is a generated file, all modifications will be overwritten!
+
+# Describes the default environment variables, secrets the deployment template and the service for jore3 importer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jore4-jore3importer
+  namespace: hsl-jore4
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "jore4-jore3importer"
+  template:
+    metadata:
+      labels:
+        app: "jore4-jore3importer"
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: "jore4-jore3importer-image"
+          image: "hsldevcom/jore4-jore3-importer:main--80cb88c8cc768ee9fb647dd58aac7d0036ad0905"
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: "jore4-jore3importer-env"
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+
+      volumes:
+        - name: secrets-store-inline
+          configMap:
+            name: jore4-jore3importer-local-secrets
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jore4-jore3importer
+  namespace: hsl-jore4
+spec:
+  type: ClusterIP
+  selector:
+    app: jore4-jore3importer
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "jore4-jore3importer-local-secrets"
+  namespace: hsl-jore4
+data:
+  destination-db-database: "jore4e2e"
+  destination-db-hostname: "jore4-testdb"
+  destination-db-password: "postgres"
+  destination-db-username: "postgres"
+  source-db-database: "jore3testdb"
+  source-db-hostname: "jore4-mssqltestdb"
+  source-db-password: "P@ssw0rd"
+  source-db-port: "1433"
+  source-db-username: "sa"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "jore4-jore3importer-env"
+  namespace: hsl-jore4
+data:
+  SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+
+
