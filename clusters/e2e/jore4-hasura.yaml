@@ -69,7 +69,7 @@ metadata:
 data:
   db-auth-username: "postgres"
   db-hostname: "jore4-testdb"
-  db-name: "postgres"
+  db-name: "jore4e2e"
   db-password: "postgres"
   db-username: "postgres"
   hasura-admin-secret: "hasura"
