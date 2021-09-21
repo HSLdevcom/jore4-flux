@@ -68,7 +68,7 @@ metadata:
   namespace: hsl-jore4
 data:
   db-hostname: "jore4-testdb"
-  db-name: "postgres"
+  db-name: "jore4e2e"
   db-password: "postgres"
   db-username: "postgres"
   oidc-client-id: "0838619941439007"

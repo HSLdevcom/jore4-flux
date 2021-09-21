@@ -37,7 +37,7 @@ microServices:
       HASURA_GRAPHQL_ENABLE_CONSOLE: "false"
     localSecrets:
       db-hostname: jore4-testdb
-      db-name: postgres
+      db-name: jore4e2e
       db-username: postgres
       db-password: postgres
       hasura-admin-secret: hasura
@@ -53,7 +53,7 @@ microServices:
       oidc-client-id: "0838619941439007"
       oidc-client-secret: "9uV5p45F6IZQubCErBiquZYaL7Wm2AWM"
       db-hostname: jore4-testdb
-      db-name: postgres
+      db-name: jore4e2e
       db-username: postgres
       db-password: postgres
   testdb:
