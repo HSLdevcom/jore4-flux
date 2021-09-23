@@ -1,0 +1,121 @@
+# This is a generated file, all modifications will be overwritten!
+
+# Describes the default environment variables, secrets the deployment template and the service for jore4 auth backend instance
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jore4-auth
+  namespace: hsl-jore4
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "jore4-auth"
+  template:
+    metadata:
+      labels:
+        app: "jore4-auth"
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: "jore4-auth-image"
+          image: "hsldevcom/jore4-auth:main--60a1dd2715803e63cdde7f36e6955d5f0eb29d0a"
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: "jore4-auth-env"
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+
+      volumes:
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "jore4-auth-secret-mapping"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jore4-auth
+  namespace: hsl-jore4
+spec:
+  type: ClusterIP
+  selector:
+    app: jore4-auth
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+---
+apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
+kind: SecretProviderClass
+metadata:
+  name: jore4-auth-secret-mapping
+  namespace: hsl-jore4
+spec:
+  provider: azure
+  parameters:
+    useVMManagedIdentity: "true"
+    tenantId: "572a41dd-c389-4f0a-b256-aefd1bf149d7"
+    keyvaultName: "hsl-jore4-prod-vault"
+    objects: |
+      array:
+        - |
+          objectName: hsl-jore4-auth-oidc-client-id
+          objectAlias: oidc-client-id
+          objectType: secret
+        - |
+          objectName: hsl-jore4-auth-oidc-client-secret
+          objectAlias: oidc-client-secret
+          objectType: secret
+        - |
+          objectName: hsl-jore4-db-auth-password
+          objectAlias: db-password
+          objectType: secret
+        - |
+          objectName: hsl-jore4-db-auth-username
+          objectAlias: db-username
+          objectType: secret
+        - |
+          objectName: hsl-jore4-public-db-database
+          objectAlias: db-name
+          objectType: secret
+        - |
+          objectName: hsl-jore4-public-db-hostname
+          objectAlias: db-hostname
+          objectType: secret
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "jore4-auth-env"
+  namespace: hsl-jore4
+data:
+  API_PATH_PREFIX: ""
+  API_PATH_PREFIX_PUBLIC: "/api/auth"
+  DB_SESSION_SCHEMA: "auth_session"
+  LOGINPAGE_URL: "https://jore.hsl.fi"
+  LOGOUTPAGE_URL: "https://jore.hsl.fi"
+  OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
+  SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+  SELF_PUBLIC_BASE_URL: "https://jore.hsl.fi"
+
+

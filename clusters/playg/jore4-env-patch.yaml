@@ -1,9 +1,0 @@
-# Patches jore4 services to add/customize some environment variables
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: jore4-hasura-env
-  namespace: hsl-jore4
-data:
-  HASURA_GRAPHQL_ENABLE_CONSOLE: "false"

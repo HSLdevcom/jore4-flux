@@ -1,0 +1,27 @@
+stage: test
+ingress:
+  type: agic
+  hostname: test.jore.hsl.fi
+  routes:
+    - path: /
+      serviceName: ui
+      servicePort: 80
+    - path: /api/graphql/*
+      serviceName: hasura
+      servicePort: 8080
+    - path: /api/auth/*
+      serviceName: auth
+      servicePort: 8080
+    - path: /api/mbtiles/*
+      serviceName: mbtiles
+      servicePort: 8000
+microServices:
+  hasura:
+    env:
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "false"
+  auth:
+    env:
+      SELF_PUBLIC_BASE_URL: "https://test.jore.hsl.fi"
+      LOGINPAGE_URL: "https://test.jore.hsl.fi"
+      LOGOUTPAGE_URL: "https://test.jore.hsl.fi"
+      OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"

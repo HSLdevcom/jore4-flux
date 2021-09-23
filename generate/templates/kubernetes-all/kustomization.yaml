@@ -1,0 +1,15 @@
+# This is a generated file, all modifications will be overwritten!
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ./jore4-namespace.yaml
+  - ./jore4-limit-range.yaml
+{{- if .Values.fluxSyncEnabled }}
+  - ./flux-sync.yaml
+{{- end }}
+  - ./jore4-ingress.yaml
+{{- range $microService, $value := .Values.microServices }}
+  - ./jore4-{{ $microService }}.yaml
+{{- end }}

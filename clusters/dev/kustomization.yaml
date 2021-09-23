@@ -1,22 +1,14 @@
+# This is a generated file, all modifications will be overwritten!
+
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - ../base/jore4-services
-  - ../base/jore4-secret-bindings
+  - ./jore4-namespace.yaml
+  - ./jore4-limit-range.yaml
   - ./flux-sync.yaml
-
-patchesStrategicMerge:
-  - ./jore4-env-patch.yaml
-  - ./jore4-secrets-patch.yaml
-
-patches:
-  # patch every SecretProviderClass to use the proper keyvault
-  - path: jore4-keyvaults-patch.yaml
-    target:
-      kind: SecretProviderClass
-
-  # patch every Ingress to use the proper keyvault and hostname
-  - path: jore4-ingress-patch.yaml
-    target:
-      kind: Ingress
+  - ./jore4-ingress.yaml
+  - ./jore4-auth.yaml
+  - ./jore4-hasura.yaml
+  - ./jore4-mbtiles.yaml
+  - ./jore4-ui.yaml

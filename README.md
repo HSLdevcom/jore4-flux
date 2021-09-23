@@ -18,11 +18,12 @@ Flux configuration for the jore4 Kubernetes deployment
   - [Branching](#branching)
   - [Rebasing](#rebasing)
   - [Rollback and Hotfixes](#rollback-and-hotfixes)
+- [Directory Structure](#directory-structure)
+  - [CRDs](#crds)
+  - [Cluster Definitions](#cluster-definitions)
 - [Development](#development)
-  - [Cluster Directory Structure](#cluster-directory-structure)
-    - [CRDs](#crds)
-    - [Base Resource Templates](#base-resource-templates)
-    - [Cluster Definitions](#cluster-definitions)
+  - [Generate Kubernetes and Docker-Compose configurations](#generate-kubernetes-and-docker-compose-configurations)
+  - [Deploying a new microservice](#deploying-a-new-microservice)
   - [Generate Flux configurations](#generate-flux-configurations)
   - [Troubleshooting](#troubleshooting)
     - [Testing Kustomize](#testing-kustomize)
@@ -30,11 +31,13 @@ Flux configuration for the jore4 Kubernetes deployment
     - [Uninstall](#uninstall)
     - [Flux Monitoring](#flux-monitoring)
 - [Use in end-to-end tests](#use-in-end-to-end-tests)
-  - [Setting up Kind cluster locally](#setting-up-kind-cluster-locally)
-  - [Setting up Kind cluster remotely](#setting-up-kind-cluster-remotely)
-  - [Development of Kind cluster](#development-of-kind-cluster)
-  - [Architecture and port mapping in Kind cluster](#architecture-and-port-mapping-in-kind-cluster)
-  - [Differences between AKS and Kind](#differences-between-aks-and-kind)
+  - [Kind](#kind)
+    - [Setting up Kind cluster locally](#setting-up-kind-cluster-locally)
+    - [Setting up Kind cluster remotely](#setting-up-kind-cluster-remotely)
+    - [Development of Kind cluster](#development-of-kind-cluster)
+    - [Architecture and port mapping in Kind cluster](#architecture-and-port-mapping-in-kind-cluster)
+    - [Differences between AKS and Kind](#differences-between-aks-and-kind)
+  - [Docker-compose](#docker-compose)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -104,12 +107,11 @@ Kustomize restrictions:
 
 ### Basic Idea
 
-- The current Flux setup is monitoring changes in `dev`, `test` and `prod` branches.
+- The current Flux setup is monitoring changes in `playg`, `dev`, `test` and `prod` branches.
 - Other branches don't affect the deployment. Also you need to remember to push the branches to github :)
 - When the branch is moved to a different commit, Flux picks up the configuration: `./clusters/dev`
-  for `dev` branch, `./clusters/test` for `test` branch and `./clusters/prod` for `prod` branch. Flux
-  tries to deploy the given configuration and sends a message to Slack when it succeeds/fails (to
-  be implemented later).
+  for `dev` branch, `./clusters/test` for `test` branch and so on. Flux
+  tries to deploy the given configuration and sends a message to Slack when it succeeds/fails (slack notification to be implemented later).
 
 ### Trackability
 
@@ -128,8 +130,8 @@ We are assuming here that git commits contain configurations which will succeed 
 time delay is negligible.
 
 _Rule 2:_ We should be able to _confidently_ push versions to `prod`, knowing that if the same configuration
-worked in `dev` and `test`, it will also work in `prod`. This implies that we have to minimize the
-difference between the `dev`, `test` and `prod` deployment configurations and that we ensure that
+worked in `playg`, `dev` and `test`, it will also work in `prod`. This implies that we have to minimize the
+difference between the `playg`, `dev`, `test` and `prod` deployment configurations and that we ensure that
 all the tested changes in the `dev` configurations will be fluently propagated to `test` and `prod`.
 
 ### Branching
@@ -142,7 +144,9 @@ point, the deployment configuration changes don't get deployed to the different 
 `test` and `prod` branches haven't been touched. This should ensure Trackability Rule 2 to be
 implemented.
 
-Whenever deploying a version to a stage, should use no-fast-forward git merging to make sure that at
+The `playg` branch can be freely moved around to any commit. Its purpose is to allow fast and easy testing of a new cluster setup in Azure.
+
+Whenever deploying a version to a `dev`/`test`/`prod` stages, you should use no-fast-forward git merging to make sure that at
 least an empty commit is created to testify about the configuration change in the given stage
 (Trackability Rule 1). For `dev` stage, it should look like this:
 
@@ -186,11 +190,9 @@ In case you want to do a hotfix in production for a critical issue, you should c
 commit directly in `prod`. Remember to also cherry-pick it to `main` to avoid merge conflicts later
 on. However avoid hotfixing and strive to test your changes properly in `dev` and `test`.
 
-## Development
+## Directory Structure
 
-### Cluster Directory Structure
-
-#### CRDs
+### CRDs
 
 The cluster uses the following Custom Resource Definitions (~ Kubernetes plugins):
 
@@ -201,20 +203,9 @@ The cluster uses the following Custom Resource Definitions (~ Kubernetes plugins
 To be able to create special resources (like secret provider mapping), you need to deploy the
 CRDs first with `./kubernetes.sh deploy:crd <stage>`
 
-#### Base Resource Templates
+### Cluster Definitions
 
-The base resource templates can be found from `clusters/base`.
-
-`jore4-services` defines the basic Kubernetes services for jore4: hasura, frontend
-and ingress. The ingress defines how the HTTP requests are mapped to the Kubernetes pods.
-
-`jore4-secret-bindings` defines the resources required for mapping Azure key-vault secrets to
-the jore4 services. This is in a separate directory, because in some cases (e.g. for running
-the cluster locally) we want to map secrets using different volumes - like local files
-
-#### Cluster Definitions
-
-The actual cluster definitons can be found from `clusters/dev`, `clusters/test` and
+The cluster definitons can be found from `clusters/dev`, `clusters/test` and
 `clusters/prod`. For example, `dev` includes the following:
 
 - `flux-sync.yaml` tells Flux what repository (`jore4-flux`), branch (`dev`) and folder
@@ -226,6 +217,76 @@ The actual cluster definitons can be found from `clusters/dev`, `clusters/test` 
   form the `dev` environment
 
 Deploy the `dev` cluster with `./kubernetes.sh deploy:cluster dev`
+
+To make sure that all stages' cluster definitions are the same (except of course the stage-specific
+configurations), we are [generating the yamls](#yaml-templates) with gomplate
+
+Clusters have [LimitRange](https://kubernetes.io/docs/concepts/policy/limit-range/) defined to avoid
+memory/CPU leaks for misbehaving containers. These resource limits are defined tight to identify
+resource bottlenecks early. These limits can be set for the whole namespace and can be overridden
+also for individual pods.
+[See here](https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/)
+
+## Development
+
+### Generate Kubernetes and Docker-Compose configurations
+
+To help creating generic configurations for Kubernetes and Docker-Compose,
+we are using [gomplate](https://docs.gomplate.ca/) for rendering yaml templates. This is the same tool
+that Helm uses to render its charts, we are also aiming to keep a similar directory structure to
+support switching to Helm easy in case the need emerges in the future.
+
+The templates are found from `/generate/templates`:
+
+- `resources`: individual resource definition template pieces (e.g. deployment, service, configmap)
+  from which other bigger templates are building
+- `kubernetes-all`: templates that all clusters should render (e2e, playg, dev, test, prod)
+- `kubernetes-azure-only`: templates that azure clusters should additionally render (e.g. flux sync file)
+- `kubernetes-local-only`: templates that local clusters should additionally render (e.g. test databases)
+- `docker-compose`: template that renders into a docker-compose.yaml file.
+
+The substituted values can be found from `/generate/values`:
+
+- `common.yaml`: general definition/configuration of all microservices, with default values
+- `e2e|playg|dev|test|prod.yaml`: stage-specific overwrites of the common defaults
+
+To rerender all yaml templates for all stages, run `./development.sh generate`
+
+- Generated Kubernetes clusters (`e2e`,`playg`,`dev`,`test`,`prod`) will have the following files:
+  - flux-sync.yaml: for flux configurations
+  - jore4-namespace.yaml: for creating the namespace
+  - jore4-ingress.yaml: for creating the ingress
+  - jore4-\*.yaml: for creating the microservices
+  - kustomization.yaml: for bundling this all to a deployable package for Kustomize/Flux
+- Generated Docker-Compose setup will have the following files:
+  - docker-compose.yaml: the actual docker-compose config
+  - secret-\*: secret files to feed usernames & passwords to the containers
+  - nginx.conf: to parameterize the ingress proxy
+
+### Deploying a new microservice
+
+1. Describe the new microservice in `generate/values/common.yaml`. For reference, see how other
+   microservices are created
+1. Create a new service manifest in `generate/templates/kubernetes-all`. If you don't need anything
+   custom additions, you could just copy-paste the template from another microservice and rename relevant parts
+1. If the service has an HTTP endpoint that needs to be accessed externally, create the ingress rule
+   in all environments `generate/values/<dev|e2e|playg|prod|test|...>.yaml`
+1. If there are other customizations to be done to the service (e.g. needs different environment
+   variables in different stages), edit the relevant parts in
+   `generate/values/<dev|e2e|playg|prod|test|...>.yaml`
+1. Generate the manifests using `./development.sh generate`
+1. Test locally that everything works:
+   1. with docker-compose: `docker-compose -f clusters/docker-compose/docker-compose.yml up`
+   1. with Kind: `./kindcluster.sh start --cluster=clusters/e2e`
+   1. with Azure: commit your changes, move `playg` branch to your the commit and wait for Flux to
+      deploy it for you
+1. Testing with CI/CD:
+   1. Kind cluster remote setup: extend the `patchesStrategicMerge` section in `/remotecluster.sh`
+      to allow switching the docker image to another one in e2e tests.
+   1. Kind cluster github testing: extend all jobs with your microservice in
+      `.github/workflows/test-e2e-cluster-setup.yml`
+   1. Docker compose github testing: extend all jobs with your microservice in
+      `.github/workflows/test-e2e-docker-compose.yml`
 
 ### Generate Flux configurations
 
@@ -335,10 +396,12 @@ there's a wrong version deployed:
 
 ## Use in end-to-end tests
 
+### Kind
+
 To run the cluster locally in kubernetes, we are using
 [kind](https://kind.sigs.k8s.io/docs/user/quick-start#installation).
 
-### Setting up Kind cluster locally
+#### Setting up Kind cluster locally
 
 To start Kind, execute `./kindcluster.sh kind:start`, to stop, run `./kindcluster.sh stop`.
 This will create a cluster called `kind-jore4-local-cluster` that works pretty much the same as the
@@ -369,7 +432,7 @@ This will start up the JORE4 cluster that's defined in `clusters/e2e` directory.
 We don't use Flux to set up the applications within the Kind Kubernetes as it would just slow things
 down. Instead, the resources are deployed directly.
 
-### Setting up Kind cluster remotely
+#### Setting up Kind cluster remotely
 
 To set up and run the Kind cluster remotely, from e.g. a github action instead of your local workdir,
 there is a `remotecluster.sh` script in the repo root that downloads the necessary configuration
@@ -386,16 +449,18 @@ curl https://raw.githubusercontent.com/HSLdevcom/jore4-flux/e2e/remotecluster.sh
 
 The script recognizes the following environment variables as parameters:
 
-- `FRONTEND_DOCKER_IMAGE`: redefines which frontend docker image should be used instead of the e2e
-  cluster default. E.g `FRONTEND_DOCKER_IMAGE="hsldevcom/jore4-ui:latest"`
+- `UI_DOCKER_IMAGE`: redefines which UI docker image should be used instead of the e2e
+  cluster default. E.g `UI_DOCKER_IMAGE="hsldevcom/jore4-ui:latest"`
 - `HASURA_DOCKER_IMAGE`: redefines which hasura docker image should be used instead of the e2e
-  cluster default. E.g `FRONTEND_DOCKER_IMAGE="hsldevcom/jore4-hasura:latest"`
+  cluster default. E.g `HASURA_DOCKER_IMAGE="hsldevcom/jore4-hasura:latest"`
+- `AUTH_DOCKER_IMAGE`: redefines which auth backend docker image should be used instead of the e2e
+  cluster default. E.g `AUTH_DOCKER_IMAGE="hsldevcom/jore4-auth:latest"`
 
 To stop and remove the cluster, call `kind delete clusters jore4-local-cluster`. This will delete
 the docker container(s) where Kind is running and free up all resources. Currently we are not using
 volume mappings, so there's no need to clean up any directories either.
 
-### Development of Kind cluster
+#### Development of Kind cluster
 
 When making changes to the Kind cluster setup, modify `kind-cluster.yaml` as described
 [here](https://kind.sigs.k8s.io/docs/user/configuration). You have to delete and rerun the Kind
@@ -405,11 +470,11 @@ Otherwise, if you make changes in the Kubernetes cluster resources themselves (u
 you may reapply the changes by calling `kindcluster.sh` again. `remotecluster.sh` loads resources
 from the `e2e` branch, so cannot be tested locally.
 
-### Architecture and port mapping in Kind cluster
+#### Architecture and port mapping in Kind cluster
 
 ![Architecture and port mapping](docs/kindcluster.png)
 
-### Differences between AKS and Kind
+#### Differences between AKS and Kind
 
 - Kind is still in early development, many Kubernetes features won't work.
 - Azure's `AGIC ingress controller` is only intended for AKS, we are using `nginx` as a substitute
@@ -419,3 +484,47 @@ from the `e2e` branch, so cannot be tested locally.
   to the cluster as a volume.
 - We don't have a `key-vault` locally, so instead of using the `secret store CSI driver`, we'll
   have to map the secrets to the pods directly as files from the host machine
+
+### Docker-compose
+
+To run e2e tests or run microservices locally, we can also use
+[docker-compose](https://docs.docker.com/compose/). Whenever the `clusters/docker-compose` directory is updated in the `e2e` branch, a new version of the release tar.gz is created in the [repository](https://github.com/HSLdevcom/jore4-flux/releases).
+
+You may use the following script for downloading and starting up docker-compose in your own
+project repository. It will always download the latest version of the docker-compose package to your
+workspace and run it. Feel free to modify it to your needs (e.g. patch the nginx conf file or set
+your custom docker-compose override yaml file).
+
+```sh
+#!/bin/bash
+
+set -euo pipefail
+
+# download latest version of the docker-compose package
+mkdir -p ./docker
+curl -L https://github.com/HSLdevcom/jore4-flux/releases/download/e2e-docker-compose/e2e-docker-compose.tar.gz | tar -xvf - -C ./docker/
+
+# start up all services
+docker-compose -f ./docker/docker-compose.yml up
+
+# start up only some services
+# docker-compose -f ./docker/docker-compose.yml up jore4-ui jore4-proxy
+
+# start up only some services, in the background
+# docker-compose -f ./docker/docker-compose.yml up -d jore4-ui jore4-proxy
+```
+
+As there is a new version coming of this docker-compose package, it's wise to add the `./docker`
+folder to `.gitignore`.
+
+To overwrite some values in the generic docker-compose config, you could use
+[docker-compose overrides](https://docs.docker.com/compose/extends/#multiple-compose-files)
+
+To use your local repository version of the docker image instead of the e2e version, you could use
+[docker-compose local build](https://docs.docker.com/compose/compose-file/compose-file-v3/#build)
+
+To run your service locally e.g. in Maven and then point services within the docker-compose network
+to use this natively running service, you could use
+[host.docker.internal](https://docs.docker.com/desktop/windows/networking/#per-container-ip-addressing-is-not-possible).
+For this, the `extra_hosts` parameter is already set for every service within the docker-compose
+package.

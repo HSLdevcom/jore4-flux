@@ -21,10 +21,14 @@ curl "https://raw.githubusercontent.com/HSLdevcom/jore4-flux/$E2E_SCRIPTS_VERSIO
 chmod u+x "$tmp_dir/kindcluster.sh"
 
 # Loading the base e2e cluster definition, then patch it:
-# - FRONTEND_DOCKER_IMAGE env variable is defined, the frontend image in the Kind cluster will be
-# replaced with image in the value, e.g. FRONTEND_DOCKER_IMAGE="hsldevcom/jore4-ui:abc"
-# - HASURA_DOCKER_IMAGE env variable is defined, the frontend image in the Kind cluster will be
+# - UI_DOCKER_IMAGE env variable is defined, the ui image in the Kind cluster will be
+# replaced with image in the value, e.g. UI_DOCKER_IMAGE="hsldevcom/jore4-ui:abc"
+# - HASURA_DOCKER_IMAGE env variable is defined, the hasura image in the Kind cluster will be
 # replaced with image in the value, e.g. HASURA_DOCKER_IMAGE="hsldevcom/jore4-hasura:def"
+# - AUTH_DOCKER_IMAGE env variable is defined, the auth backend image in the Kind cluster will be
+# replaced with image in the value, e.g. AUTH_DOCKER_IMAGE="hsldevcom/jore4-auth:ghi"
+# - MBTILES_DOCKER_IMAGE env variable is defined, the mbtiles server image in the Kind cluster will be
+# replaced with image in the value, e.g. MBTILES_DOCKER_IMAGE="hsldevcom/jore4-mbtiles-server:jkl"
 echo "Customizing cluster definition"
 cat <<EOT >"$tmp_dir/kustomization.yaml"
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -38,14 +42,14 @@ patchesStrategicMerge:
   apiVersion: apps/v1
   kind: Deployment
   metadata:
-    name: jore4-frontend
+    name: jore4-ui
     namespace: hsl-jore4
   spec:
     template:
       spec:
         containers:
-        - name: jore4-frontend-image
-          ${FRONTEND_DOCKER_IMAGE:+image: $FRONTEND_DOCKER_IMAGE}
+        - name: jore4-ui-image
+          ${UI_DOCKER_IMAGE:+image: $UI_DOCKER_IMAGE}
 - |-
   apiVersion: apps/v1
   kind: Deployment
@@ -58,6 +62,30 @@ patchesStrategicMerge:
         containers:
         - name: jore4-hasura-image
           ${HASURA_DOCKER_IMAGE:+image: $HASURA_DOCKER_IMAGE}
+- |-
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: jore4-auth
+    namespace: hsl-jore4
+  spec:
+    template:
+      spec:
+        containers:
+        - name: jore4-auth-image
+          ${AUTH_DOCKER_IMAGE:+image: $AUTH_DOCKER_IMAGE}
+- |-
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: jore4-mbtiles
+    namespace: hsl-jore4
+  spec:
+    template:
+      spec:
+        containers:
+        - name: jore4-mbtiles-image
+          ${MBTILES_DOCKER_IMAGE:+image: $MBTILES_DOCKER_IMAGE}
 EOT
 
 echo "Downloading Kind config"

@@ -1,0 +1,104 @@
+tenantId: "572a41dd-c389-4f0a-b256-aefd1bf149d7"
+fluxSyncEnabled: true
+limitRanges:
+  memory:
+    default: 512Mi
+    defaultRequest: 256Mi
+  cpu:
+    default: 1
+    defaultRequest: 0.1
+microServices:
+  auth:
+    serviceName: "auth"
+    serviceType: "ClusterIP"
+    dockerImage: "hsldevcom/jore4-auth:main--60a1dd2715803e63cdde7f36e6955d5f0eb29d0a"
+    ports:
+      - containerPort: 8080
+        localPort: 3200
+    podSpec:
+      livenessProbe:
+        httpGet:
+          path: /actuator/health
+          port: 8080
+      readinessProbe:
+        httpGet:
+          path: /actuator/health
+          port: 8080
+    env:
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+      API_PATH_PREFIX: ""
+      API_PATH_PREFIX_PUBLIC: "/api/auth"
+      DB_SESSION_SCHEMA: "auth_session"
+    secretMappings:
+      hsl-jore4-auth-oidc-client-id: oidc-client-id
+      hsl-jore4-auth-oidc-client-secret: oidc-client-secret
+      hsl-jore4-public-db-hostname: db-hostname
+      hsl-jore4-public-db-database: db-name
+      hsl-jore4-db-auth-username: db-username
+      hsl-jore4-db-auth-password: db-password
+  hasura:
+    serviceName: "hasura"
+    serviceType: "ClusterIP"
+    dockerImage: "hsldevcom/jore4-hasura:main--3d8d576622696e67b7d9de470e1ed4aa2a50024f"
+    ports:
+      - containerPort: 8080
+        localPort: 3201
+    podSpec:
+      livenessProbe:
+        httpGet:
+          path: /healthz
+          port: 8080
+      readinessProbe:
+        httpGet:
+          path: /healthz
+          port: 8080
+    env:
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+      HASURA_GRAPHQL_MIGRATIONS_DIR: "/hasura-migrations"
+      HASURA_GRAPHQL_METADATA_DIR: "/hasura-metadata"
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "false"
+      HASURA_GRAPHQL_ENABLE_TELEMETRY: "false"
+      HASURA_GRAPHQL_MIGRATIONS_SERVER_TIMEOUT: "60"
+      HASURA_GRAPHQL_AUTH_HOOK: "http://jore4-auth:8080/public/v1/hasura/webhook"
+      HASURA_GRAPHQL_AUTH_HOOK_MODE: "GET"
+    secretMappings:
+      hsl-jore4-public-db-hostname: db-hostname
+      hsl-jore4-public-db-database: db-name
+      hsl-jore4-db-admin-username: db-username
+      hsl-jore4-db-admin-password: db-password
+      hsl-jore4-hasura-admin-secret: hasura-admin-secret
+      hsl-jore4-db-auth-username: db-auth-username
+  ui:
+    serviceName: "ui"
+    serviceType: "ClusterIP"
+    dockerImage: "hsldevcom/jore4-ui:main--6e0d3f21ceb5e440e96bf65fc4268d66bedc15d5"
+    ports:
+      - containerPort: 80
+        localPort: 3302
+    podSpec:
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 80
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 80
+  mbtiles:
+    serviceName: "mbtiles"
+    serviceType: "ClusterIP"
+    dockerImage: "hsldevcom/jore4-mbtiles-server:main--44335e22d65ec4cb2fd76b3869c4fc452f7f6dab"
+    ports:
+      - containerPort: 8000
+        localPort: 3203
+    podSpec:
+      livenessProbe:
+        httpGet:
+          path: /services
+          port: 8000
+      readinessProbe:
+        httpGet:
+          path: /services
+          port: 8000
+    env:
+      DR_LINKKI_TILES_URL: "https://jore4storage.blob.core.windows.net/jore4-ui/dr_linkki.mbtiles"

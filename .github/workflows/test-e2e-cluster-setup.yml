@@ -3,11 +3,11 @@ name: Test e2e cluster setup
 on:
   push:
   pull_request:
-    branches: [master]
+    branches: [main]
 
 jobs:
   local-e2e-setup:
-    name: e2e setup locally
+    name: e2e setup locally with Kind
     runs-on: ubuntu-20.04
 
     steps:
@@ -18,28 +18,31 @@ jobs:
         run: "./kindcluster.sh start --cluster=clusters/e2e"
 
       - name: Verify that UI is up and running
-        run: |
-          for i in {1..20}; do
-            curl --fail http://localhost:3300 --output /dev/null --silent && break
-            sleep 5
-            echo $i
-          done
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          # Kind cluster takes long time to start
+          retries: 50
+          command: "curl --fail http://localhost:3300 --output /dev/null --silent"
 
       - name: Verify that postgresql is up and running
-        run: |
-          for i in {1..20}; do
-            pg_isready -h localhost -p 3002 && break
-            sleep 5
-            echo $i
-          done
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "pg_isready -h localhost -p 3002"
 
       - name: Verify that hasura is up and running
-        run: |
-          for i in {1..20}; do
-            curl --fail http://localhost:3300/graphql/healthz --output /dev/null --silent && break
-            sleep 5
-            echo $i
-          done
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3300/graphql/healthz --output /dev/null --silent"
+
+      - name: Verify that auth backend is up and running
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3300/api/auth/actuator/health --output /dev/null --silent"
+
+      - name: Verify that mbtiles server is up and running
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3300/api/mbtiles/services --output /dev/null --silent"
 
       - name: Stop Kind
         run: "./kindcluster.sh stop"
@@ -52,14 +55,20 @@ jobs:
       matrix:
         include:
           # no overwrites
-          - frontend-docker-image: ""
+          - ui-docker-image: ""
             hasura-docker-image: ""
+            auth-docker-image: ""
+            mbtiles-docker-image: ""
           # overwrite all
-          - frontend-docker-image: "hsldevcom/jore4-ui:latest"
+          - ui-docker-image: "hsldevcom/jore4-ui:latest"
             hasura-docker-image: "hsldevcom/jore4-hasura:latest"
+            auth-docker-image: "hsldevcom/jore4-auth:latest"
+            mbtiles-docker-image: "hsldevcom/jore4-mbtiles-server:latest"
           # overwrite some
-          - frontend-docker-image: "hsldevcom/jore4-ui:latest"
+          - ui-docker-image: "hsldevcom/jore4-ui:latest"
             hasura-docker-image: ""
+            auth-docker-image: ""
+            mbtiles-docker-image: ""
 
     steps:
       # note that we don't checkout code in this job to make sure that the script works from an empty workspace!
@@ -67,63 +76,65 @@ jobs:
         run: '[ -z "$(ls -A)" ]'
 
       - name: Extract branch name to env variable
+        uses: HSLdevcom/jore4-tools/github-actions/extract-metadata@extract-metadata-v1
+
+      - name: Set e2e script version to be tested
         run: |
-          # In pull requests
-          BRANCH_NAME="${GITHUB_HEAD_REF}"
-          [[ ${BRANCH_NAME} == "" ]] && {
-            # In branch pushes
-            BRANCH_NAME="$(echo "${GITHUB_REF}" | cut -d '/' -f 3-)"
-          }
-          echo "BRANCH_NAME=${BRANCH_NAME}" >> "${GITHUB_ENV}"
+          # make sure we are testing the remotecluster.sh against the current branch
+          echo "E2E_SCRIPTS_VERSION=${{ env.BRANCH_NAME }}" >> "${GITHUB_ENV}"
 
       - name: Setup e2e cluster with the remote script
         env:
           # change some docker images to use a different version
-          FRONTEND_DOCKER_IMAGE: ${{ matrix.frontend-docker-image }}
+          UI_DOCKER_IMAGE: ${{ matrix.ui-docker-image }}
           HASURA_DOCKER_IMAGE: ${{ matrix.hasura-docker-image }}
-          # make sure we are testing the remotecluster.sh against the current branch
-          E2E_SCRIPTS_VERSION: ${{ env.BRANCH_NAME }}
-        run: "curl https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${BRANCH_NAME}/remotecluster.sh | bash"
+          AUTH_DOCKER_IMAGE: ${{ matrix.auth-docker-image }}
+          MBTILES_DOCKER_IMAGE: ${{ matrix.mbtiles-docker-image }}
+        run: |
+          curl "https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${E2E_SCRIPTS_VERSION}/remotecluster.sh" | bash
 
       - name: Verify that UI is up and running
-        run: |
-          for i in {1..20}; do
-            curl --fail http://localhost:3300 --output /dev/null --silent && break
-            sleep 5
-            echo $i
-          done
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          # Kind cluster takes long time to start
+          retries: 50
+          command: "curl --fail http://localhost:3300 --output /dev/null --silent"
 
       - name: Verify that postgresql is up and running
-        run: |
-          for i in {1..20}; do
-            pg_isready -h localhost -p 3002 && break
-            sleep 5
-            echo $i
-          done
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "pg_isready -h localhost -p 3002"
 
       - name: Verify that hasura is up and running
-        run: |
-          for i in {1..20}; do
-            curl --fail http://localhost:3300/graphql/healthz --output /dev/null --silent && break
-            sleep 5
-            echo $i
-          done
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3300/graphql/healthz --output /dev/null --silent"
 
-      - name: Testing that the correct version got deployed from frontend
-        # if matrix.frontend-docker-image is defined should use that, otherwise use default
+      - name: Verify that auth backend is up and running
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3300/api/auth/actuator/health --output /dev/null --silent"
+
+      - name: Verify that mbtiles server is up and running
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3300/api/mbtiles/services --output /dev/null --silent"
+
+      - name: Testing that the correct version got deployed from UI
+        # if matrix.ui-docker-image is defined should use that, otherwise use default
         run: |
-          FRONTEND_DEPLOYED_VERSION=`kubectl get deployment jore4-frontend --namespace hsl-jore4 --output jsonpath='{.spec.template.spec.containers[0].image}'`
-          if [[ "${{ matrix.frontend-docker-image }}" == "" ]]
+          UI_DEPLOYED_VERSION=$(kubectl get deployment jore4-ui --namespace hsl-jore4 --output jsonpath='{.spec.template.spec.containers[0].image}')
+          if [[ "${{ matrix.ui-docker-image }}" == "" ]]
           then
-            [[ "$FRONTEND_DEPLOYED_VERSION" != "${{ matrix.frontend-docker-image }}" ]]
+            [[ "$UI_DEPLOYED_VERSION" != "${{ matrix.ui-docker-image }}" ]]
           else
-            [[ "$FRONTEND_DEPLOYED_VERSION" == "${{ matrix.frontend-docker-image }}" ]]
+            [[ "$UI_DEPLOYED_VERSION" == "${{ matrix.ui-docker-image }}" ]]
           fi
 
       - name: Testing that the correct version got deployed from hasura
         # if matrix.hasura-docker-image is defined should use that, otherwise use default
         run: |
-          HASURA_DEPLOYED_VERSION=`kubectl get deployment jore4-hasura --namespace hsl-jore4 --output jsonpath='{.spec.template.spec.containers[0].image}'`
+          HASURA_DEPLOYED_VERSION=$(kubectl get deployment jore4-hasura --namespace hsl-jore4 --output jsonpath='{.spec.template.spec.containers[0].image}')
           if [[ "${{ matrix.hasura-docker-image }}" == "" ]]
           then
             [[ "$HASURA_DEPLOYED_VERSION" != "${{ matrix.hasura-docker-image }}" ]]
@@ -131,5 +142,28 @@ jobs:
             [[ "$HASURA_DEPLOYED_VERSION" == "${{ matrix.hasura-docker-image }}" ]]
           fi
 
+      - name: Testing that the correct version got deployed from auth backend
+        # if matrix.auth-docker-image is defined should use that, otherwise use default
+        run: |
+          AUTH_DEPLOYED_VERSION=$(kubectl get deployment jore4-auth --namespace hsl-jore4 --output jsonpath='{.spec.template.spec.containers[0].image}')
+          if [[ "${{ matrix.auth-docker-image }}" == "" ]]
+          then
+            [[ "$AUTH_DEPLOYED_VERSION" != "${{ matrix.auth-docker-image }}" ]]
+          else
+            [[ "$AUTH_DEPLOYED_VERSION" == "${{ matrix.auth-docker-image }}" ]]
+          fi
+
+      - name: Testing that the correct version got deployed from mbtiles server
+        # if matrix.mbtiles-docker-image is defined should use that, otherwise use default
+        run: |
+          MBTILES_DEPLOYED_VERSION=$(kubectl get deployment jore4-mbtiles --namespace hsl-jore4 --output jsonpath='{.spec.template.spec.containers[0].image}')
+          if [[ "${{ matrix.mbtiles-docker-image }}" == "" ]]
+          then
+            [[ "$MBTILES_DEPLOYED_VERSION" != "${{ matrix.mbtiles-docker-image }}" ]]
+          else
+            [[ "$MBTILES_DEPLOYED_VERSION" == "${{ matrix.mbtiles-docker-image }}" ]]
+          fi
+
       - name: Stop Kind
-        run: "curl https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${BRANCH_NAME}/kindcluster.sh | bash -s -- stop"
+        run: |
+          curl "https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${E2E_SCRIPTS_VERSION}/kindcluster.sh" | bash -s -- stop

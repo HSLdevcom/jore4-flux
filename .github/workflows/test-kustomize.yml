@@ -3,7 +3,7 @@ name: Test kustomize
 on:
   push:
   pull_request:
-    branches: [master]
+    branches: [main]
 
 jobs:
   test-kustomizations:
@@ -31,4 +31,4 @@ jobs:
               | tar -xz \
               > ./kustomize \
             && chmod u+x ./kustomize \
-            && ./kustomize build ${KUSTOMIZE_BUILD_DIR}
+            && ./kustomize build "${KUSTOMIZE_BUILD_DIR}"
