@@ -21,8 +21,11 @@ jobs:
           echo "Release version: ${RELEASE_VERSION}"
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
+          # create a version file (to enable tracking version changes)
+          echo "${GITHUB_SHA}" > RELEASE_VERSION.txt
+
           # create a tar.gz of the docker-compose config + dependencies
-          tar -czvf e2e-docker-compose.tar.gz -C clusters/docker-compose .
+          tar -czvf e2e-docker-compose.tar.gz RELEASE_VERSION.txt -C clusters/docker-compose .
 
           # delete and recreate github release
           gh release delete ${RELEASE_VERSION} || echo "There in no previous github release with the name '${RELEASE_VERSION}'"
@@ -30,4 +33,5 @@ jobs:
 
           # append the tar.gz package and also the individual files (just in case) to the release
           gh release upload ${RELEASE_VERSION} clusters/docker-compose/**
+          gh release upload ${RELEASE_VERSION} RELEASE_VERSION.txt
           gh release upload ${RELEASE_VERSION} e2e-docker-compose.tar.gz
