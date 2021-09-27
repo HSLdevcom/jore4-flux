@@ -100,3 +100,21 @@ microServices:
       # destination-db-port defaults to 5432
       destination-db-username: postgres
       destination-db-password: postgres
+  mapmatching:
+    serviceType: "NodePort"
+    ports:
+      - containerPort: 8080
+        nodePort: 30435
+        localPort: 3005
+    localSecrets:
+      db-username: mapmatching
+      db-password: password
+  mapmatchingdb:
+    serviceType: "NodePort"
+    ports:
+      - containerPort: 5432
+        nodePort: 30436
+        localPort: 6433
+    localSecrets:
+      postgres-user: mapmatching
+      postgres-password: password

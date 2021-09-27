@@ -56,6 +56,16 @@ jobs:
         with:
           command: "curl --fail http://localhost:3004/actuator/health --output /dev/null --silent"
 
+      - name: Verify that map matching server is up and running
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3005/actuator/health --output /dev/null --silent"
+
+      - name: Verify that map matching database is up and running
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "pg_isready -h localhost -p 3006"
+
       - name: Stop Kind
         run: "./kindcluster.sh stop"
 
@@ -72,18 +82,21 @@ jobs:
             auth-docker-image: ""
             mbtiles-docker-image: ""
             importer-docker-image: ""
+            mapmatching-docker-image: ""
           # overwrite all
           - ui-docker-image: "hsldevcom/jore4-ui:latest"
             hasura-docker-image: "hsldevcom/jore4-hasura:latest"
             auth-docker-image: "hsldevcom/jore4-auth:latest"
             mbtiles-docker-image: "hsldevcom/jore4-mbtiles-server:latest"
             importer-docker-image: "hsldevcom/jore4-jore3-importer:latest"
+            mapmatching-docker-image: "hsldevcom/jore4-map-matching:latest"
           # overwrite some
           - ui-docker-image: "hsldevcom/jore4-ui:latest"
             hasura-docker-image: ""
             auth-docker-image: ""
             mbtiles-docker-image: ""
             importer-docker-image: ""
+            mapmatching-docker-image: ""
 
     steps:
       # note that we don't checkout code in this job to make sure that the script works from an empty workspace!
@@ -106,6 +119,7 @@ jobs:
           AUTH_DOCKER_IMAGE: ${{ matrix.auth-docker-image }}
           MBTILES_DOCKER_IMAGE: ${{ matrix.mbtiles-docker-image }}
           IMPORTER_DOCKER_IMAGE: ${{ matrix.importer-docker-image }}
+          MAPMATCHING_DOCKER_IMAGE: ${{ matrix.mapmatching-docker-image }}
         run: |
           curl "https://raw.githubusercontent.com/HSLdevcom/jore4-flux/${E2E_SCRIPTS_VERSION}/remotecluster.sh" | bash
 
@@ -147,6 +161,16 @@ jobs:
         uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
         with:
           command: "curl --fail http://localhost:3004/actuator/health --output /dev/null --silent"
+
+      - name: Verify that map matching server is up and running
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3005/actuator/health --output /dev/null --silent"
+
+      - name: Verify that map matching database is up and running
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "pg_isready -h localhost -p 3006"
 
       - name: Testing that the correct version got deployed from UI
         # if matrix.ui-docker-image is defined should use that, otherwise use default
@@ -201,6 +225,17 @@ jobs:
             [[ "$IMPORTER_DEPLOYED_VERSION" != "${{ matrix.importer-docker-image }}" ]]
           else
             [[ "$IMPORTER_DEPLOYED_VERSION" == "${{ matrix.importer-docker-image }}" ]]
+          fi
+
+      - name: Testing that the correct version got deployed from map matching server
+        # if matrix.mapmatching-docker-image is defined should use that, otherwise use default
+        run: |
+          MAPMATCHING_DEPLOYED_VERSION=$(kubectl get deployment jore4-mapmatching --namespace hsl-jore4 --output jsonpath='{.spec.template.spec.containers[0].image}')
+          if [[ "${{ matrix.mapmatching-docker-image }}" == "" ]]
+          then
+            [[ "$MAPMATCHING_DEPLOYED_VERSION" != "${{ matrix.mapmatching-docker-image }}" ]]
+          else
+            [[ "$MAPMATCHING_DEPLOYED_VERSION" == "${{ matrix.mapmatching-docker-image }}" ]]
           fi
 
       - name: Stop Kind

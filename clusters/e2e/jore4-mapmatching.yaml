@@ -1,0 +1,76 @@
+# This is a generated file, all modifications will be overwritten!
+
+# Describes the default environment variables, secrets the deployment template and the service for jore4 map-matching service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jore4-mapmatching
+  namespace: hsl-jore4
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "jore4-mapmatching"
+  template:
+    metadata:
+      labels:
+        app: "jore4-mapmatching"
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: "jore4-mapmatching-image"
+          image: "hsldevcom/jore4-map-matching:dockerise--d004159af809fa61d4ddc4f45b217cc4626c0591"
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: "jore4-mapmatching-env"
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+      volumes:
+        - name: secrets-store-inline
+          configMap:
+            name: jore4-mapmatching-local-secrets
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jore4-mapmatching
+  namespace: hsl-jore4
+spec:
+  type: NodePort
+  selector:
+    app: jore4-mapmatching
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30435
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "jore4-mapmatching-local-secrets"
+  namespace: hsl-jore4
+data:
+  db-password: "password"
+  db-username: "mapmatching"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "jore4-mapmatching-env"
+  namespace: hsl-jore4
+data:
+  DB_DATABASE: "jore4mapmatching"
+  DB_HOSTNAME: "jore4-mapmatchingdb"
+  SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+
+

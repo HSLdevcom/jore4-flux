@@ -1,0 +1,76 @@
+# This is a generated file, all modifications will be overwritten!
+
+# Describes the default environment variables, secrets the deployment template and the service for the custom jore4 map-matching database
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jore4-mapmatchingdb
+  namespace: hsl-jore4
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "jore4-mapmatchingdb"
+  template:
+    metadata:
+      labels:
+        app: "jore4-mapmatchingdb"
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: "jore4-mapmatchingdb-image"
+          image: "hsldevcom/jore4-postgres:mapmatching-mapmatching--3f0ad2859372c172ab71b602f53927edff1e524b"
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: "jore4-mapmatchingdb-env"
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+      volumes:
+        - name: secrets-store-inline
+          configMap:
+            name: jore4-mapmatchingdb-local-secrets
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jore4-mapmatchingdb
+  namespace: hsl-jore4
+spec:
+  type: NodePort
+  selector:
+    app: jore4-mapmatchingdb
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+      nodePort: 30436
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "jore4-mapmatchingdb-local-secrets"
+  namespace: hsl-jore4
+data:
+  postgres-password: "password"
+  postgres-user: "mapmatching"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "jore4-mapmatchingdb-env"
+  namespace: hsl-jore4
+data:
+  DIGIROAD_ROUTING_DUMP_VERSION: "2021-09-28"
+  POSTGRES_DB: "jore4mapmatching"
+  SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+
+
