@@ -34,3 +34,11 @@ nodes:
       - containerPort: 30434
         hostPort: 3004
         protocol: TCP
+      # map matching service
+      - containerPort: 30435
+        hostPort: 3005
+        protocol: TCP
+      # map matching database
+      - containerPort: 30436
+        hostPort: 3006
+        protocol: TCP
