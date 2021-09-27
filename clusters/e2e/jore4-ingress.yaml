@@ -43,6 +43,14 @@ spec:
                 port:
                   number: 8000
 
+          - path: "/api/mapmatching(/|$)(.*)"
+            pathType: Prefix
+            backend:
+              service:
+                name: "jore4-mapmatching"
+                port:
+                  number: 8080
+
           - path: "/()(.*)"
             pathType: Prefix
             backend:
