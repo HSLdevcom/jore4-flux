@@ -131,3 +131,34 @@ microServices:
       # destination-db-port defaults to 5432
       hsl-jore4-db-jore3importer-username: destination-db-username
       hsl-jore4-db-jore3importer-password: destination-db-password
+  mapmatching:
+    serviceName: "mapmatching"
+    serviceType: "ClusterIP"
+    dockerImage: "hsldevcom/jore4-map-matching:dockerise--72afd7647728bac762ecb6926318f60d86f82866"
+    ports:
+      - containerPort: 8080
+        localPort: 3205
+    env:
+      DB_DATABASE: jore4mapmatching
+      DB_HOSTNAME: jore4-mapmatchingdb
+      # TODO: figure out where to store this username + password
+      DB_USER: changethis
+      DB_PASSWORD: changethis
+  mapmatchingdb:
+    serviceName: "mapmatchingdb"
+    serviceType: "ClusterIP"
+    dockerImage: "pgrouting/pgrouting:13-3.1-3.2.0"
+    ports:
+      - containerPort: 5432
+        localPort: 3206
+    env:
+      POSTGRES_DB: jore4mapmatching
+      # TODO: figure out where to store this username + password
+      POSTGRES_USER: changethis
+      POSTGRES_PASSWORD: changethis
+      # must change the default path for data to a subvolume as it can't be the root of an azuredisk volume
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - type: azuredisk
+        mountPath: /var/lib/postgresql/data/
+        size: 10Gi

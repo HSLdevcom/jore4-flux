@@ -1,0 +1,35 @@
+{{- range $index, $volume := .volumes }}
+{{/**/}}{{- if (eq $volume.type "azuredisk") }}
+---
+# https://docs.microsoft.com/en-us/azure/aks/concepts-storage#storage-classes
+# we are defining a custom storage class that is an azure-disk and is retained even after all pods that use it are deleted
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  namespace: hsl-jore4
+  name: managed-standard-retain
+provisioner: kubernetes.io/azure-disk
+reclaimPolicy: Retain
+parameters:
+  storageaccounttype: StandardSSD_LRS
+  kind: Managed
+---
+# https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: hsl-jore4
+  name: azure-managed-disk
+spec:
+  accessModes:
+  # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes
+  # The volume can be mounted as read-write by a single node
+    - ReadWriteOnce
+  storageClassName: managed-standard-retain
+  resources:
+    requests:
+      storage: 10Gi
+{{- else }}
+Unknown storage type: {{.type}}
+{{- end }}
+{{- end }}

@@ -13,3 +13,6 @@
 ---
 {{/**/}}{{ tmpl.Exec "templates/configmap-env.yaml" . }}
 {{- end }}
+{{- if (index . "volumes") }}
+{{/**/}}{{ tmpl.Exec "templates/volumes.yaml" . }}
+{{- end }}
