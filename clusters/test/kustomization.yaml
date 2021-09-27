@@ -11,5 +11,7 @@ resources:
   - ./jore4-auth.yaml
   - ./jore4-hasura.yaml
   - ./jore4-jore3importer.yaml
+  - ./jore4-mapmatching.yaml
+  - ./jore4-mapmatchingdb.yaml
   - ./jore4-mbtiles.yaml
   - ./jore4-ui.yaml
