@@ -37,6 +37,9 @@ jobs:
                 "jore4-jore3importer",
               ]
 
+          # start only mapmatching database and service
+          - services: ["jore4-mapmatchingdb", "jore4-mapmatching"]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -115,3 +118,21 @@ jobs:
         uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
         with:
           command: "curl --fail http://localhost:3004/actuator/health --output /dev/null --silent"
+
+      - name: Verify that map matching database is up and running standalone
+        if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-mapmatchingdb') }}
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "pg_isready -h localhost -p 6433"
+
+      - name: Verify that map matching server is up and running standalone
+        if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-mapmatching') }}
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3005/actuator/health --output /dev/null --silent"
+
+      - name: Verify that map matching server is up and running through proxy
+        if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-mapmatching') && contains(matrix.services, 'jore4-proxy') }}
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        with:
+          command: "curl --fail http://localhost:3300/api/mapmatching/actuator/health --output /dev/null --silent"

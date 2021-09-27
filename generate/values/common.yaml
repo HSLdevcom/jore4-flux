@@ -132,3 +132,31 @@ microServices:
       # destination-db-port defaults to 5432
       hsl-jore4-db-jore3importer-username: destination-db-username
       hsl-jore4-db-jore3importer-password: destination-db-password
+  mapmatching:
+    serviceName: "mapmatching"
+    serviceType: "ClusterIP"
+    dockerImage: "hsldevcom/jore4-map-matching:dockerise--d004159af809fa61d4ddc4f45b217cc4626c0591"
+    ports:
+      - containerPort: 8080
+        localPort: 3205
+    secretMappings:
+      hsl-jore4-db-mapmatching-username: db-username
+      hsl-jore4-db-mapmatching-password: db-password
+    env:
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+      DB_DATABASE: jore4mapmatching
+      DB_HOSTNAME: jore4-mapmatchingdb
+  mapmatchingdb:
+    serviceName: "mapmatchingdb"
+    serviceType: "ClusterIP"
+    dockerImage: "hsldevcom/jore4-postgres:mapmatching-main--5ad5e8cc8d6fffa386c18edf517552a78de65999"
+    ports:
+      - containerPort: 5432
+        localPort: 3206
+    secretMappings:
+      hsl-jore4-db-mapmatching-username: postgres-user
+      hsl-jore4-db-mapmatching-password: postgres-password
+    env:
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+      POSTGRES_DB: jore4mapmatching
+      DIGIROAD_ROUTING_DUMP_VERSION: "2021-10-11"
