@@ -125,16 +125,28 @@ services:
 
   jore4-testdb:
     container_name: "testdb"
-    image: "postgis/postgis:12-3.1-alpine"
+    image: "hsldevcom/jore4-postgres:azuredbmock-jore4-azure-db-mock--ce326cafa264464830c37828c09616d481dfb684"
     restart: "unless-stopped"
     networks:
       - jore4
     environment:
       POSTGRES_DB: "jore4e2e"
-      POSTGRES_PASSWORD: "postgres"
-      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "adminpassword"
+      POSTGRES_USER: "dbadmin"
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
     ports:
       - "127.0.0.1:6432:5432"
+    secrets:
+      - source: testdb-db-auth-password
+        target: /mnt/secrets-store/db-auth-password
+      - source: testdb-db-auth-username
+        target: /mnt/secrets-store/db-auth-username
+      - source: testdb-db-jore3importer-password
+        target: /mnt/secrets-store/db-jore3importer-password
+      - source: testdb-db-jore3importer-username
+        target: /mnt/secrets-store/db-jore3importer-username
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   jore4-ui:
     container_name: "ui"
@@ -202,3 +214,11 @@ secrets:
     file: ./secret-jore3importer-source-db-port
   jore3importer-source-db-username:
     file: ./secret-jore3importer-source-db-username
+  testdb-db-auth-password:
+    file: ./secret-testdb-db-auth-password
+  testdb-db-auth-username:
+    file: ./secret-testdb-db-auth-username
+  testdb-db-jore3importer-password:
+    file: ./secret-testdb-db-jore3importer-password
+  testdb-db-jore3importer-username:
+    file: ./secret-testdb-db-jore3importer-username

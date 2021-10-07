@@ -38,10 +38,10 @@ microServices:
     localSecrets:
       db-hostname: jore4-testdb
       db-name: jore4e2e
-      db-username: postgres
-      db-password: postgres
+      db-username: dbadmin
+      db-password: adminpassword
       hasura-admin-secret: hasura
-      db-auth-username: postgres
+      db-auth-username: dbauth
   auth:
     env:
       SELF_PUBLIC_BASE_URL: "http://localhost:3300"
@@ -54,20 +54,26 @@ microServices:
       oidc-client-secret: "9uV5p45F6IZQubCErBiquZYaL7Wm2AWM"
       db-hostname: jore4-testdb
       db-name: jore4e2e
-      db-username: postgres
-      db-password: postgres
+      db-username: dbauth
+      db-password: authpassword
   testdb:
     serviceName: "testdb"
     serviceType: "NodePort"
-    dockerImage: "postgis/postgis:12-3.1-alpine"
+    dockerImage: "hsldevcom/jore4-postgres:azuredbmock-jore4-azure-db-mock--ce326cafa264464830c37828c09616d481dfb684"
     ports:
       - containerPort: 5432
         nodePort: 30432
         localPort: 6432
     env:
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
       POSTGRES_DB: jore4e2e
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: dbadmin
+      POSTGRES_PASSWORD: adminpassword
+    localSecrets:
+      db-auth-username: dbauth
+      db-auth-password: authpassword
+      db-jore3importer-username: dbimporter
+      db-jore3importer-password: importerpassword
   mssqltestdb:
     serviceName: "mssqltestdb"
     serviceType: "NodePort"
@@ -98,5 +104,5 @@ microServices:
       destination-db-hostname: jore4-testdb
       destination-db-database: jore4e2e
       # destination-db-port defaults to 5432
-      destination-db-username: postgres
-      destination-db-password: postgres
+      destination-db-username: dbimporter
+      destination-db-password: importerpassword

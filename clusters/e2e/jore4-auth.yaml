@@ -69,8 +69,8 @@ metadata:
 data:
   db-hostname: "jore4-testdb"
   db-name: "jore4e2e"
-  db-password: "postgres"
-  db-username: "postgres"
+  db-password: "authpassword"
+  db-username: "dbauth"
   oidc-client-id: "0838619941439007"
   oidc-client-secret: "9uV5p45F6IZQubCErBiquZYaL7Wm2AWM"
 
