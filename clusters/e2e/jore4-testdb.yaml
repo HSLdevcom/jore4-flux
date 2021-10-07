@@ -21,13 +21,21 @@ spec:
       restartPolicy: Always
       containers:
         - name: "jore4-testdb-image"
-          image: "postgis/postgis:12-3.1-alpine"
+          image: "hsldevcom/jore4-postgres:azuredbmock-main--f35e9a038c868cc51f2c740becb6d1e4009354d6"
           imagePullPolicy: Always
           ports:
           - containerPort: 5432
           envFrom:
             - configMapRef:
                 name: "jore4-testdb-env"
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+      volumes:
+        - name: secrets-store-inline
+          configMap:
+            name: jore4-testdb-local-secrets
 
 ---
 apiVersion: v1
@@ -49,12 +57,25 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  name: "jore4-testdb-local-secrets"
+  namespace: hsl-jore4
+data:
+  db-auth-password: "authpassword"
+  db-auth-username: "dbauth"
+  db-jore3importer-password: "importerpassword"
+  db-jore3importer-username: "dbimporter"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
   name: "jore4-testdb-env"
   namespace: hsl-jore4
 data:
   POSTGRES_DB: "jore4e2e"
-  POSTGRES_PASSWORD: "postgres"
-  POSTGRES_USER: "postgres"
+  POSTGRES_PASSWORD: "adminpassword"
+  POSTGRES_USER: "dbadmin"
+  SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
 
 
 

@@ -70,8 +70,8 @@ metadata:
 data:
   destination-db-database: "jore4e2e"
   destination-db-hostname: "jore4-testdb"
-  destination-db-password: "postgres"
-  destination-db-username: "postgres"
+  destination-db-password: "importerpassword"
+  destination-db-username: "dbimporter"
   source-db-database: "jore3testdb"
   source-db-hostname: "jore4-mssqltestdb"
   source-db-password: "P@ssw0rd"

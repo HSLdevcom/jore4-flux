@@ -67,11 +67,11 @@ metadata:
   name: "jore4-hasura-local-secrets"
   namespace: hsl-jore4
 data:
-  db-auth-username: "postgres"
+  db-auth-username: "dbauth"
   db-hostname: "jore4-testdb"
   db-name: "jore4e2e"
-  db-password: "postgres"
-  db-username: "postgres"
+  db-password: "adminpassword"
+  db-username: "dbadmin"
   hasura-admin-secret: "hasura"
 
 ---
