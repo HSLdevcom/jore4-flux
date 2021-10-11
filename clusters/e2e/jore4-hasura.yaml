@@ -70,8 +70,8 @@ data:
   db-auth-username: "dbauth"
   db-hostname: "jore4-testdb"
   db-name: "jore4e2e"
-  db-password: "adminpassword"
-  db-username: "dbadmin"
+  db-password: "hasurapassword"
+  db-username: "dbhasura"
   hasura-admin-secret: "hasura"
 
 ---
