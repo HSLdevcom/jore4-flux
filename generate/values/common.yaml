@@ -64,8 +64,8 @@ microServices:
     secretMappings:
       hsl-jore4-public-db-hostname: db-hostname
       hsl-jore4-public-db-database: db-name
-      hsl-jore4-db-admin-username: db-username
-      hsl-jore4-db-admin-password: db-password
+      hsl-jore4-db-hasura-username: db-username
+      hsl-jore4-db-hasura-password: db-password
       hsl-jore4-hasura-admin-secret: hasura-admin-secret
       hsl-jore4-db-auth-username: db-auth-username
   ui:

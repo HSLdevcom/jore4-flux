@@ -38,8 +38,8 @@ microServices:
     localSecrets:
       db-hostname: jore4-testdb
       db-name: jore4e2e
-      db-username: dbadmin
-      db-password: adminpassword
+      db-username: dbhasura
+      db-password: dbhasurapassword
       hasura-admin-secret: hasura
       db-auth-username: dbauth
   auth:

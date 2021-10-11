@@ -78,16 +78,16 @@ spec:
     objects: |
       array:
         - |
-          objectName: hsl-jore4-db-admin-password
+          objectName: hsl-jore4-db-auth-username
+          objectAlias: db-auth-username
+          objectType: secret
+        - |
+          objectName: hsl-jore4-db-hasura-password
           objectAlias: db-password
           objectType: secret
         - |
-          objectName: hsl-jore4-db-admin-username
+          objectName: hsl-jore4-db-hasura-username
           objectAlias: db-username
-          objectType: secret
-        - |
-          objectName: hsl-jore4-db-auth-username
-          objectAlias: db-auth-username
           objectType: secret
         - |
           objectName: hsl-jore4-hasura-admin-secret
