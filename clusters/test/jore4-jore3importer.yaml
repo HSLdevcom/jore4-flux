@@ -1,0 +1,126 @@
+# This is a generated file, all modifications will be overwritten!
+
+# Describes the default environment variables, secrets the deployment template and the service for jore3 importer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jore4-jore3importer
+  namespace: hsl-jore4
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "jore4-jore3importer"
+  template:
+    metadata:
+      labels:
+        app: "jore4-jore3importer"
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: "jore4-jore3importer-image"
+          image: "hsldevcom/jore4-jore3-importer:main--80cb88c8cc768ee9fb647dd58aac7d0036ad0905"
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: "jore4-jore3importer-env"
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+
+      volumes:
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "jore4-jore3importer-secret-mapping"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jore4-jore3importer
+  namespace: hsl-jore4
+spec:
+  type: ClusterIP
+  selector:
+    app: jore4-jore3importer
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+---
+apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
+kind: SecretProviderClass
+metadata:
+  name: jore4-jore3importer-secret-mapping
+  namespace: hsl-jore4
+spec:
+  provider: azure
+  parameters:
+    useVMManagedIdentity: "true"
+    tenantId: "572a41dd-c389-4f0a-b256-aefd1bf149d7"
+    keyvaultName: "hsl-jore4-test-vault"
+    objects: |
+      array:
+        - |
+          objectName: hsl-jore3-db-database
+          objectAlias: source-db-database
+          objectType: secret
+        - |
+          objectName: hsl-jore3-db-hostname
+          objectAlias: source-db-hostname
+          objectType: secret
+        - |
+          objectName: hsl-jore3-db-password
+          objectAlias: source-db-password
+          objectType: secret
+        - |
+          objectName: hsl-jore3-db-port
+          objectAlias: source-db-port
+          objectType: secret
+        - |
+          objectName: hsl-jore3-db-username
+          objectAlias: source-db-username
+          objectType: secret
+        - |
+          objectName: hsl-jore4-db-jore3importer-password
+          objectAlias: destination-db-password
+          objectType: secret
+        - |
+          objectName: hsl-jore4-db-jore3importer-username
+          objectAlias: destination-db-username
+          objectType: secret
+        - |
+          objectName: hsl-jore4-public-db-database
+          objectAlias: destination-db-database
+          objectType: secret
+        - |
+          objectName: hsl-jore4-public-db-hostname
+          objectAlias: destination-db-hostname
+          objectType: secret
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "jore4-jore3importer-env"
+  namespace: hsl-jore4
+data:
+  SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+
+

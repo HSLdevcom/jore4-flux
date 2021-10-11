@@ -37,11 +37,11 @@ microServices:
       HASURA_GRAPHQL_ENABLE_CONSOLE: "false"
     localSecrets:
       db-hostname: jore4-testdb
-      db-name: postgres
-      db-username: postgres
-      db-password: postgres
+      db-name: jore4e2e
+      db-username: dbadmin
+      db-password: adminpassword
       hasura-admin-secret: hasura
-      db-auth-username: postgres
+      db-auth-username: dbauth
   auth:
     env:
       SELF_PUBLIC_BASE_URL: "http://localhost:3300"
@@ -53,18 +53,56 @@ microServices:
       oidc-client-id: "0838619941439007"
       oidc-client-secret: "9uV5p45F6IZQubCErBiquZYaL7Wm2AWM"
       db-hostname: jore4-testdb
-      db-name: postgres
-      db-username: postgres
-      db-password: postgres
+      db-name: jore4e2e
+      db-username: dbauth
+      db-password: authpassword
   testdb:
     serviceName: "testdb"
     serviceType: "NodePort"
-    dockerImage: "postgis/postgis:12-3.1-alpine"
+    dockerImage: "hsldevcom/jore4-postgres:azuredbmock-main--f35e9a038c868cc51f2c740becb6d1e4009354d6"
     ports:
       - containerPort: 5432
         nodePort: 30432
         localPort: 6432
     env:
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
       POSTGRES_DB: jore4e2e
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: dbadmin
+      POSTGRES_PASSWORD: adminpassword
+    localSecrets:
+      db-auth-username: dbauth
+      db-auth-password: authpassword
+      db-jore3importer-username: dbimporter
+      db-jore3importer-password: importerpassword
+  mssqltestdb:
+    serviceName: "mssqltestdb"
+    serviceType: "NodePort"
+    dockerImage: "hsldevcom/jore4-mssql-testdb:schema-only-main--bcc4c828a37f194b9ac416f7fa5de9583cf5b8ce"
+    ports:
+      - containerPort: 1433
+        nodePort: 30433
+        localPort: 1433
+    env:
+      SA_PASSWORD: "P@ssw0rd"
+    podSpec:
+      resources:
+        limits:
+          # the default 512Mi memory limit is not enough for the dockerized mssql database
+          memory: "1024Mi"
+  jore3importer:
+    serviceType: "NodePort"
+    ports:
+      - containerPort: 8080
+        nodePort: 30434
+        localPort: 3004
+    localSecrets:
+      source-db-hostname: jore4-mssqltestdb
+      source-db-port: 1433
+      source-db-database: jore3testdb
+      source-db-username: "sa"
+      source-db-password: "P@ssw0rd"
+      destination-db-hostname: jore4-testdb
+      destination-db-database: jore4e2e
+      # destination-db-port defaults to 5432
+      destination-db-username: dbimporter
+      destination-db-password: importerpassword
