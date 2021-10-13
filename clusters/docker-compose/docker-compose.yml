@@ -103,6 +103,46 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+  jore4-mapmatching:
+    container_name: "mapmatching"
+    image: "hsldevcom/jore4-map-matching:dockerise--d004159af809fa61d4ddc4f45b217cc4626c0591"
+    restart: "unless-stopped"
+    networks:
+      - jore4
+    environment:
+      DB_DATABASE: "jore4mapmatching"
+      DB_HOSTNAME: "jore4-mapmatchingdb"
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+    ports:
+      - "127.0.0.1:3005:8080"
+    secrets:
+      - source: mapmatching-db-password
+        target: /mnt/secrets-store/db-password
+      - source: mapmatching-db-username
+        target: /mnt/secrets-store/db-username
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  jore4-mapmatchingdb:
+    container_name: "mapmatchingdb"
+    image: "hsldevcom/jore4-postgres:mapmatching-main--5ad5e8cc8d6fffa386c18edf517552a78de65999"
+    restart: "unless-stopped"
+    networks:
+      - jore4
+    environment:
+      DIGIROAD_ROUTING_DUMP_VERSION: "2021-10-11"
+      POSTGRES_DB: "jore4mapmatching"
+      SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+    ports:
+      - "127.0.0.1:6433:5432"
+    secrets:
+      - source: mapmatchingdb-postgres-password
+        target: /mnt/secrets-store/postgres-password
+      - source: mapmatchingdb-postgres-user
+        target: /mnt/secrets-store/postgres-user
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
   jore4-mbtiles:
     container_name: "mbtiles"
     image: "hsldevcom/jore4-mbtiles-server:main--44335e22d65ec4cb2fd76b3869c4fc452f7f6dab"
@@ -224,6 +264,14 @@ secrets:
     file: ./secret-jore3importer-source-db-port
   jore3importer-source-db-username:
     file: ./secret-jore3importer-source-db-username
+  mapmatching-db-password:
+    file: ./secret-mapmatching-db-password
+  mapmatching-db-username:
+    file: ./secret-mapmatching-db-username
+  mapmatchingdb-postgres-password:
+    file: ./secret-mapmatchingdb-postgres-password
+  mapmatchingdb-postgres-user:
+    file: ./secret-mapmatchingdb-postgres-user
   testdb-db-auth-password:
     file: ./secret-testdb-db-auth-password
   testdb-db-auth-username:
