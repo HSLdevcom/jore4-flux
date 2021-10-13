@@ -1,0 +1,143 @@
+name: "Start e2e environemnt"
+description: "Builds e2e environment with docker-compose and tests that services are running."
+inputs:
+  ui_version:
+    description: Version of ui to use (docker image tag)
+    required: false
+    default: ""
+  hasura_version:
+    description: Version of hasura to use (docker image tag)
+    required: false
+    default: ""
+  auth_version:
+    description: Version of auth to use (docker image tag)
+    required: false
+    default: ""
+  mbtiles_version:
+    description: Version of mbtiles server to use (docker image tag)
+    required: false
+    default: ""
+  jore3importer_version:
+    description: Version of jore3importer to use (docker image tag)
+    required: false
+    default: ""
+  testdb_version:
+    description: Version of testdb to use (docker image tag)
+    required: false
+    default: ""
+  mssqltestdb_version:
+    description: Version of mssqltestdb to use (docker image tag)
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download and extract e2e docker-compose release
+      run: |
+        mkdir -p ${{ github.workspace }}/docker
+        curl -L https://github.com/HSLdevcom/jore4-flux/releases/download/e2e-docker-compose/e2e-docker-compose.tar.gz --silent | tar -xzf - -C ./docker/ | bash
+      shell: bash
+
+    - name: Create override file for docker-compose
+      env:
+        UI_DOCKER_IMAGE: ${{ inputs.ui_version }} # should be "" if using default
+        HASURA_DOCKER_IMAGE: ${{ inputs.hasura_version }} # should be "" if using default
+        AUTH_DOCKER_IMAGE: ${{ inputs.auth_version }} # should be "" if using default
+        MBTILES_DOCKER_IMAGE: ${{ inputs.mbtiles_version }} # should be "" if using default
+        JORE3IMPORTER_DOCKER_IMAGE: ${{ inputs.jore3importer_version }} # should be "" if using default
+        TESTDB_DOCKER_IMAGE: ${{ inputs.testdb_version }} # should be "" if using default
+        MSSQLTESTDB_DOCKER_IMAGE: ${{ inputs.mssqltestdb_version }} # should be "" if using default
+      run: |
+        cat <<EOF > ${{ github.workspace }}/docker/docker-compose.override.yml
+        version: "3.8"
+        services: {
+          ${UI_DOCKER_IMAGE:+"jore4-ui: {image: $UI_DOCKER_IMAGE},"}
+          ${HASURA_DOCKER_IMAGE:+"jore4-hasura: {image: $HASURA_DOCKER_IMAGE},"}
+          ${AUTH_DOCKER_IMAGE:+"jore4-auth: {image: $AUTH_DOCKER_IMAGE},"}
+          ${MBTILES_DOCKER_IMAGE:+"jore4-mbtiles: {image: $MBTILES_DOCKER_IMAGE},"}
+          ${JORE3IMPORTER_DOCKER_IMAGE:+"jore4-jore3importer: {image: $JORE3IMPORTER_DOCKER_IMAGE},"}
+          ${TESTDB_DOCKER_IMAGE:+"jore4-testdb: {image: $TESTDB_DOCKER_IMAGE},"}
+          ${MSSQLTESTDB_DOCKER_IMAGE:+"jore4-mssqltestdb: {image: $MSSQLTESTDB_DOCKER_IMAGE},"}
+          }
+        EOF
+      shell: bash
+
+    - name: Start e2e environment
+      run: |
+        docker-compose -f ${{ github.workspace }}/docker/docker-compose.yml -f ${{ github.workspace }}/docker/docker-compose.override.yml up -d
+      shell: bash
+
+    - name: Verify that UI is up and running standalone
+      uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+      with:
+        command: "curl --fail http://localhost:3302 --output /dev/null --silent"
+
+    - name: Verify that UI is up and running through proxy
+      uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+      with:
+        command: "curl --fail http://localhost:3300 --output /dev/null --silent"
+
+    - name: Verify that postgresql is up and running
+      uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+      with:
+        command: "pg_isready -h localhost -p 6432"
+
+    - name: Verify that mssql testdb is up and running
+      uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+      env:
+        SA_PASSWORD: "P@ssw0rd"
+      with:
+        command: 'sqlcmd -S 127.0.0.1 -U sa -P "$SA_PASSWORD" -d master -Q "SELECT ''OK'';"'
+
+    - name: Verify that hasura is up and running standalone
+      uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+      with:
+        command: "curl --fail http://localhost:3201/healthz --output /dev/null --silent"
+
+    - name: Verify that hasura is up and running through proxy
+      uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+      with:
+        command: "curl --fail http://localhost:3300/api/graphql/healthz --output /dev/null --silent"
+
+    - name: Verify that auth backend is up and running standalone
+      uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+      with:
+        command: "curl --fail http://localhost:3200/actuator/health --output /dev/null --silent"
+
+    - name: Verify that auth backend is up and running through proxy
+      uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+      with:
+        command: "curl --fail http://localhost:3300/api/auth/actuator/health --output /dev/null --silent"
+
+    - name: Verify that mbtiles server is up and running standalone
+      uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+      with:
+        command: "curl --fail http://localhost:3203/services --output /dev/null --silent"
+
+    - name: Verify that mbtiles server is up and running through proxy
+      uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+      with:
+        command: "curl --fail http://localhost:3300/api/mbtiles/services --output /dev/null --silent"
+
+    - name: Verify that jore3 importer is up and running standalone
+      uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+      with:
+        command: "curl --fail http://localhost:3004/actuator/health --output /dev/null --silent"
+
+    #this needs to be done until issue 483 is done
+    - name: Restart auth backend
+      run: docker-compose -f ${{ github.workspace }}/docker/docker-compose.yml restart jore4-auth
+      shell: bash
+
+    #this needs to be done until issue 483 is done
+    - name: Verify that auth backend is up and running standalone
+      uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+      with:
+        command: "curl --fail http://localhost:3200/actuator/health --output /dev/null --silent"
+
+    #this needs to be done until issue 483 is done
+    - name: Verify that auth backend is up and running through proxy
+      uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+      with:
+        command: "curl --fail http://localhost:3300/api/auth/actuator/health --output /dev/null --silent"
