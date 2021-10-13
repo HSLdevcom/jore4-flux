@@ -1,7 +1,6 @@
 name: Test e2e docker-compose setup
 
 on:
-  push:
   pull_request:
     branches: [main]
 

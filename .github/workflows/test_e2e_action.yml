@@ -1,0 +1,165 @@
+name: Testing e2e environment setup action
+
+on:
+  push:
+    branches: [setup-e2e-environment-v1]
+
+  pull_request:
+    branches: [main]
+
+jobs:
+  create_tag_for_testing:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Tag commit as testing
+        #used to specify the version of the action used in the next jobs
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            github.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "refs/tags/testing",
+              sha: context.sha
+            })
+
+  test-docker-compose-action:
+    needs: create_tag_for_testing
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        include:
+          #no overwrites for images
+          - ui-docker-image:
+            hasura-docker-image:
+            auth-docker-image:
+            mbtiles-docker-image:
+            jore3importer-docker-image:
+            testdb-docker-image:
+            mssqltestdb-docker-image:
+          # overwrite all
+          - ui-docker-image: "hsldevcom/jore4-ui:latest"
+            hasura-docker-image: "hsldevcom/jore4-hasura:latest"
+            auth-docker-image: "hsldevcom/jore4-auth:latest"
+            mbtiles-docker-image: "hsldevcom/jore4-mbtiles-server:latest"
+            jore3importer-docker-image: "hsldevcom/jore4-jore3-importer:latest"
+            testdb-docker-image: "hsldevcom/jore4-postgres:latest"
+            mssqltestdb-docker-image: "hsldevcom/jore4-mssql-testdb:schema-only-main--bcc4c828a37f194b9ac416f7fa5de9583cf5b8ce"
+          # overwrite some
+          - ui-docker-image: "hsldevcom/jore4-ui:latest"
+            hasura-docker-image:
+            auth-docker-image: "hsldevcom/jore4-auth:latest"
+            mbtiles-docker-image: "hsldevcom/jore4-mbtiles-server:latest"
+            jore3importer-docker-image:
+            testdb-docker-image:
+            mssqltestdb-docker-image: "hsldevcom/jore4-mssql-testdb:schema-only-main--bcc4c828a37f194b9ac416f7fa5de9583cf5b8ce"
+
+    steps:
+      - name: make folder for docker-compose files
+        run: mkdir docker
+
+      - name: start e2e env
+        uses: HSLdevcom/jore4-flux/.github/actions/setup-e2e-environment@testing
+        with:
+          ui_version: ${{ matrix.ui-docker-image }}
+          hasura_version: ${{ matrix.hasura-docker-image }}
+          auth_version: ${{ matrix.auth-docker-image }}
+          mbtiles_version: ${{ matrix.mbtiles-docker-image }}
+          jore3importer_version: ${{ matrix.jore3importer-docker-image }}
+          testdb_version: ${{ matrix.testdb-docker-image }}
+          mssqltestdb_version: ${{ matrix.mssqltestdb-docker-image }}
+
+      - name: Check that correct version of UI is running
+        if: always()
+        run: |
+          UI_DEPLOYED_VERSION=`docker inspect --format='{{.Config.Image}}' ui`
+          if [[ "${{ matrix.ui-docker-image }}" == "" ]]
+          then
+            [[ "$UI_DEPLOYED_VERSION" != "${{ matrix.ui-docker-image }}" ]]
+          else
+            [[ "$UI_DEPLOYED_VERSION" == "${{ matrix.ui-docker-image }}" ]]
+          fi
+
+      - name: Check that correct version of HASURA is running
+        if: always()
+        run: |
+          HASURA_DEPLOYED_VERSION=`docker inspect --format='{{.Config.Image}}' hasura`
+          if [[ "${{ matrix.hasura-docker-image }}" == "" ]]
+          then
+            [[ "$HASURA_DEPLOYED_VERSION" != "${{ matrix.hasura-docker-image }}" ]]
+          else
+            [[ "$HASURA_DEPLOYED_VERSION" == "${{ matrix.hasura-docker-image }}" ]]
+          fi
+
+      - name: Check that correct version of AUTH is running
+        if: always()
+        run: |
+          AUTH_DEPLOYED_VERSION=`docker inspect --format='{{.Config.Image}}' auth`
+          if [[ "${{ matrix.auth-docker-image }}" == "" ]]
+          then
+            [[ "$AUTH_DEPLOYED_VERSION" != "${{ matrix.auth-docker-image }}" ]]
+          else
+            [[ "$AUTH_DEPLOYED_VERSION" == "${{ matrix.auth-docker-image }}" ]]
+          fi
+
+      - name: Check that correct version of MBTILES is running
+        if: always()
+        run: |
+          MBTILES_DEPLOYED_VERSION=`docker inspect --format='{{.Config.Image}}' mbtiles`
+          if [[ "${{ matrix.mbtiles-docker-image }}" == "" ]]
+          then
+            [[ "$MBTILES_DEPLOYED_VERSION" != "${{ matrix.mbtiles-docker-image }}" ]]
+          else
+            [[ "$MBTILES_DEPLOYED_VERSION" == "${{ matrix.mbtiles-docker-image }}" ]]
+          fi
+
+      - name: Check that correct version of JORE3IMPORTER is running
+        if: always()
+        run: |
+          JORE3IMPORTER_DEPLOYED_VERSION=`docker inspect --format='{{.Config.Image}}' jore3importer`
+          if [[ "${{ matrix.jore3importer-docker-image }}" == "" ]]
+          then
+            [[ "$JORE3IMPORTER_DEPLOYED_VERSION" != "${{ matrix.jore3importer-docker-image }}" ]]
+          else
+            [[ "$JORE3IMPORTER_DEPLOYED_VERSION" == "${{ matrix.jore3importer-docker-image }}" ]]
+          fi
+
+      - name: Check that correct version of TESTDB is running
+        if: always()
+        run: |
+          TESTDB_DEPLOYED_VERSION=`docker inspect --format='{{.Config.Image}}' testdb`
+          if [[ "${{ matrix.testdb-docker-image }}" == "" ]]
+          then
+            [[ "$TESTDB_DEPLOYED_VERSION" != "${{ matrix.testdb-docker-image }}" ]]
+          else
+            [[ "$TESTDB_DEPLOYED_VERSION" == "${{ matrix.testdb-docker-image }}" ]]
+          fi
+
+      - name: Check that correct version of MSSQLTESTDB is running
+        if: always()
+        run: |
+          MSSQLTESTDB_DEPLOYED_VERSION=`docker inspect --format='{{.Config.Image}}' mssqltestdb`
+          if [[ "${{ matrix.mssqltestdb-docker-image }}" == "" ]]
+          then
+            [[ "$MSSQLTESTDB_DEPLOYED_VERSION" != "${{ matrix.mssqltestdb-docker-image }}" ]]
+          else
+            [[ "$MSSQLTESTDB_DEPLOYED_VERSION" == "${{ matrix.mssqltestdb-docker-image }}" ]]
+          fi
+
+  delete_tag_after_testing:
+    needs: test-docker-compose-action
+    if: always()
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Remove tag
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            github.git.deleteRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "tags/testing"
+            })

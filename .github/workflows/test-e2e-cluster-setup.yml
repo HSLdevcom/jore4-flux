@@ -1,7 +1,6 @@
 name: Test e2e cluster setup
 
 on:
-  push:
   pull_request:
     branches: [main]
 

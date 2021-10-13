@@ -282,8 +282,7 @@ To rerender all yaml templates for all stages, run `./development.sh generate`
    1. with Azure: commit your changes, move `playg` branch to your the commit and wait for Flux to
       deploy it for you
 1. Testing with CI/CD:
-   1. Kind cluster remote setup: extend the `patchesStrategicMerge` section in `/remotecluster.sh`
-      to allow switching the docker image to another one in e2e tests.
+   1. Add the new service to list of inputs in `.github/actions/setup-e2e-environment/action.yml` and to the `Create override file for docker-compose`steps service list to allow switching the docker image to another one in e2e tests.
    1. Kind cluster github testing: extend all jobs with your microservice in
       `.github/workflows/test-e2e-cluster-setup.yml`
    1. Docker compose github testing: extend all jobs with your microservice in
@@ -487,6 +486,19 @@ from the `e2e` branch, so cannot be tested locally.
   have to map the secrets to the pods directly as files from the host machine
 
 ### Docker-compose
+
+To start docker-compose in your ci/cd pipeline you can use `.github/actions/setup-e2e-environment/action.yml` which takes versions that you want to use for services as inputs (should be given in `hsldevcom/jore4-"service-name":"tag"` format). If you don't provide any, it defaults to the ones in e2e release.
+Example usage:
+
+```
+- name: make folder for docker-compose files
+        run: mkdir docker
+
+- name: start e2e env
+        uses: HSLdevcom/jore4-flux/.github/actions/setup-e2e-environment@setup-e2e-environment-v1
+        with:
+          ui_version: hsldevcom/jore4-ui:latest
+```
 
 To run e2e tests or run microservices locally, we can also use
 [docker-compose](https://docs.docker.com/compose/). Whenever the `clusters/docker-compose` directory is updated in the `e2e` branch, a new version of the release tar.gz is created in the [repository](https://github.com/HSLdevcom/jore4-flux/releases).
