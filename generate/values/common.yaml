@@ -39,7 +39,7 @@ microServices:
   hasura:
     serviceName: "hasura"
     serviceType: "ClusterIP"
-    dockerImage: "hsldevcom/jore4-hasura:main--3d8d576622696e67b7d9de470e1ed4aa2a50024f"
+    dockerImage: "hsldevcom/jore4-hasura:main--988be388157e7eafa38864c4745d819e67d15a24"
     ports:
       - containerPort: 8080
         localPort: 3201
@@ -64,10 +64,11 @@ microServices:
     secretMappings:
       hsl-jore4-public-db-hostname: db-hostname
       hsl-jore4-public-db-database: db-name
-      hsl-jore4-db-admin-username: db-username
-      hsl-jore4-db-admin-password: db-password
+      hsl-jore4-db-hasura-username: db-username
+      hsl-jore4-db-hasura-password: db-password
       hsl-jore4-hasura-admin-secret: hasura-admin-secret
       hsl-jore4-db-auth-username: db-auth-username
+      hsl-jore4-db-jore3importer-username: db-jore3importer-username
   ui:
     serviceName: "ui"
     serviceType: "ClusterIP"

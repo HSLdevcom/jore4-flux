@@ -21,7 +21,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: "jore4-testdb-image"
-          image: "hsldevcom/jore4-postgres:azuredbmock-main--f35e9a038c868cc51f2c740becb6d1e4009354d6"
+          image: "hsldevcom/jore4-postgres:azuredbmock-main--95833a388a10c2eec9d9dba104891a5a2fafdf5d"
           imagePullPolicy: Always
           ports:
           - containerPort: 5432
@@ -62,6 +62,9 @@ metadata:
 data:
   db-auth-password: "authpassword"
   db-auth-username: "dbauth"
+  db-hasura-name: "jore4e2e"
+  db-hasura-password: "hasurapassword"
+  db-hasura-username: "dbhasura"
   db-jore3importer-password: "importerpassword"
   db-jore3importer-username: "dbimporter"
 

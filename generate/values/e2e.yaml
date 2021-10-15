@@ -38,10 +38,11 @@ microServices:
     localSecrets:
       db-hostname: jore4-testdb
       db-name: jore4e2e
-      db-username: dbadmin
-      db-password: adminpassword
+      db-username: dbhasura
+      db-password: hasurapassword
       hasura-admin-secret: hasura
       db-auth-username: dbauth
+      db-jore3importer-username: dbimporter
   auth:
     env:
       SELF_PUBLIC_BASE_URL: "http://localhost:3300"
@@ -59,7 +60,7 @@ microServices:
   testdb:
     serviceName: "testdb"
     serviceType: "NodePort"
-    dockerImage: "hsldevcom/jore4-postgres:azuredbmock-main--f35e9a038c868cc51f2c740becb6d1e4009354d6"
+    dockerImage: "hsldevcom/jore4-postgres:azuredbmock-main--95833a388a10c2eec9d9dba104891a5a2fafdf5d"
     ports:
       - containerPort: 5432
         nodePort: 30432
@@ -74,6 +75,9 @@ microServices:
       db-auth-password: authpassword
       db-jore3importer-username: dbimporter
       db-jore3importer-password: importerpassword
+      db-hasura-username: dbhasura
+      db-hasura-password: hasurapassword
+      db-hasura-name: jore4e2e
   mssqltestdb:
     serviceName: "mssqltestdb"
     serviceType: "NodePort"
