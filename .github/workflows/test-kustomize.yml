@@ -1,6 +1,7 @@
 name: Test kustomize
 
 on:
+  push:
   pull_request:
     branches: [main]
 
