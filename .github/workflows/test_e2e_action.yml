@@ -2,7 +2,6 @@ name: Testing e2e environment setup action
 
 on:
   push:
-    branches: [setup-e2e-environment-v1]
 
   pull_request:
     branches: [main]
@@ -57,11 +56,14 @@ jobs:
             mssqltestdb-docker-image: "hsldevcom/jore4-mssql-testdb:schema-only-main--bcc4c828a37f194b9ac416f7fa5de9583cf5b8ce"
 
     steps:
+      - name: Extract repository metadata to env variables
+        uses: HSLdevcom/jore4-tools/github-actions/extract-metadata@extract-metadata-v1
+
       - name: make folder for docker-compose files
         run: mkdir docker
 
       - name: start e2e env
-        uses: HSLdevcom/jore4-flux/.github/actions/setup-e2e-environment@testing
+        uses: HSLdevcom/jore4-flux/github-actions/setup-e2e-environment@testing
         with:
           ui_version: ${{ matrix.ui-docker-image }}
           hasura_version: ${{ matrix.hasura-docker-image }}
@@ -72,7 +74,6 @@ jobs:
           mssqltestdb_version: ${{ matrix.mssqltestdb-docker-image }}
 
       - name: Check that correct version of UI is running
-        if: always()
         run: |
           UI_DEPLOYED_VERSION=`docker inspect --format='{{.Config.Image}}' ui`
           if [[ "${{ matrix.ui-docker-image }}" == "" ]]
@@ -83,7 +84,6 @@ jobs:
           fi
 
       - name: Check that correct version of HASURA is running
-        if: always()
         run: |
           HASURA_DEPLOYED_VERSION=`docker inspect --format='{{.Config.Image}}' hasura`
           if [[ "${{ matrix.hasura-docker-image }}" == "" ]]
@@ -94,7 +94,6 @@ jobs:
           fi
 
       - name: Check that correct version of AUTH is running
-        if: always()
         run: |
           AUTH_DEPLOYED_VERSION=`docker inspect --format='{{.Config.Image}}' auth`
           if [[ "${{ matrix.auth-docker-image }}" == "" ]]
@@ -105,7 +104,6 @@ jobs:
           fi
 
       - name: Check that correct version of MBTILES is running
-        if: always()
         run: |
           MBTILES_DEPLOYED_VERSION=`docker inspect --format='{{.Config.Image}}' mbtiles`
           if [[ "${{ matrix.mbtiles-docker-image }}" == "" ]]
@@ -116,7 +114,6 @@ jobs:
           fi
 
       - name: Check that correct version of JORE3IMPORTER is running
-        if: always()
         run: |
           JORE3IMPORTER_DEPLOYED_VERSION=`docker inspect --format='{{.Config.Image}}' jore3importer`
           if [[ "${{ matrix.jore3importer-docker-image }}" == "" ]]
@@ -127,7 +124,6 @@ jobs:
           fi
 
       - name: Check that correct version of TESTDB is running
-        if: always()
         run: |
           TESTDB_DEPLOYED_VERSION=`docker inspect --format='{{.Config.Image}}' testdb`
           if [[ "${{ matrix.testdb-docker-image }}" == "" ]]
@@ -138,7 +134,6 @@ jobs:
           fi
 
       - name: Check that correct version of MSSQLTESTDB is running
-        if: always()
         run: |
           MSSQLTESTDB_DEPLOYED_VERSION=`docker inspect --format='{{.Config.Image}}' mssqltestdb`
           if [[ "${{ matrix.mssqltestdb-docker-image }}" == "" ]]

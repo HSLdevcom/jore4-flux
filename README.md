@@ -282,7 +282,8 @@ To rerender all yaml templates for all stages, run `./development.sh generate`
    1. with Azure: commit your changes, move `playg` branch to your the commit and wait for Flux to
       deploy it for you
 1. Testing with CI/CD:
-   1. Add the new service to list of inputs in `.github/actions/setup-e2e-environment/action.yml` and to the `Create override file for docker-compose`steps service list to allow switching the docker image to another one in e2e tests.
+   1. Add the new service to list of inputs in `github-actions/setup-e2e-environment/action.yml`
+   1. In that action.yml file, also add the new service to the list of env variables in the `Create override file for docker-compose`step. And then also to the list of services in the run command of that step.
    1. Kind cluster github testing: extend all jobs with your microservice in
       `.github/workflows/test-e2e-cluster-setup.yml`
    1. Docker compose github testing: extend all jobs with your microservice in

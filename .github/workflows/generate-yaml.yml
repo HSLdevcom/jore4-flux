@@ -1,6 +1,7 @@
 name: Generate yaml
 
 on:
+  push:
   pull_request:
     branches: [main]
 
