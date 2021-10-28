@@ -33,6 +33,9 @@ inputs:
 runs:
   using: "composite"
   steps:
+     - name: make folder for docker-compose files
+        run: mkdir docker
+
     - name: Download and extract e2e docker-compose release
       run: "curl -L https://github.com/HSLdevcom/jore4-flux/releases/download/e2e-docker-compose/e2e-docker-compose.tar.gz --silent | tar -xzf - -C ./docker/ | bash"
       shell: bash

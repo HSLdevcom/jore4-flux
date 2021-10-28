@@ -59,11 +59,8 @@ jobs:
       - name: Extract repository metadata to env variables
         uses: HSLdevcom/jore4-tools/github-actions/extract-metadata@extract-metadata-v1
 
-      - name: make folder for docker-compose files
-        run: mkdir docker
-
       - name: start e2e env
-        uses: HSLdevcom/jore4-flux/.github/actions/setup-e2e-environment@${{ env.COMMIT_ID }}
+        uses: HSLdevcom/jore4-flux/.github/actions/setup-e2e-environment@${{ env.BRANCH_NAME }}
         with:
           ui_version: ${{ matrix.ui-docker-image }}
           hasura_version: ${{ matrix.hasura-docker-image }}
