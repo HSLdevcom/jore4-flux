@@ -1,9 +1,6 @@
 name: Super-Linter
 
 on:
-  push:
-  pull_request:
-    branches: [main]
 
 jobs:
   # general linter for many languages and tools

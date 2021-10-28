@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: [main]
 
+jobs:
   test-docker-compose-action:
     needs: create_tag_for_testing
     runs-on: ubuntu-20.04
