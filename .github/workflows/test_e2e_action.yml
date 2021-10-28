@@ -7,7 +7,24 @@ on:
     branches: [main]
 
 jobs:
+  create_tag_for_testing:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Tag commit as testing
+        #used to specify the version of the action used in the next jobs
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            github.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "refs/tags/testing",
+              sha: context.sha
+            })
+
   test-docker-compose-action:
+    needs: create_tag_for_testing
     runs-on: ubuntu-20.04
 
     strategy:
@@ -43,7 +60,7 @@ jobs:
         uses: HSLdevcom/jore4-tools/github-actions/extract-metadata@extract-metadata-v1
 
       - name: start e2e env
-        uses: HSLdevcom/jore4-flux/.github/actions/setup-e2e-environment@$BRANCH_NAME
+        uses: HSLdevcom/jore4-flux/.github/actions/setup-e2e-environment@testing
         with:
           ui_version: ${{ matrix.ui-docker-image }}
           hasura_version: ${{ matrix.hasura-docker-image }}
@@ -122,3 +139,19 @@ jobs:
           else
             [[ "$MSSQLTESTDB_DEPLOYED_VERSION" == "${{ matrix.mssqltestdb-docker-image }}" ]]
           fi
+
+  delete_tag_after_testing:
+    needs: test-docker-compose-action
+    if: always()
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Remove tag
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            github.git.deleteRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "tags/testing"
+            })
