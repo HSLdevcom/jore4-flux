@@ -34,7 +34,9 @@ runs:
   using: "composite"
   steps:
     - name: Download and extract e2e docker-compose release
-      run: "curl -L https://github.com/HSLdevcom/jore4-flux/releases/download/e2e-docker-compose/e2e-docker-compose.tar.gz --silent | tar -xzf - -C ./docker/ | bash"
+      run: |
+        mkdir -p ${{ github.workspace }}/foobar
+        curl -L https://github.com/HSLdevcom/jore4-flux/releases/download/e2e-docker-compose/e2e-docker-compose.tar.gz --silent | tar -xzf - -C ./foobar/ | bash
       shell: bash
 
     - name: Create override file for docker-compose
@@ -47,7 +49,7 @@ runs:
         TESTDB_DOCKER_IMAGE: ${{ inputs.testdb_version }} # should be "" if using default
         MSSQLTESTDB_DOCKER_IMAGE: ${{ inputs.mssqltestdb_version }} # should be "" if using default
       run: |
-        cat <<EOF > ${{ github.workspace }}/docker/docker-compose.override.yml
+        cat <<EOF > ${{ github.workspace }}/foobar/docker-compose.override.yml
         version: "3.8"
         services: {
           ${UI_DOCKER_IMAGE:+"jore4-ui: {image: $UI_DOCKER_IMAGE},"}
@@ -62,12 +64,12 @@ runs:
       shell: bash
 
     - name: Print override file
-      run: cat ${{ github.workspace }}/docker/docker-compose.override.yml
+      run: cat ${{ github.workspace }}/foobar/docker-compose.override.yml
       shell: bash
 
     - name: Start e2e environment
       run: |
-        docker-compose -f ${{ github.workspace }}/docker/docker-compose.yml -f ${{ github.workspace }}/docker/docker-compose.override.yml up -d
+        docker-compose -f ${{ github.workspace }}/foobar/docker-compose.yml -f ${{ github.workspace }}/foobar/docker-compose.override.yml up -d
       shell: bash
 
     - name: Verify that UI is up and running standalone
