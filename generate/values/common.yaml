@@ -28,12 +28,12 @@ microServices:
       SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
       API_PATH_PREFIX: ""
       API_PATH_PREFIX_PUBLIC: "/api/auth"
-      DB_SESSION_SCHEMA: "auth_session"
+      DB_SESSION_SCHEMA: "public"
     secretMappings:
       hsl-jore4-auth-oidc-client-id: oidc-client-id
       hsl-jore4-auth-oidc-client-secret: oidc-client-secret
       hsl-jore4-public-db-hostname: db-hostname
-      hsl-jore4-public-db-database: db-name
+      hsl-jore4-public-auth-database: db-name
       hsl-jore4-db-auth-username: db-username
       hsl-jore4-db-auth-password: db-password
   hasura:
@@ -63,7 +63,7 @@ microServices:
       HASURA_GRAPHQL_AUTH_HOOK_MODE: "GET"
     secretMappings:
       hsl-jore4-public-db-hostname: db-hostname
-      hsl-jore4-public-db-database: db-name
+      hsl-jore4-public-jore4-database: db-name
       hsl-jore4-db-hasura-username: db-username
       hsl-jore4-db-hasura-password: db-password
       hsl-jore4-hasura-admin-secret: hasura-admin-secret
@@ -128,7 +128,7 @@ microServices:
       hsl-jore3-db-username: source-db-username
       hsl-jore3-db-password: source-db-password
       hsl-jore4-public-db-hostname: destination-db-hostname
-      hsl-jore4-public-db-database: destination-db-database
+      hsl-jore4-public-jore3importer-database: destination-db-database
       # destination-db-port defaults to 5432
       hsl-jore4-db-jore3importer-username: destination-db-username
       hsl-jore4-db-jore3importer-password: destination-db-password

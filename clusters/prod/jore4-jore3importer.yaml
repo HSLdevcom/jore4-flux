@@ -106,12 +106,12 @@ spec:
           objectAlias: destination-db-username
           objectType: secret
         - |
-          objectName: hsl-jore4-public-db-database
-          objectAlias: destination-db-database
-          objectType: secret
-        - |
           objectName: hsl-jore4-public-db-hostname
           objectAlias: destination-db-hostname
+          objectType: secret
+        - |
+          objectName: hsl-jore4-public-jore3importer-database
+          objectAlias: destination-db-database
           objectType: secret
 
 ---
