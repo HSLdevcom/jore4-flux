@@ -94,7 +94,7 @@ spec:
           objectAlias: db-username
           objectType: secret
         - |
-          objectName: hsl-jore4-public-db-database
+          objectName: hsl-jore4-public-auth-database
           objectAlias: db-name
           objectType: secret
         - |
@@ -111,7 +111,7 @@ metadata:
 data:
   API_PATH_PREFIX: ""
   API_PATH_PREFIX_PUBLIC: "/api/auth"
-  DB_SESSION_SCHEMA: "auth_session"
+  DB_SESSION_SCHEMA: "public"
   LOGINPAGE_URL: "https://test.jore.hsl.fi"
   LOGOUTPAGE_URL: "https://test.jore.hsl.fi"
   OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"

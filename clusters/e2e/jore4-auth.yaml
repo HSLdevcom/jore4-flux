@@ -68,8 +68,9 @@ metadata:
   namespace: hsl-jore4
 data:
   db-hostname: "jore4-testdb"
-  db-name: "jore4e2e"
+  db-name: "authdb"
   db-password: "authpassword"
+  db-session-schema: "public"
   db-username: "dbauth"
   oidc-client-id: "0838619941439007"
   oidc-client-secret: "9uV5p45F6IZQubCErBiquZYaL7Wm2AWM"
@@ -83,7 +84,7 @@ metadata:
 data:
   API_PATH_PREFIX: ""
   API_PATH_PREFIX_PUBLIC: "/api/auth"
-  DB_SESSION_SCHEMA: "auth_session"
+  DB_SESSION_SCHEMA: "public"
   LOGINPAGE_URL: "http://localhost:3300"
   LOGOUTPAGE_URL: "http://localhost:3300"
   OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"

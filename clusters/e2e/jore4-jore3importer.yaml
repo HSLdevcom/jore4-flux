@@ -68,7 +68,7 @@ metadata:
   name: "jore4-jore3importer-local-secrets"
   namespace: hsl-jore4
 data:
-  destination-db-database: "jore4e2e"
+  destination-db-database: "importerdb"
   destination-db-hostname: "jore4-testdb"
   destination-db-password: "importerpassword"
   destination-db-username: "dbimporter"
