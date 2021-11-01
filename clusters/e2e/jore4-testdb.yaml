@@ -21,7 +21,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: "jore4-testdb-image"
-          image: "hsldevcom/jore4-postgres:azuredbmock-main--95833a388a10c2eec9d9dba104891a5a2fafdf5d"
+          image: "hsldevcom/jore4-postgres:azuredbmock-create-logical-databases--451112984066a8d2f702ac0e719e3127ae8ac2e6"
           imagePullPolicy: Always
           ports:
           - containerPort: 5432
@@ -60,11 +60,13 @@ metadata:
   name: "jore4-testdb-local-secrets"
   namespace: hsl-jore4
 data:
+  db-auth-name: "authdb"
   db-auth-password: "authpassword"
   db-auth-username: "dbauth"
   db-hasura-name: "jore4e2e"
   db-hasura-password: "hasurapassword"
   db-hasura-username: "dbhasura"
+  db-jore3importer-name: "importerdb"
   db-jore3importer-password: "importerpassword"
   db-jore3importer-username: "dbimporter"
 

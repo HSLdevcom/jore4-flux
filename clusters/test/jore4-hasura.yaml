@@ -98,12 +98,12 @@ spec:
           objectAlias: hasura-admin-secret
           objectType: secret
         - |
-          objectName: hsl-jore4-public-db-database
-          objectAlias: db-name
-          objectType: secret
-        - |
           objectName: hsl-jore4-public-db-hostname
           objectAlias: db-hostname
+          objectType: secret
+        - |
+          objectName: hsl-jore4-public-jore4-database
+          objectAlias: db-name
           objectType: secret
 
 ---

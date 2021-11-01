@@ -27,6 +27,8 @@ services:
         target: /mnt/secrets-store/db-name
       - source: auth-db-password
         target: /mnt/secrets-store/db-password
+      - source: auth-db-session-schema
+        target: /mnt/secrets-store/db-session-schema
       - source: auth-db-username
         target: /mnt/secrets-store/db-username
       - source: auth-oidc-client-id
@@ -127,7 +129,7 @@ services:
 
   jore4-testdb:
     container_name: "testdb"
-    image: "hsldevcom/jore4-postgres:azuredbmock-main--95833a388a10c2eec9d9dba104891a5a2fafdf5d"
+    image: "hsldevcom/jore4-postgres:azuredbmock-create-logical-databases--451112984066a8d2f702ac0e719e3127ae8ac2e6"
     restart: "unless-stopped"
     networks:
       - jore4
@@ -139,6 +141,8 @@ services:
     ports:
       - "127.0.0.1:6432:5432"
     secrets:
+      - source: testdb-db-auth-name
+        target: /mnt/secrets-store/db-auth-name
       - source: testdb-db-auth-password
         target: /mnt/secrets-store/db-auth-password
       - source: testdb-db-auth-username
@@ -149,6 +153,8 @@ services:
         target: /mnt/secrets-store/db-hasura-password
       - source: testdb-db-hasura-username
         target: /mnt/secrets-store/db-hasura-username
+      - source: testdb-db-jore3importer-name
+        target: /mnt/secrets-store/db-jore3importer-name
       - source: testdb-db-jore3importer-password
         target: /mnt/secrets-store/db-jore3importer-password
       - source: testdb-db-jore3importer-username
@@ -186,6 +192,8 @@ secrets:
     file: ./secret-auth-db-name
   auth-db-password:
     file: ./secret-auth-db-password
+  auth-db-session-schema:
+    file: ./secret-auth-db-session-schema
   auth-db-username:
     file: ./secret-auth-db-username
   auth-oidc-client-id:
@@ -224,6 +232,8 @@ secrets:
     file: ./secret-jore3importer-source-db-port
   jore3importer-source-db-username:
     file: ./secret-jore3importer-source-db-username
+  testdb-db-auth-name:
+    file: ./secret-testdb-db-auth-name
   testdb-db-auth-password:
     file: ./secret-testdb-db-auth-password
   testdb-db-auth-username:
@@ -234,6 +244,8 @@ secrets:
     file: ./secret-testdb-db-hasura-password
   testdb-db-hasura-username:
     file: ./secret-testdb-db-hasura-username
+  testdb-db-jore3importer-name:
+    file: ./secret-testdb-db-jore3importer-name
   testdb-db-jore3importer-password:
     file: ./secret-testdb-db-jore3importer-password
   testdb-db-jore3importer-username:

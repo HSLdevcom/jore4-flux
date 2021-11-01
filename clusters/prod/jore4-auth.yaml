@@ -94,7 +94,7 @@ spec:
           objectAlias: db-username
           objectType: secret
         - |
-          objectName: hsl-jore4-public-db-database
+          objectName: hsl-jore4-public-auth-database
           objectAlias: db-name
           objectType: secret
         - |
