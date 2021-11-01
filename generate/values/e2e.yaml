@@ -88,7 +88,7 @@ microServices:
   mssqltestdb:
     serviceName: "mssqltestdb"
     serviceType: "NodePort"
-    dockerImage: "hsldevcom/jore4-mssql-testdb:schema-only-main--bcc4c828a37f194b9ac416f7fa5de9583cf5b8ce"
+    dockerImage: "hsldevcom/jore4-mssql-testdb:schema-only-main--85fc067fb260c7dede93139aa4fe9f080b1b0b30"
     ports:
       - containerPort: 1433
         nodePort: 30433
