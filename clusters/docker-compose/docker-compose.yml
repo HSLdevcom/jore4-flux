@@ -158,7 +158,7 @@ services:
 
   jore4-mssqltestdb:
     container_name: "mssqltestdb"
-    image: "hsldevcom/jore4-mssql-testdb:schema-only-main--bcc4c828a37f194b9ac416f7fa5de9583cf5b8ce"
+    image: "hsldevcom/jore4-mssql-testdb:schema-only-increase-timeouts--9834930467adeb8ed2cb9c78756a1608503dfd4e"
     restart: "unless-stopped"
     networks:
       - jore4
