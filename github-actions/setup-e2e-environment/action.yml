@@ -152,3 +152,7 @@ runs:
       uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
       with:
         command: "curl --fail http://localhost:3200/api/public/v1/login --output /dev/null --silent"
+
+    - name: Verify that all containers are healthy
+      run: '[ -z "$(docker ps -q --filter health=unhealthy)" ]'
+      shell: bash
