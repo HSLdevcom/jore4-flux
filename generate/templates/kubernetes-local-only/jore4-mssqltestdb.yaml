@@ -1,6 +1,0 @@
-#{{/* add comment that result yaml was generated */}} This is a generated file, all modifications will be overwritten!
-
-# Describes the default environment variables, secrets the deployment template and the service for jore3 mssql test database
-{{ if (index .Values.microServices "mssqltestdb") }}
-{{/**/}}{{ tmpl.Exec "templates/microservice.yaml" .Values.microServices.mssqltestdb }}
-{{ end }}
