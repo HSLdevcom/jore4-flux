@@ -264,7 +264,8 @@ To rerender all yaml templates for all stages, run `./development.sh generate`
 1. Create a new service manifest in `generate/templates/kubernetes-all`. If you don't need anything
    custom additions, you could just copy-paste the template from another microservice and rename relevant parts
 1. If the service has an HTTP endpoint that needs to be accessed externally, create the ingress rule
-   in all environments `generate/values/<dev|e2e|playg|prod|test|...>.yaml`
+   in all environments `generate/values/<dev|e2e|playg|prod|test|...>.yaml`. Please note that the
+   ingress rule will work only if you specify readiness and liveliness probes for the microservice.
 1. If there are other customizations to be done to the service (e.g. needs different environment
    variables in different stages), edit the relevant parts in
    `generate/values/<dev|e2e|playg|prod|test|...>.yaml`
