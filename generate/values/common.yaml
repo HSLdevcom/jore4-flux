@@ -139,6 +139,15 @@ microServices:
     ports:
       - containerPort: 8080
         localPort: 3205
+    podSpec:
+      livenessProbe:
+        httpGet:
+          path: /actuator/health
+          port: 8080
+      readinessProbe:
+        httpGet:
+          path: /actuator/health
+          port: 8080
     secretMappings:
       hsl-jore4-db-mapmatching-username: db-username
       hsl-jore4-db-mapmatching-password: db-password
