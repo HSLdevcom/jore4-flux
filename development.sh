@@ -1,5 +1,4 @@
 #!/bin/bash
-echo bla
 set -eu
 
 function generate_manifests {
