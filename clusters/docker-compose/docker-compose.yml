@@ -40,7 +40,7 @@ services:
 
   jore4-hasura:
     container_name: "hasura"
-    image: "hsldevcom/jore4-hasura:main--988be388157e7eafa38864c4745d819e67d15a24"
+    image: "hsldevcom/jore4-hasura:main--13071eb7ca33267037cc1247d27630332f0e6a71"
     restart: "unless-stopped"
     networks:
       - jore4
