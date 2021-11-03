@@ -109,10 +109,10 @@ runs:
       with:
         command: "curl --fail http://localhost:3200/actuator/health --output /dev/null --silent"
 
-    - name: Verify that dockerized Auth Backend can access sessions from the DB
+    - name: Verify that auth backend has access to database
       uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
       with:
-        command: "curl --fail http://localhost:3200/api/public/v1/login --output /dev/null --silent"
+        command: "curl --fail http://localhost:3200/public/v1/login --output /dev/null --silent"
 
     - name: Verify that auth backend is up and running through proxy
       uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1

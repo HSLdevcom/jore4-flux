@@ -99,7 +99,7 @@ jobs:
         uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
         if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-auth') }}
         with:
-          command: "curl --fail http://localhost:3200/api/public/v1/login --output /dev/null --silent"
+          command: "curl --fail http://localhost:3200/public/v1/login --output /dev/null --silent"
 
       - name: Verify that auth backend is up and running through proxy
         if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-auth') && contains(matrix.services, 'jore4-proxy') }}
