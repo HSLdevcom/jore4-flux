@@ -16,7 +16,6 @@ jobs:
           - "./clusters/test"
           - "./clusters/prod"
           - "./clusters/playg"
-          - "./clusters/e2e"
 
     steps:
       - name: Checkout code

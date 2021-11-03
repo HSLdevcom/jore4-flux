@@ -27,6 +27,10 @@ ingress:
     - path: /api/mbtiles(/|$)(.*)
       serviceName: mbtiles
       servicePort: 8000
+    # note the (/|$) allows the url to terminate after "mapmatching" or continue with a "/"
+    - path: /api/mapmatching(/|$)(.*)
+      serviceName: mapmatching
+      servicePort: 8080
     # note the first () will be an empty capture group
     - path: /()(.*)
       serviceName: ui
@@ -110,3 +114,21 @@ microServices:
       # destination-db-port defaults to 5432
       destination-db-username: dbimporter
       destination-db-password: importerpassword
+  mapmatching:
+    serviceType: "NodePort"
+    ports:
+      - containerPort: 8080
+        nodePort: 30435
+        localPort: 3005
+    localSecrets:
+      db-username: mapmatching
+      db-password: password
+  mapmatchingdb:
+    serviceType: "NodePort"
+    ports:
+      - containerPort: 5432
+        nodePort: 30436
+        localPort: 6433
+    localSecrets:
+      postgres-user: mapmatching
+      postgres-password: password

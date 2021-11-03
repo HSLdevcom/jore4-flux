@@ -1,5 +1,4 @@
 #!/bin/bash
-echo bla
 set -eu
 
 function generate_manifests {
@@ -13,35 +12,15 @@ function generate_manifests {
   OUTPUT_DIR="/tmp/clusters"
 
   AZURE_STAGES=("playg" "dev" "test" "prod")
-  LOCAL_STAGES=("e2e")
-  ALL_STAGES=("${AZURE_STAGES[@]}" "${LOCAL_STAGES[@]}")
 
   GOMPLATE_CMD="docker run --rm -v $(pwd):/tmp hairyhenderson/gomplate@sha256:8e46d887a73ef5d90fde1f1a7d679fa94cf9f6dfc686b0b1a581858faffb1e16 \
     --template templates=$TEMPLATES_DIR/resources/ \
     -d common=$VALUES_DIR/common.yaml"
 
   # generate default manifests for all stages
-  for STAGE in "${ALL_STAGES[@]}"; do
-    $GOMPLATE_CMD \
-      --input-dir "$TEMPLATES_DIR/kubernetes-all" \
-      --output-dir "$OUTPUT_DIR/$STAGE" \
-      -d "env=$VALUES_DIR/$STAGE.yaml" \
-      -c "Values=merge:env|common"
-  done
-
-  # generate additions to azure stages (e.g. flux sync)
   for STAGE in "${AZURE_STAGES[@]}"; do
     $GOMPLATE_CMD \
-      --input-dir "$TEMPLATES_DIR/kubernetes-azure-only" \
-      --output-dir "$OUTPUT_DIR/$STAGE" \
-      -d "env=$VALUES_DIR/$STAGE.yaml" \
-      -c "Values=merge:env|common"
-  done
-
-  # generate additions to local stages (e.g. test databases)
-  for STAGE in "${LOCAL_STAGES[@]}"; do
-    $GOMPLATE_CMD \
-      --input-dir "$TEMPLATES_DIR/kubernetes-local-only" \
+      --input-dir "$TEMPLATES_DIR/kubernetes" \
       --output-dir "$OUTPUT_DIR/$STAGE" \
       -d "env=$VALUES_DIR/$STAGE.yaml" \
       -c "Values=merge:env|common"

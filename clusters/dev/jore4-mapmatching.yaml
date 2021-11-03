@@ -1,0 +1,91 @@
+# This is a generated file, all modifications will be overwritten!
+
+# Describes the default environment variables, secrets the deployment template and the service for jore4 map-matching service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jore4-mapmatching
+  namespace: hsl-jore4
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "jore4-mapmatching"
+  template:
+    metadata:
+      labels:
+        app: "jore4-mapmatching"
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: "jore4-mapmatching-image"
+          image: "hsldevcom/jore4-map-matching:dockerise--d004159af809fa61d4ddc4f45b217cc4626c0591"
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: "jore4-mapmatching-env"
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+      volumes:
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "jore4-mapmatching-secret-mapping"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jore4-mapmatching
+  namespace: hsl-jore4
+spec:
+  type: ClusterIP
+  selector:
+    app: jore4-mapmatching
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+---
+apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
+kind: SecretProviderClass
+metadata:
+  name: jore4-mapmatching-secret-mapping
+  namespace: hsl-jore4
+spec:
+  provider: azure
+  parameters:
+    useVMManagedIdentity: "true"
+    tenantId: "572a41dd-c389-4f0a-b256-aefd1bf149d7"
+    keyvaultName: "hsl-jore4-dev-vault"
+    objects: |
+      array:
+        - |
+          objectName: hsl-jore4-db-mapmatching-password
+          objectAlias: db-password
+          objectType: secret
+        - |
+          objectName: hsl-jore4-db-mapmatching-username
+          objectAlias: db-username
+          objectType: secret
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "jore4-mapmatching-env"
+  namespace: hsl-jore4
+data:
+  DB_DATABASE: "jore4mapmatching"
+  DB_HOSTNAME: "jore4-mapmatchingdb"
+  SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+
+

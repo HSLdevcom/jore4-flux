@@ -1,8 +1,0 @@
-# This is a generated file, all modifications will be overwritten!
-
-# Creates namespace for jore4 services
-
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: hsl-jore4

@@ -31,12 +31,6 @@ Flux configuration for the jore4 Kubernetes deployment
     - [Uninstall](#uninstall)
     - [Flux Monitoring](#flux-monitoring)
 - [Use in end-to-end tests](#use-in-end-to-end-tests)
-  - [Kind](#kind)
-    - [Setting up Kind cluster locally](#setting-up-kind-cluster-locally)
-    - [Setting up Kind cluster remotely](#setting-up-kind-cluster-remotely)
-    - [Development of Kind cluster](#development-of-kind-cluster)
-    - [Architecture and port mapping in Kind cluster](#architecture-and-port-mapping-in-kind-cluster)
-    - [Differences between AKS and Kind](#differences-between-aks-and-kind)
   - [Docker-compose](#docker-compose)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -48,7 +42,6 @@ For running the commands in this README, you'll need to following:
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/)
 - [Kustomize](https://kustomize.io/)
 - [Flux](https://fluxcd.io/)
-- [Kind](https://kind.sigs.k8s.io/)
 
 Optionally, you may want to install:
 
@@ -278,14 +271,9 @@ To rerender all yaml templates for all stages, run `./development.sh generate`
 1. Generate the manifests using `./development.sh generate`
 1. Test locally that everything works:
    1. with docker-compose: `docker-compose -f clusters/docker-compose/docker-compose.yml up`
-   1. with Kind: `./kindcluster.sh start --cluster=clusters/e2e`
    1. with Azure: commit your changes, move `playg` branch to your the commit and wait for Flux to
       deploy it for you
 1. Testing with CI/CD:
-   1. Kind cluster remote setup: extend the `patchesStrategicMerge` section in `/remotecluster.sh`
-      to allow switching the docker image to another one in e2e tests.
-   1. Kind cluster github testing: extend all jobs with your microservice in
-      `.github/workflows/test-e2e-cluster-setup.yml`
    1. Docker compose github testing: extend all jobs with your microservice in
       `.github/workflows/test-e2e-docker-compose.yml`
 
@@ -396,95 +384,6 @@ there's a wrong version deployed:
    `kubectl logs <pod-name> --namespace <pod-namespace>` (or use Lens)
 
 ## Use in end-to-end tests
-
-### Kind
-
-To run the cluster locally in kubernetes, we are using
-[kind](https://kind.sigs.k8s.io/docs/user/quick-start#installation).
-
-#### Setting up Kind cluster locally
-
-To start Kind, execute `./kindcluster.sh kind:start`, to stop, run `./kindcluster.sh stop`.
-This will create a cluster called `kind-jore4-local-cluster` that works pretty much the same as the
-AKS Kubernetes service. To fine-tune its settings, edit the `kind-cluster.yaml` file. More
-information about the available settings [here](https://kind.sigs.k8s.io/docs/user/configuration/).
-
-You may use the same `./kindcluster.sh deploy:*` commands to deploy CRDs and applications to Kind as
-with the AKS. To start the cluster for end-to-end testing, just execute:
-
-```
-./kindcluster.sh kind:start
-./kindcluster.sh deploy:crd
-./kindcluster.sh deploy:cluster --cluster=clusters/e2e
-```
-
-Or simply:
-
-```
-./kindcluster.sh start --cluster=clusters/e2e
-```
-
-This will start up the JORE4 cluster that's defined in `clusters/e2e` directory.
-
-- The UI runs on `http://localhost:3300`
-- The postgresql database is exposed on `localhost:3002` (credentials are defined in
-  `clusters/e2e/jore4-local-secrets.yaml`)
-
-We don't use Flux to set up the applications within the Kind Kubernetes as it would just slow things
-down. Instead, the resources are deployed directly.
-
-#### Setting up Kind cluster remotely
-
-To set up and run the Kind cluster remotely, from e.g. a github action instead of your local workdir,
-there is a `remotecluster.sh` script in the repo root that downloads the necessary configuration
-files and helper scripts from the `jore4-flux` repository from the `e2e` branch and instructs
-`kindcluster.sh` to deploy the e2e cluster to Kind. The `e2e` branch follows the same logic as the
-[Deployment Strategy](#deployment-strategy) describes.
-
-Just download the `remotecluster.sh` and execute it on your machine to have the full setup done. You
-may also execute it directly with:
-
-```
-curl https://raw.githubusercontent.com/HSLdevcom/jore4-flux/e2e/remotecluster.sh | bash
-```
-
-The script recognizes the following environment variables as parameters:
-
-- `UI_DOCKER_IMAGE`: redefines which UI docker image should be used instead of the e2e
-  cluster default. E.g `UI_DOCKER_IMAGE="hsldevcom/jore4-ui:latest"`
-- `HASURA_DOCKER_IMAGE`: redefines which hasura docker image should be used instead of the e2e
-  cluster default. E.g `HASURA_DOCKER_IMAGE="hsldevcom/jore4-hasura:latest"`
-- `AUTH_DOCKER_IMAGE`: redefines which auth backend docker image should be used instead of the e2e
-  cluster default. E.g `AUTH_DOCKER_IMAGE="hsldevcom/jore4-auth:latest"`
-
-To stop and remove the cluster, call `kind delete clusters jore4-local-cluster`. This will delete
-the docker container(s) where Kind is running and free up all resources. Currently we are not using
-volume mappings, so there's no need to clean up any directories either.
-
-#### Development of Kind cluster
-
-When making changes to the Kind cluster setup, modify `kind-cluster.yaml` as described
-[here](https://kind.sigs.k8s.io/docs/user/configuration). You have to delete and rerun the Kind
-cluster for the changes to take effect.
-
-Otherwise, if you make changes in the Kubernetes cluster resources themselves (under `clusters/e2e`),
-you may reapply the changes by calling `kindcluster.sh` again. `remotecluster.sh` loads resources
-from the `e2e` branch, so cannot be tested locally.
-
-#### Architecture and port mapping in Kind cluster
-
-![Architecture and port mapping](docs/kindcluster.png)
-
-#### Differences between AKS and Kind
-
-- Kind is still in early development, many Kubernetes features won't work.
-- Azure's `AGIC ingress controller` is only intended for AKS, we are using `nginx` as a substitute
-  in Kind.
-- Kind allows you to
-  [map a directory](https://kind.sigs.k8s.io/docs/user/configuration/#extra-mounts) from you machine
-  to the cluster as a volume.
-- We don't have a `key-vault` locally, so instead of using the `secret store CSI driver`, we'll
-  have to map the secrets to the pods directly as files from the host machine
 
 ### Docker-compose
 
