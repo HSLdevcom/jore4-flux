@@ -9,6 +9,9 @@ jobs:
   e2e-docker-compose-setup:
     name: e2e setup with docker-compose
     runs-on: ubuntu-20.04
+    env:
+      # the password should be defined here instead of within the mssql step
+      SA_PASSWORD: "P@ssw0rd"
 
     strategy:
       matrix:
@@ -74,8 +77,6 @@ jobs:
       - name: Verify that mssql testdb is up and running
         if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-mssqltestdb') }}
         uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
-        env:
-          SA_PASSWORD: "P@ssw0rd"
         with:
           command: 'sqlcmd -S 127.0.0.1 -U sa -P "$SA_PASSWORD" -d master -Q "SELECT ''OK'';"'
           # it may take a while for the database to start
