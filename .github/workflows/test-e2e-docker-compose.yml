@@ -68,6 +68,8 @@ jobs:
         uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
         with:
           command: "pg_isready -h localhost -p 6432"
+          # it takes a while for the database to start
+          retries: 50
 
       - name: Verify that mssql testdb is up and running
         if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-mssqltestdb') }}
@@ -76,6 +78,8 @@ jobs:
           SA_PASSWORD: "P@ssw0rd"
         with:
           command: 'sqlcmd -S 127.0.0.1 -U sa -P "$SA_PASSWORD" -d master -Q "SELECT ''OK'';"'
+          # it may take a while for the database to start
+          retries: 50
 
       - name: Verify that hasura is up and running standalone
         if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-hasura') }}
