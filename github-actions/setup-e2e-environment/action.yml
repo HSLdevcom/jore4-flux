@@ -148,26 +148,3 @@ runs:
       uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
       with:
         command: "curl --fail http://localhost:3300/api/mapmatching/actuator/health --output /dev/null --silent"
-
-    #this needs to be done until issue 483 is done
-    - name: Restart auth backend
-      run: docker-compose -f ${{ github.workspace }}/docker/docker-compose.yml restart jore4-auth
-      shell: bash
-
-    #this needs to be done until issue 483 is done
-    - name: Verify that auth backend is up and running standalone
-      uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
-      with:
-        command: "curl --fail http://localhost:3200/actuator/health --output /dev/null --silent"
-
-    #this needs to be done until issue 483 is done
-    - name: Verify that auth backend is up and running through proxy
-      uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
-      with:
-        command: "curl --fail http://localhost:3300/api/auth/actuator/health --output /dev/null --silent"
-
-    #this needs to be done until issue 483 is done
-    - name: Verify that dockerized Auth Backend can access sessions from the DB
-      uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
-      with:
-        command: "curl --fail http://localhost:3200/api/public/v1/login --output /dev/null --silent"
