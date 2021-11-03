@@ -82,6 +82,8 @@ runs:
       uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
       with:
         command: "pg_isready -h localhost -p 6432"
+        # it takes a while for the database to start
+        retries: 50
 
     - name: Verify that mssql testdb is up and running
       uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
@@ -89,6 +91,8 @@ runs:
         SA_PASSWORD: "P@ssw0rd"
       with:
         command: 'sqlcmd -S 127.0.0.1 -U sa -P "$SA_PASSWORD" -d master -Q "SELECT ''OK'';"'
+        # it takes a while for the database to start
+        retries: 50
 
     - name: Verify that hasura is up and running standalone
       uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
