@@ -1,6 +1,10 @@
 name: "Start e2e environemnt"
 description: "Builds e2e environment with docker-compose and tests that services are running."
 inputs:
+  bundle_version:
+    description: Version of the docker-compose bundle to use (= github release version)
+    required: false
+    default: "e2e-docker-compose"
   ui_version:
     description: Version of ui to use (docker image tag)
     required: false
@@ -39,7 +43,7 @@ runs:
     - name: Download and extract e2e docker-compose release
       run: |
         mkdir -p ${{ github.workspace }}/docker
-        curl -L https://github.com/HSLdevcom/jore4-flux/releases/download/e2e-docker-compose/e2e-docker-compose.tar.gz --silent | tar -xzf - -C ./docker/ | bash
+        curl -L https://github.com/HSLdevcom/jore4-flux/releases/download/${{ inputs.bundle_version }}/e2e-docker-compose.tar.gz --silent | tar -xzf - -C ./docker/ | bash
       shell: bash
 
     - name: Create override file for docker-compose
