@@ -7,7 +7,21 @@ on:
     branches: [main]
 
 jobs:
+  create-test-bundle:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Create docker compose bundle release for testing
+        uses: ./github-actions/create-docker-bundle-release
+        with:
+          release_name: e2e-setup-test-bundle
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
   test-e2e-setup-action:
+    needs: create-test-bundle
     runs-on: ubuntu-20.04
 
     strategy:
@@ -33,12 +47,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Create docker compose bundle release for testing
-        uses: ./github-actions/create-docker-bundle-release
-        with:
-          release_name: e2e-setup-test-bundle
-          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: start e2e env
         uses: ./github-actions/setup-e2e-environment
