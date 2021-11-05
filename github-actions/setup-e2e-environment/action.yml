@@ -36,9 +36,7 @@ inputs:
 
 runs:
   using: "composite"
-  env:
-    # the password should be defined here instead of within the mssql step
-    SA_PASSWORD: "P@ssw0rd"
+
   steps:
     - name: Download and extract e2e docker-compose release
       run: |
@@ -95,7 +93,7 @@ runs:
     - name: Verify that mssql testdb is up and running
       uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
       with:
-        command: 'sqlcmd -S 127.0.0.1 -U sa -P "$SA_PASSWORD" -d master -Q "SELECT ''OK'';"'
+        command: 'sqlcmd -S 127.0.0.1 -U sa -P "P@ssw0rd" -d master -Q "SELECT ''OK'';"'
         # it takes a while for the database to start
         retries: 50
 
