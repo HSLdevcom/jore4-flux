@@ -4,6 +4,9 @@ inputs:
   release_name:
     description: Name of the github release for the bundle
     required: true
+  github_token:
+    description: Github token is used to authenticate for github release uploading
+    required: true
 
 runs:
   using: "composite"
@@ -14,7 +17,7 @@ runs:
         RELEASE_VERSION: ${{ inputs.release_name }}
       run: |
         echo "Release version: ${RELEASE_VERSION}"
-        echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+        echo "${{ inputs.github_token }}" | gh auth login --with-token
 
         # create a version file (to enable tracking version changes)
         echo "${GITHUB_SHA}" > RELEASE_VERSION.txt
@@ -23,7 +26,7 @@ runs:
         tar -czvf e2e-docker-compose.tar.gz RELEASE_VERSION.txt -C clusters/docker-compose .
 
         # delete and recreate github release
-        gh release delete ${RELEASE_VERSION} || echo "There in no previous github release with the name '${RELEASE_VERSION}'"
+        gh release delete ${RELEASE_VERSION} || echo "There are no previous github releases with the name '${RELEASE_VERSION}'"
         gh release create ${RELEASE_VERSION} --notes "docker-compose config with nginx.conf and secrets"
 
         # append the tar.gz package and also the individual files (just in case) to the release

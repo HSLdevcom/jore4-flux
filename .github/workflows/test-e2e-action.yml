@@ -38,6 +38,7 @@ jobs:
         uses: ./github-actions/create-docker-bundle-release
         with:
           release_name: e2e-setup-test-bundle
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: start e2e env
         uses: ./github-actions/setup-e2e-environment

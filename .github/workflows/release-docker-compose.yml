@@ -18,3 +18,4 @@ jobs:
         uses: ./github-actions/create-docker-bundle-release
         with:
           release_name: e2e-docker-compose
+          github_token: ${{ secrets.GITHUB_TOKEN }}
