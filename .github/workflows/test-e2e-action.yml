@@ -62,11 +62,7 @@ jobs:
           fi
 
       - name: Check that correct version of HASURA is running
+        # should not be :latest as it hasn't been overwritten
         run: |
           HASURA_DEPLOYED_VERSION=`docker inspect --format='{{.Config.Image}}' hasura`
-          if [[ "${{ matrix.hasura-docker-image }}" == "" ]]
-          then
-            [[ "$HASURA_DEPLOYED_VERSION" != "${{ matrix.hasura-docker-image }}" ]]
-          else
-            [[ "$HASURA_DEPLOYED_VERSION" == "${{ matrix.hasura-docker-image }}" ]]
-          fi
+          [[ "$HASURA_DEPLOYED_VERSION" != "hsldevcom/jore4-hasura:latest" ]]
