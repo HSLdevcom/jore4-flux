@@ -79,6 +79,11 @@ jobs:
           # it may take a while for the database to start
           retries: 50
 
+      - name: debug
+        run: |
+          docker logs mssqltestdb || echo foo
+        shell: bash
+
       - name: Verify that hasura is up and running standalone
         if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-hasura') }}
         uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
