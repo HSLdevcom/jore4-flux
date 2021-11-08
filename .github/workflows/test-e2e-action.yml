@@ -1,8 +1,6 @@
 name: Test e2e environment setup action
 
 on:
-  push:
-
   pull_request:
     branches: [main]
 
@@ -14,6 +12,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # note: make sure to only run a single workflow from this as you cannot create multiple
+      # releases with the same name at once (e.g. only run workflow on 'pull_request')
       - name: Create docker compose bundle release for testing
         uses: ./github-actions/create-docker-bundle-release
         with:
