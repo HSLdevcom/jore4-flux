@@ -97,6 +97,11 @@ runs:
         # it takes a while for the database to start
         retries: 50
 
+    - name: debug
+      run: |
+        docker logs mssqltestdb || echo foo
+      shell: bash
+
     - name: Verify that hasura is up and running standalone
       uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
       with:
