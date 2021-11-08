@@ -58,13 +58,14 @@ microServices:
       oidc-client-id: "0838619941439007"
       oidc-client-secret: "9uV5p45F6IZQubCErBiquZYaL7Wm2AWM"
       db-hostname: jore4-testdb
-      db-name: jore4e2e
+      db-name: authdb
       db-username: dbauth
       db-password: authpassword
+      db-session-schema: public
   testdb:
     serviceName: "testdb"
     serviceType: "NodePort"
-    dockerImage: "hsldevcom/jore4-postgres:azuredbmock-main--95833a388a10c2eec9d9dba104891a5a2fafdf5d"
+    dockerImage: "hsldevcom/jore4-postgres:azuredbmock-main--5ad5e8cc8d6fffa386c18edf517552a78de65999"
     ports:
       - containerPort: 5432
         nodePort: 30432
@@ -77,15 +78,17 @@ microServices:
     localSecrets:
       db-auth-username: dbauth
       db-auth-password: authpassword
+      db-auth-name: authdb
       db-jore3importer-username: dbimporter
       db-jore3importer-password: importerpassword
+      db-jore3importer-name: importerdb
       db-hasura-username: dbhasura
       db-hasura-password: hasurapassword
       db-hasura-name: jore4e2e
   mssqltestdb:
     serviceName: "mssqltestdb"
     serviceType: "NodePort"
-    dockerImage: "hsldevcom/jore4-mssql-testdb:schema-only-main--bcc4c828a37f194b9ac416f7fa5de9583cf5b8ce"
+    dockerImage: "hsldevcom/jore4-mssql-testdb:schema-only-main--85fc067fb260c7dede93139aa4fe9f080b1b0b30"
     ports:
       - containerPort: 1433
         nodePort: 30433
@@ -110,7 +113,7 @@ microServices:
       source-db-username: "sa"
       source-db-password: "P@ssw0rd"
       destination-db-hostname: jore4-testdb
-      destination-db-database: jore4e2e
+      destination-db-database: importerdb
       # destination-db-port defaults to 5432
       destination-db-username: dbimporter
       destination-db-password: importerpassword

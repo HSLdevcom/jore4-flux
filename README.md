@@ -274,6 +274,8 @@ To rerender all yaml templates for all stages, run `./development.sh generate`
    1. with Azure: commit your changes, move `playg` branch to your the commit and wait for Flux to
       deploy it for you
 1. Testing with CI/CD:
+   1. Add the new service to list of inputs in `github-actions/setup-e2e-environment/action.yml`
+   1. In that action.yml file, also add the new service to the list of env variables in the `Create override file for docker-compose`step. And then also to the list of services in the run command of that step.
    1. Docker compose github testing: extend all jobs with your microservice in
       `.github/workflows/test-e2e-docker-compose.yml`
 
@@ -386,6 +388,16 @@ there's a wrong version deployed:
 ## Use in end-to-end tests
 
 ### Docker-compose
+
+To start docker-compose in your ci/cd pipeline you can use `.github/actions/setup-e2e-environment/action.yml` which takes versions that you want to use for services as inputs (should be given in `hsldevcom/jore4-"service-name":"tag"` format). If you don't provide any, it defaults to the ones in e2e release.
+Example usage:
+
+```
+- name: start e2e env
+        uses: HSLdevcom/jore4-flux/github-actions/setup-e2e-environment@setup-e2e-environment-v1
+        with:
+          ui_version: hsldevcom/jore4-ui:latest
+```
 
 To run e2e tests or run microservices locally, we can also use
 [docker-compose](https://docs.docker.com/compose/). Whenever the `clusters/docker-compose` directory is updated in the `e2e` branch, a new version of the release tar.gz is created in the [repository](https://github.com/HSLdevcom/jore4-flux/releases).

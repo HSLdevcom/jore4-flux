@@ -1,0 +1,77 @@
+name: Test e2e environment setup action
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  create-test-bundle:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # note: make sure to only run a single workflow from this as you cannot create multiple
+      # releases with the same name at once (e.g. only run workflow on 'pull_request')
+      - name: Create docker compose bundle release for testing
+        uses: ./github-actions/create-docker-bundle-release
+        with:
+          release_name: e2e-setup-test-bundle
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  test-e2e-setup-action:
+    needs: create-test-bundle
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        include:
+          # no overwrites for images
+          - ui-docker-image:
+            hasura-docker-image:
+            auth-docker-image:
+            mbtiles-docker-image:
+            jore3importer-docker-image:
+            testdb-docker-image:
+            mssqltestdb-docker-image:
+          # overwrite some
+          - ui-docker-image: "hsldevcom/jore4-ui:latest"
+            hasura-docker-image:
+            auth-docker-image:
+            mbtiles-docker-image:
+            jore3importer-docker-image:
+            testdb-docker-image:
+            mssqltestdb-docker-image:
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: start e2e env
+        uses: ./github-actions/setup-e2e-environment
+        with:
+          bundle_version: e2e-setup-test-bundle
+          ui_version: ${{ matrix.ui-docker-image }}
+          hasura_version: ${{ matrix.hasura-docker-image }}
+          auth_version: ${{ matrix.auth-docker-image }}
+          mbtiles_version: ${{ matrix.mbtiles-docker-image }}
+          jore3importer_version: ${{ matrix.jore3importer-docker-image }}
+          testdb_version: ${{ matrix.testdb-docker-image }}
+          mssqltestdb_version: ${{ matrix.mssqltestdb-docker-image }}
+
+      - name: Check that correct version of UI is running
+        run: |
+          UI_DEPLOYED_VERSION=`docker inspect --format='{{.Config.Image}}' ui`
+          if [[ "${{ matrix.ui-docker-image }}" == "" ]]
+          then
+            [[ "$UI_DEPLOYED_VERSION" != "${{ matrix.ui-docker-image }}" ]]
+          else
+            [[ "$UI_DEPLOYED_VERSION" == "${{ matrix.ui-docker-image }}" ]]
+          fi
+
+      - name: Check that correct version of HASURA is running
+        # should not be :latest as it hasn't been overwritten
+        run: |
+          HASURA_DEPLOYED_VERSION=`docker inspect --format='{{.Config.Image}}' hasura`
+          [[ "$HASURA_DEPLOYED_VERSION" != "hsldevcom/jore4-hasura:latest" ]]

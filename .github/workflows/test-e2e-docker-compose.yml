@@ -1,7 +1,6 @@
 name: Test e2e docker-compose setup
 
 on:
-  push:
   pull_request:
     branches: [main]
 
@@ -68,6 +67,8 @@ jobs:
         uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
         with:
           command: "pg_isready -h localhost -p 6432"
+          # it takes a while for the database to start
+          retries: 50
 
       - name: Verify that mssql testdb is up and running
         if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-mssqltestdb') }}
@@ -76,6 +77,14 @@ jobs:
           SA_PASSWORD: "P@ssw0rd"
         with:
           command: 'sqlcmd -S 127.0.0.1 -U sa -P "$SA_PASSWORD" -d master -Q "SELECT ''OK'';"'
+          # it may take a while for the database to start
+          retries: 50
+
+        # on some rare occasions unfortunately this is failing...
+      - name: Debug on failure
+        if: ${{ failure() }}
+        run: |
+          docker logs mssqltestdb || echo "no mssql container"
 
       - name: Verify that hasura is up and running standalone
         if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-hasura') }}
@@ -94,6 +103,12 @@ jobs:
         uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
         with:
           command: "curl --fail http://localhost:3200/actuator/health --output /dev/null --silent"
+
+      - name: Verify that auth backend has access to database
+        uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
+        if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-auth') }}
+        with:
+          command: "curl --fail http://localhost:3200/public/v1/login --output /dev/null --silent"
 
       - name: Verify that auth backend is up and running through proxy
         if: ${{ matrix.services[0] == '' || contains(matrix.services, 'jore4-auth') && contains(matrix.services, 'jore4-proxy') }}
@@ -136,3 +151,6 @@ jobs:
         uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
         with:
           command: "curl --fail http://localhost:3300/api/mapmatching/actuator/health --output /dev/null --silent"
+
+      - name: Verify that all containers are healthy
+        run: '[ -z "$(docker ps -q --filter health=unhealthy)" ]'
