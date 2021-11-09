@@ -234,9 +234,7 @@ The templates are found from `/generate/templates`:
 
 - `resources`: individual resource definition template pieces (e.g. deployment, service, configmap)
   from which other bigger templates are building
-- `kubernetes-all`: templates that all clusters should render (e2e, playg, dev, test, prod)
-- `kubernetes-azure-only`: templates that azure clusters should additionally render (e.g. flux sync file)
-- `kubernetes-local-only`: templates that local clusters should additionally render (e.g. test databases)
+- `kubernetes`: templates that used by kubernetes cluster manifests (playg, dev, test, prod)
 - `docker-compose`: template that renders into a docker-compose.yaml file.
 
 The substituted values can be found from `/generate/values`:
@@ -261,10 +259,11 @@ To rerender all yaml templates for all stages, run `./development.sh generate`
 
 1. Describe the new microservice in `generate/values/common.yaml`. For reference, see how other
    microservices are created
-1. Create a new service manifest in `generate/templates/kubernetes-all`. If you don't need anything
+1. Create a new service manifest in `generate/templates/kubernetes`. If you don't need anything
    custom additions, you could just copy-paste the template from another microservice and rename relevant parts
 1. If the service has an HTTP endpoint that needs to be accessed externally, create the ingress rule
-   in all environments `generate/values/<dev|e2e|playg|prod|test|...>.yaml`
+   in all environments `generate/values/<dev|e2e|playg|prod|test|...>.yaml`. Please note that the
+   ingress rule will work only if you specify readiness and liveliness probes for the microservice.
 1. If there are other customizations to be done to the service (e.g. needs different environment
    variables in different stages), edit the relevant parts in
    `generate/values/<dev|e2e|playg|prod|test|...>.yaml`

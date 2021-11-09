@@ -40,7 +40,7 @@ services:
 
   jore4-hasura:
     container_name: "hasura"
-    image: "hsldevcom/jore4-hasura:main--988be388157e7eafa38864c4745d819e67d15a24"
+    image: "hsldevcom/jore4-hasura:main--13071eb7ca33267037cc1247d27630332f0e6a71"
     restart: "unless-stopped"
     networks:
       - jore4
@@ -158,7 +158,7 @@ services:
 
   jore4-mssqltestdb:
     container_name: "mssqltestdb"
-    image: "hsldevcom/jore4-mssql-testdb:schema-only-main--85fc067fb260c7dede93139aa4fe9f080b1b0b30"
+    image: "hsldevcom/jore4-mssql-testdb:schema-only-main--0cbf0c2778761d5ddd3eeff8c7071fd4fa712f8f"
     restart: "unless-stopped"
     networks:
       - jore4
