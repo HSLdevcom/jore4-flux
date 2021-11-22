@@ -135,7 +135,7 @@ microServices:
   mapmatching:
     serviceName: "mapmatching"
     serviceType: "ClusterIP"
-    dockerImage: "hsldevcom/jore4-map-matching:dockerise--d004159af809fa61d4ddc4f45b217cc4626c0591"
+    dockerImage: "hsldevcom/jore4-map-matching:main--b6a0d7ed317905c44ed9848b8aa40a873c314b35"
     ports:
       - containerPort: 8080
         localPort: 3205
@@ -158,7 +158,7 @@ microServices:
   mapmatchingdb:
     serviceName: "mapmatchingdb"
     serviceType: "ClusterIP"
-    dockerImage: "hsldevcom/jore4-postgres:mapmatching-main--5ad5e8cc8d6fffa386c18edf517552a78de65999"
+    dockerImage: "hsldevcom/jore4-postgres:mapmatching-main--df61098c81ba5419cea763136644fa84ba31a870"
     ports:
       - containerPort: 5432
         localPort: 3206
@@ -168,4 +168,4 @@ microServices:
     env:
       SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
       POSTGRES_DB: jore4mapmatching
-      DIGIROAD_ROUTING_DUMP_VERSION: "2021-10-11"
+      DIGIROAD_ROUTING_DUMP_VERSION: "2021-11-04"
