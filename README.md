@@ -102,7 +102,7 @@ Kustomize restrictions:
 ### Basic Idea
 
 - The current Flux setup is monitoring changes in `playg`, `dev`, `test` and `prod` branches.
-- Other branches don't affect the deployment. Also you need to remember to push the branches to github :)
+- Other branches don't affect the deployment. Also you need to remember to push the branches to GitHub :)
 - When the branch is moved to a different commit, Flux picks up the configuration: `./clusters/dev`
   for `dev` branch, `./clusters/test` for `test` branch and so on. Flux
   tries to deploy the given configuration and sends a message to Slack when it succeeds/fails (slack notification to be implemented later).
@@ -116,7 +116,7 @@ deployed. We are aiming to use the git history for this, which is of course not 
 because:
 
 - failed deployments don't show in the git history
-- deployments only happen if the commit is actually pushed to github
+- deployments only happen if the commit is actually pushed to GitHub
 - users can rewrite git history with force push
 - deployments take some time
 
@@ -275,7 +275,7 @@ To rerender all yaml templates for all stages, run `./development.sh generate`
 1. Testing with CI/CD:
    1. Add the new service to list of inputs in `github-actions/setup-e2e-environment/action.yml`
    1. In that action.yml file, also add the new service to the list of env variables in the `Create override file for docker-compose`step. And then also to the list of services in the run command of that step.
-   1. Docker compose github testing: extend all jobs with your microservice in
+   1. Docker compose GitHub testing: extend all jobs with your microservice in
       `.github/workflows/test-e2e-docker-compose.yml`
 
 ### Generate Flux configurations
