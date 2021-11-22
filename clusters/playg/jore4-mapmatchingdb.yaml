@@ -20,7 +20,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: "jore4-mapmatchingdb-image"
-          image: "hsldevcom/jore4-postgres:mapmatching-main--5ad5e8cc8d6fffa386c18edf517552a78de65999"
+          image: "hsldevcom/jore4-postgres:mapmatching-main--df61098c81ba5419cea763136644fa84ba31a870"
           imagePullPolicy: Always
           ports:
           - containerPort: 5432
@@ -84,7 +84,7 @@ metadata:
   name: "jore4-mapmatchingdb-env"
   namespace: hsl-jore4
 data:
-  DIGIROAD_ROUTING_DUMP_VERSION: "2021-10-11"
+  DIGIROAD_ROUTING_DUMP_VERSION: "2021-11-04"
   POSTGRES_DB: "jore4mapmatching"
   SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
 
