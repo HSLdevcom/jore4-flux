@@ -35,6 +35,8 @@ jobs:
             jore3importer-docker-image:
             testdb-docker-image:
             mssqltestdb-docker-image:
+            mapmatching-docker-image:
+            mapmatchingdb-docker-image:
           # overwrite some
           - ui-docker-image: "hsldevcom/jore4-ui:latest"
             hasura-docker-image:
@@ -43,6 +45,8 @@ jobs:
             jore3importer-docker-image:
             testdb-docker-image:
             mssqltestdb-docker-image:
+            mapmatching-docker-image:
+            mapmatchingdb-docker-image:
 
     steps:
       - name: Checkout code
@@ -59,6 +63,8 @@ jobs:
           jore3importer_version: ${{ matrix.jore3importer-docker-image }}
           testdb_version: ${{ matrix.testdb-docker-image }}
           mssqltestdb_version: ${{ matrix.mssqltestdb-docker-image }}
+          mapmatching_version: ${{ matrix.mapmatching-docker-image }}
+          mapmatchingdb_version: ${{ matrix.mapmatchingdb-docker-image }}
 
       - name: Check that correct version of UI is running
         run: |
