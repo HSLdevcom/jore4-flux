@@ -33,6 +33,14 @@ inputs:
     description: Version of mssqltestdb to use (docker image tag). Set to "" if using the default version.
     required: false
     default: ""
+  mapmatching_version:
+    description: Version of map matching service to use (docker image tag). Set to "" if using the default version.
+    required: false
+    default: ""
+  mapmatchingdb_version:
+    description: Version of map matching database to use (docker image tag). Set to "" if using the default version.
+    required: false
+    default: ""
 
 runs:
   using: "composite"
@@ -52,6 +60,8 @@ runs:
         JORE3IMPORTER_DOCKER_IMAGE: ${{ inputs.jore3importer_version }}
         TESTDB_DOCKER_IMAGE: ${{ inputs.testdb_version }}
         MSSQLTESTDB_DOCKER_IMAGE: ${{ inputs.mssqltestdb_version }}
+        MAPMATCHING_DOCKER_IMAGE: ${{ inputs.mapmatching_version }}
+        MAPMATCHINGDB_DOCKER_IMAGE: ${{ inputs.mapmatchingdb_version }}
       run: |
         cat <<EOF > ${{ github.workspace }}/docker/docker-compose.override.yml
         version: "3.8"
@@ -63,6 +73,8 @@ runs:
           ${JORE3IMPORTER_DOCKER_IMAGE:+"jore4-jore3importer: {image: $JORE3IMPORTER_DOCKER_IMAGE},"}
           ${TESTDB_DOCKER_IMAGE:+"jore4-testdb: {image: $TESTDB_DOCKER_IMAGE},"}
           ${MSSQLTESTDB_DOCKER_IMAGE:+"jore4-mssqltestdb: {image: $MSSQLTESTDB_DOCKER_IMAGE},"}
+          ${MAPMATCHING_DOCKER_IMAGE:+"jore4-mapmatching: {image: $MAPMATCHING_DOCKER_IMAGE},"}
+          ${MAPMATCHINGDB_DOCKER_IMAGE:+"jore4-mapmatchingdb: {image: $MAPMATCHINGDB_DOCKER_IMAGE},"}
           }
         EOF
       shell: bash
