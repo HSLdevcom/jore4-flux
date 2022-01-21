@@ -5,7 +5,7 @@ version: "3.8"
 services:
   jore4-auth:
     container_name: "auth"
-    image: "hsldevcom/jore4-auth:main--60a1dd2715803e63cdde7f36e6955d5f0eb29d0a"
+    image: "hsldevcom/jore4-auth:main--9363f9aa7d8dd5fac3e746fd015e1f8a5b068bba"
     restart: "unless-stopped"
     networks:
       - jore4
