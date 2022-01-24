@@ -6,31 +6,39 @@ inputs:
     required: false
     default: "e2e-docker-compose"
   ui_version:
-    description: Version of ui to use (docker image tag)
+    description: Version of ui to use (docker image tag). Set to "" if using the default version.
     required: false
     default: ""
   hasura_version:
-    description: Version of hasura to use (docker image tag)
+    description: Version of hasura to use (docker image tag). Set to "" if using the default version.
     required: false
     default: ""
   auth_version:
-    description: Version of auth to use (docker image tag)
+    description: Version of auth to use (docker image tag). Set to "" if using the default version.
     required: false
     default: ""
   mbtiles_version:
-    description: Version of mbtiles server to use (docker image tag)
+    description: Version of mbtiles server to use (docker image tag). Set to "" if using the default version.
     required: false
     default: ""
   jore3importer_version:
-    description: Version of jore3importer to use (docker image tag)
+    description: Version of jore3importer to use (docker image tag). Set to "" if using the default version.
     required: false
     default: ""
   testdb_version:
-    description: Version of testdb to use (docker image tag)
+    description: Version of testdb to use (docker image tag). Set to "" if using the default version.
     required: false
     default: ""
   mssqltestdb_version:
-    description: Version of mssqltestdb to use (docker image tag)
+    description: Version of mssqltestdb to use (docker image tag). Set to "" if using the default version.
+    required: false
+    default: ""
+  mapmatching_version:
+    description: Version of map matching service to use (docker image tag). Set to "" if using the default version.
+    required: false
+    default: ""
+  mapmatchingdb_version:
+    description: Version of map matching database to use (docker image tag). Set to "" if using the default version.
     required: false
     default: ""
 
@@ -45,13 +53,15 @@ runs:
 
     - name: Create override file for docker-compose
       env:
-        UI_DOCKER_IMAGE: ${{ inputs.ui_version }} # should be "" if using default
-        HASURA_DOCKER_IMAGE: ${{ inputs.hasura_version }} # should be "" if using default
-        AUTH_DOCKER_IMAGE: ${{ inputs.auth_version }} # should be "" if using default
-        MBTILES_DOCKER_IMAGE: ${{ inputs.mbtiles_version }} # should be "" if using default
-        JORE3IMPORTER_DOCKER_IMAGE: ${{ inputs.jore3importer_version }} # should be "" if using default
-        TESTDB_DOCKER_IMAGE: ${{ inputs.testdb_version }} # should be "" if using default
-        MSSQLTESTDB_DOCKER_IMAGE: ${{ inputs.mssqltestdb_version }} # should be "" if using default
+        UI_DOCKER_IMAGE: ${{ inputs.ui_version }}
+        HASURA_DOCKER_IMAGE: ${{ inputs.hasura_version }}
+        AUTH_DOCKER_IMAGE: ${{ inputs.auth_version }}
+        MBTILES_DOCKER_IMAGE: ${{ inputs.mbtiles_version }}
+        JORE3IMPORTER_DOCKER_IMAGE: ${{ inputs.jore3importer_version }}
+        TESTDB_DOCKER_IMAGE: ${{ inputs.testdb_version }}
+        MSSQLTESTDB_DOCKER_IMAGE: ${{ inputs.mssqltestdb_version }}
+        MAPMATCHING_DOCKER_IMAGE: ${{ inputs.mapmatching_version }}
+        MAPMATCHINGDB_DOCKER_IMAGE: ${{ inputs.mapmatchingdb_version }}
       run: |
         cat <<EOF > ${{ github.workspace }}/docker/docker-compose.override.yml
         version: "3.8"
@@ -63,6 +73,8 @@ runs:
           ${JORE3IMPORTER_DOCKER_IMAGE:+"jore4-jore3importer: {image: $JORE3IMPORTER_DOCKER_IMAGE},"}
           ${TESTDB_DOCKER_IMAGE:+"jore4-testdb: {image: $TESTDB_DOCKER_IMAGE},"}
           ${MSSQLTESTDB_DOCKER_IMAGE:+"jore4-mssqltestdb: {image: $MSSQLTESTDB_DOCKER_IMAGE},"}
+          ${MAPMATCHING_DOCKER_IMAGE:+"jore4-mapmatching: {image: $MAPMATCHING_DOCKER_IMAGE},"}
+          ${MAPMATCHINGDB_DOCKER_IMAGE:+"jore4-mapmatchingdb: {image: $MAPMATCHINGDB_DOCKER_IMAGE},"}
           }
         EOF
       shell: bash
