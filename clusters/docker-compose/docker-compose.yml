@@ -147,7 +147,7 @@ services:
 
   jore4-mbtiles:
     container_name: "mbtiles"
-    image: "hsldevcom/jore4-mbtiles-server:main--44335e22d65ec4cb2fd76b3869c4fc452f7f6dab"
+    image: "hsldevcom/mbtiles-server:"
     restart: "unless-stopped"
     networks:
       - jore4

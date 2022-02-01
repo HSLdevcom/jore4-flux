@@ -20,7 +20,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: "jore4-mbtiles-image"
-          image: "hsldevcom/jore4-mbtiles-server:main--44335e22d65ec4cb2fd76b3869c4fc452f7f6dab"
+          image: "hsldevcom/mbtiles-server:"
           imagePullPolicy: Always
           ports:
           - containerPort: 8000
