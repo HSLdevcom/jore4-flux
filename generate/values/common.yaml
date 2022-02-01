@@ -88,7 +88,7 @@ microServices:
   mbtiles:
     serviceName: "mbtiles"
     serviceType: "ClusterIP"
-    dockerImage: "hsldevcom/jore4-mbtiles-server:main--44335e22d65ec4cb2fd76b3869c4fc452f7f6dab"
+    dockerImage: "hsldevcom/jore4-mbtiles-server:main--3cc33ba369a0ad472b88de49baf201895eccc298"
     ports:
       - containerPort: 8000
         localPort: 3203
