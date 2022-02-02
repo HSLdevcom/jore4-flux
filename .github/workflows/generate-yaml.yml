@@ -1,6 +1,10 @@
 name: Generate yaml
 
 on:
+  push:
+    branches:
+      # pull request branches created by auto updater
+      - "autoupdate/**"
   pull_request:
     branches: [main]
 

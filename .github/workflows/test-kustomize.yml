@@ -1,6 +1,10 @@
 name: Test kustomize
 
 on:
+  push:
+    branches:
+      # pull request branches created by auto updater
+      - "autoupdate/**"
   pull_request:
     branches: [main]
 

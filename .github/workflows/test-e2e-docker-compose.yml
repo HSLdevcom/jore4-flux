@@ -1,6 +1,10 @@
 name: Test e2e docker-compose setup
 
 on:
+  push:
+    branches:
+      # pull request branches created by auto updater
+      - "autoupdate/**"
   pull_request:
     branches: [main]
 
