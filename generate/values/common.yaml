@@ -158,7 +158,7 @@ microServices:
   mapmatchingdb:
     serviceName: "mapmatchingdb"
     serviceType: "ClusterIP"
-    dockerImage: "hsldevcom/jore4-postgres:mapmatching-main--df61098c81ba5419cea763136644fa84ba31a870"
+    dockerImage: "hsldevcom/jore4-postgres:mapmatching-main--c5fe34ea9629a59acdb899296978eccf4abaeb27"
     ports:
       - containerPort: 5432
         localPort: 3206
