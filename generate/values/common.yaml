@@ -106,7 +106,7 @@ microServices:
   jore3importer:
     serviceName: "jore3importer"
     serviceType: "ClusterIP"
-    dockerImage: "hsldevcom/jore4-jore3-importer:main--80cb88c8cc768ee9fb647dd58aac7d0036ad0905"
+    dockerImage: "hsldevcom/jore4-jore3-importer:main--197540203ddc9c666d77330fbe722b6cc70f274f"
     ports:
       - containerPort: 8080
         localPort: 3204
@@ -119,19 +119,32 @@ microServices:
         httpGet:
           path: /actuator/health
           port: 8080
+      # importer needs more memory than default settings
+      resources:
+        limits:
+          memory: 1024Mi
     env:
       SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+      DIGIROAD_STOPS_CSV_VERSION: "2022-02-03"
     secretMappings:
       hsl-jore3-db-hostname: source-db-hostname
       hsl-jore3-db-port: source-db-port
       hsl-jore3-db-database: source-db-database
       hsl-jore3-db-username: source-db-username
       hsl-jore3-db-password: source-db-password
-      hsl-jore4-public-db-hostname: destination-db-hostname
-      hsl-jore4-public-jore3importer-database: destination-db-database
-      # destination-db-port defaults to 5432
-      hsl-jore4-db-jore3importer-username: destination-db-username
-      hsl-jore4-db-jore3importer-password: destination-db-password
+      hsl-jore4-public-jore3importer-database: importer-db-database
+      hsl-jore4-public-jore4-database: jore4-db-database
+      # importer-db-port defaults to 5432
+      # jore4-db-port defaults to 5432
+      hsl-jore4-public-db-hostname:
+        - importer-db-hostname
+        - jore4-db-hostname
+      hsl-jore4-db-jore3importer-username:
+        - importer-db-username
+        - jore4-db-username
+      hsl-jore4-db-jore3importer-password:
+        - importer-db-password
+        - jore4-db-password
   mapmatching:
     serviceName: "mapmatching"
     serviceType: "ClusterIP"

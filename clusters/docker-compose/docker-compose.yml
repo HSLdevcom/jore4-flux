@@ -75,23 +75,32 @@ services:
 
   jore4-jore3importer:
     container_name: "jore3importer"
-    image: "hsldevcom/jore4-jore3-importer:main--80cb88c8cc768ee9fb647dd58aac7d0036ad0905"
+    image: "hsldevcom/jore4-jore3-importer:main--197540203ddc9c666d77330fbe722b6cc70f274f"
     restart: "unless-stopped"
     networks:
       - jore4
     environment:
+      DIGIROAD_STOPS_CSV_VERSION: "2022-02-03"
       SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
     ports:
       - "127.0.0.1:3004:8080"
     secrets:
-      - source: jore3importer-destination-db-database
-        target: /mnt/secrets-store/destination-db-database
-      - source: jore3importer-destination-db-hostname
-        target: /mnt/secrets-store/destination-db-hostname
-      - source: jore3importer-destination-db-password
-        target: /mnt/secrets-store/destination-db-password
-      - source: jore3importer-destination-db-username
-        target: /mnt/secrets-store/destination-db-username
+      - source: jore3importer-importer-db-database
+        target: /mnt/secrets-store/importer-db-database
+      - source: jore3importer-importer-db-hostname
+        target: /mnt/secrets-store/importer-db-hostname
+      - source: jore3importer-importer-db-password
+        target: /mnt/secrets-store/importer-db-password
+      - source: jore3importer-importer-db-username
+        target: /mnt/secrets-store/importer-db-username
+      - source: jore3importer-jore4-db-database
+        target: /mnt/secrets-store/jore4-db-database
+      - source: jore3importer-jore4-db-hostname
+        target: /mnt/secrets-store/jore4-db-hostname
+      - source: jore3importer-jore4-db-password
+        target: /mnt/secrets-store/jore4-db-password
+      - source: jore3importer-jore4-db-username
+        target: /mnt/secrets-store/jore4-db-username
       - source: jore3importer-source-db-database
         target: /mnt/secrets-store/source-db-database
       - source: jore3importer-source-db-hostname
@@ -254,14 +263,22 @@ secrets:
     file: ./secret-hasura-db-username
   hasura-hasura-admin-secret:
     file: ./secret-hasura-hasura-admin-secret
-  jore3importer-destination-db-database:
-    file: ./secret-jore3importer-destination-db-database
-  jore3importer-destination-db-hostname:
-    file: ./secret-jore3importer-destination-db-hostname
-  jore3importer-destination-db-password:
-    file: ./secret-jore3importer-destination-db-password
-  jore3importer-destination-db-username:
-    file: ./secret-jore3importer-destination-db-username
+  jore3importer-importer-db-database:
+    file: ./secret-jore3importer-importer-db-database
+  jore3importer-importer-db-hostname:
+    file: ./secret-jore3importer-importer-db-hostname
+  jore3importer-importer-db-password:
+    file: ./secret-jore3importer-importer-db-password
+  jore3importer-importer-db-username:
+    file: ./secret-jore3importer-importer-db-username
+  jore3importer-jore4-db-database:
+    file: ./secret-jore3importer-jore4-db-database
+  jore3importer-jore4-db-hostname:
+    file: ./secret-jore3importer-jore4-db-hostname
+  jore3importer-jore4-db-password:
+    file: ./secret-jore3importer-jore4-db-password
+  jore3importer-jore4-db-username:
+    file: ./secret-jore3importer-jore4-db-username
   jore3importer-source-db-database:
     file: ./secret-jore3importer-source-db-database
   jore3importer-source-db-hostname:
