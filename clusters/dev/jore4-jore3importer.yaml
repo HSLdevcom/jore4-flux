@@ -20,7 +20,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: "jore4-jore3importer-image"
-          image: "hsldevcom/jore4-jore3-importer:main--80cb88c8cc768ee9fb647dd58aac7d0036ad0905"
+          image: "hsldevcom/jore4-jore3-importer:main--197540203ddc9c666d77330fbe722b6cc70f274f"
           imagePullPolicy: Always
           ports:
           - containerPort: 8080
@@ -39,6 +39,9 @@ spec:
             httpGet:
               path: /actuator/health
               port: 8080
+          resources:
+            limits:
+              memory: 1024Mi
 
       volumes:
         - name: secrets-store-inline
@@ -99,19 +102,35 @@ spec:
           objectType: secret
         - |
           objectName: hsl-jore4-db-jore3importer-password
-          objectAlias: destination-db-password
+          objectAlias: importer-db-password
+          objectType: secret
+        - |
+          objectName: hsl-jore4-db-jore3importer-password
+          objectAlias: jore4-db-password
           objectType: secret
         - |
           objectName: hsl-jore4-db-jore3importer-username
-          objectAlias: destination-db-username
+          objectAlias: importer-db-username
+          objectType: secret
+        - |
+          objectName: hsl-jore4-db-jore3importer-username
+          objectAlias: jore4-db-username
           objectType: secret
         - |
           objectName: hsl-jore4-public-db-hostname
-          objectAlias: destination-db-hostname
+          objectAlias: importer-db-hostname
+          objectType: secret
+        - |
+          objectName: hsl-jore4-public-db-hostname
+          objectAlias: jore4-db-hostname
           objectType: secret
         - |
           objectName: hsl-jore4-public-jore3importer-database
-          objectAlias: destination-db-database
+          objectAlias: importer-db-database
+          objectType: secret
+        - |
+          objectName: hsl-jore4-public-jore4-database
+          objectAlias: jore4-db-database
           objectType: secret
 
 ---
@@ -121,6 +140,7 @@ metadata:
   name: "jore4-jore3importer-env"
   namespace: hsl-jore4
 data:
+  DIGIROAD_STOPS_CSV_VERSION: "2022-02-03"
   SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
 
 

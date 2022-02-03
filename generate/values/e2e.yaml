@@ -112,11 +112,16 @@ microServices:
       source-db-database: jore3testdb
       source-db-username: "sa"
       source-db-password: "P@ssw0rd"
-      destination-db-hostname: jore4-testdb
-      destination-db-database: importerdb
-      # destination-db-port defaults to 5432
-      destination-db-username: dbimporter
-      destination-db-password: importerpassword
+      importer-db-hostname: jore4-testdb
+      importer-db-database: importerdb
+      # importer-db-port defaults to 5432
+      importer-db-username: dbimporter
+      importer-db-password: importerpassword
+      jore4-db-hostname: jore4-testdb
+      jore4-db-database: jore4e2e
+      # jore4-db-port defaults to 5432
+      jore4-db-username: dbimporter
+      jore4-db-password: importerpassword
   mapmatching:
     serviceType: "NodePort"
     ports:
