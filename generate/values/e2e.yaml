@@ -28,7 +28,7 @@ ingress:
       serviceName: mbtiles
       servicePort: 8000
     # note the (/|$) allows the url to terminate after "route" or continue with a "/"
-    - path: /api/route(/|$)(.*)
+    - path: /api/mapmatching(/|$)(.*)
       serviceName: mapmatching
       servicePort: 8080
     # note the first () will be an empty capture group
