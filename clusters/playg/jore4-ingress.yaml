@@ -53,7 +53,7 @@ spec:
                 port:
                   number: 8000
 
-          - path: "/api/mapmatching/*"
+          - path: "/api/route/*"
             pathType: Prefix
             backend:
               service:

@@ -170,7 +170,7 @@ runs:
     - name: Verify that map matching server is up and running through proxy
       uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
       with:
-        command: "curl --fail http://localhost:3300/api/mapmatching/actuator/health --output /dev/null --silent"
+        command: "curl --fail http://localhost:3300/api/route/actuator/health --output /dev/null --silent"
 
     - name: Verify that all containers are healthy
       run: '[ -z "$(docker ps -q --filter health=unhealthy)" ]'
