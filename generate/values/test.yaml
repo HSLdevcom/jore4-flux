@@ -15,7 +15,7 @@ ingress:
     - path: /api/mbtiles/*
       serviceName: mbtiles
       servicePort: 8000
-    - path: /api/mapmatching/*
+    - path: /api/route/*
       serviceName: mapmatching
       servicePort: 8080
 microServices:
