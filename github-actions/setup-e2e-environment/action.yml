@@ -48,7 +48,14 @@ runs:
     - name: Download and extract e2e docker-compose release
       run: |
         mkdir -p ${{ github.workspace }}/docker
-        curl -L https://github.com/HSLdevcom/jore4-flux/releases/download/${{ inputs.bundle_version }}/e2e-docker-compose.tar.gz --silent | tar -xzf - -C ./docker/ | bash
+        curl -L https://github.com/HSLdevcom/jore4-flux/releases/download/${{ inputs.bundle_version }}/e2e-docker-compose.tar.gz --silent -o compose-bundle.tar.gz
+        tar -xzf compose-bundle.tar.gz -C ./docker/ | bash
+      shell: bash
+
+    - name: Debug on failure
+      if: ${{ failure() }}
+      run: |
+        cat compose-bundle.tar.gz
       shell: bash
 
     - name: Create override file for docker-compose
