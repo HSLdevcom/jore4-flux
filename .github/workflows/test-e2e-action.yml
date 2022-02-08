@@ -24,6 +24,11 @@ jobs:
           release_name: e2e-setup-test-bundle
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
+      # To make sure the just created release is available for download, let's wait a bit...
+      - name: Aaaand wait...
+        run: |
+          sleep 15
+
   test-e2e-setup-action:
     needs: create-test-bundle
     runs-on: ubuntu-20.04
