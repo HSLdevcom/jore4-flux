@@ -27,7 +27,7 @@ ingress:
     - path: /api/mbtiles(/|$)(.*)
       serviceName: mbtiles
       servicePort: 8000
-    # note the (/|$) allows the url to terminate after "mapmatching" or continue with a "/"
+    # note the (/|$) allows the url to terminate after "route" or continue with a "/"
     - path: /api/mapmatching(/|$)(.*)
       serviceName: mapmatching
       servicePort: 8080
@@ -88,7 +88,7 @@ microServices:
   mssqltestdb:
     serviceName: "mssqltestdb"
     serviceType: "NodePort"
-    dockerImage: "hsldevcom/jore4-mssql-testdb:schema-only-main--0cbf0c2778761d5ddd3eeff8c7071fd4fa712f8f"
+    dockerImage: "hsldevcom/jore4-mssql-testdb:schema-only-main--21ef30b56e38b0cfa118ccf610ba0fa7e9e00ef7"
     ports:
       - containerPort: 1433
         nodePort: 30433
@@ -112,11 +112,16 @@ microServices:
       source-db-database: jore3testdb
       source-db-username: "sa"
       source-db-password: "P@ssw0rd"
-      destination-db-hostname: jore4-testdb
-      destination-db-database: importerdb
-      # destination-db-port defaults to 5432
-      destination-db-username: dbimporter
-      destination-db-password: importerpassword
+      importer-db-hostname: jore4-testdb
+      importer-db-database: importerdb
+      # importer-db-port defaults to 5432
+      importer-db-username: dbimporter
+      importer-db-password: importerpassword
+      jore4-db-hostname: jore4-testdb
+      jore4-db-database: jore4e2e
+      # jore4-db-port defaults to 5432
+      jore4-db-username: dbimporter
+      jore4-db-password: importerpassword
   mapmatching:
     serviceType: "NodePort"
     ports:

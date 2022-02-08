@@ -11,7 +11,7 @@ microServices:
   auth:
     serviceName: "auth"
     serviceType: "ClusterIP"
-    dockerImage: "hsldevcom/jore4-auth:main--9363f9aa7d8dd5fac3e746fd015e1f8a5b068bba"
+    dockerImage: "hsldevcom/jore4-auth:main--7655eaf0456a0fcacfa2fd542e68c2e66385e5db"
     ports:
       - containerPort: 8080
         localPort: 3200
@@ -39,7 +39,7 @@ microServices:
   hasura:
     serviceName: "hasura"
     serviceType: "ClusterIP"
-    dockerImage: "hsldevcom/jore4-hasura:main--b8058278b54c4ae022775657520e98a3749ee319"
+    dockerImage: "hsldevcom/jore4-hasura:main--8ff82531bcca8ed0f4581c35e612f07b94ff3819"
     ports:
       - containerPort: 8080
         localPort: 3201
@@ -72,7 +72,7 @@ microServices:
   ui:
     serviceName: "ui"
     serviceType: "ClusterIP"
-    dockerImage: "hsldevcom/jore4-ui:main--47192ac414251e071c1bbecc8894f99a8ea14c25"
+    dockerImage: "hsldevcom/jore4-ui:main--50b54adc700ff042ba106507a2bd0e5775209a47"
     ports:
       - containerPort: 80
         localPort: 3302
@@ -88,7 +88,7 @@ microServices:
   mbtiles:
     serviceName: "mbtiles"
     serviceType: "ClusterIP"
-    dockerImage: "hsldevcom/jore4-mbtiles-server:main--44335e22d65ec4cb2fd76b3869c4fc452f7f6dab"
+    dockerImage: "hsldevcom/jore4-mbtiles-server:main--3cc33ba369a0ad472b88de49baf201895eccc298"
     ports:
       - containerPort: 8000
         localPort: 3203
@@ -106,7 +106,7 @@ microServices:
   jore3importer:
     serviceName: "jore3importer"
     serviceType: "ClusterIP"
-    dockerImage: "hsldevcom/jore4-jore3-importer:main--80cb88c8cc768ee9fb647dd58aac7d0036ad0905"
+    dockerImage: "hsldevcom/jore4-jore3-importer:main--ed27b502f3c8b057354c402df3946bab308b2160"
     ports:
       - containerPort: 8080
         localPort: 3204
@@ -119,23 +119,36 @@ microServices:
         httpGet:
           path: /actuator/health
           port: 8080
+      # importer needs more memory than default settings
+      resources:
+        limits:
+          memory: 1024Mi
     env:
       SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
+      DIGIROAD_STOPS_CSV_VERSION: "2022-02-03"
     secretMappings:
       hsl-jore3-db-hostname: source-db-hostname
       hsl-jore3-db-port: source-db-port
       hsl-jore3-db-database: source-db-database
       hsl-jore3-db-username: source-db-username
       hsl-jore3-db-password: source-db-password
-      hsl-jore4-public-db-hostname: destination-db-hostname
-      hsl-jore4-public-jore3importer-database: destination-db-database
-      # destination-db-port defaults to 5432
-      hsl-jore4-db-jore3importer-username: destination-db-username
-      hsl-jore4-db-jore3importer-password: destination-db-password
+      hsl-jore4-public-jore3importer-database: importer-db-database
+      hsl-jore4-public-jore4-database: jore4-db-database
+      # importer-db-port defaults to 5432
+      # jore4-db-port defaults to 5432
+      hsl-jore4-public-db-hostname:
+        - importer-db-hostname
+        - jore4-db-hostname
+      hsl-jore4-db-jore3importer-username:
+        - importer-db-username
+        - jore4-db-username
+      hsl-jore4-db-jore3importer-password:
+        - importer-db-password
+        - jore4-db-password
   mapmatching:
     serviceName: "mapmatching"
     serviceType: "ClusterIP"
-    dockerImage: "hsldevcom/jore4-map-matching:main--d3dd3e0a31e2080b556e21b14f96d3edb144591e"
+    dockerImage: "hsldevcom/jore4-map-matching:main--c88198562a3800b412647f2e487f89ba5972f216"
     ports:
       - containerPort: 8080
         localPort: 3205
@@ -158,7 +171,7 @@ microServices:
   mapmatchingdb:
     serviceName: "mapmatchingdb"
     serviceType: "ClusterIP"
-    dockerImage: "hsldevcom/jore4-postgres:mapmatching-main--df61098c81ba5419cea763136644fa84ba31a870"
+    dockerImage: "hsldevcom/jore4-postgres:mapmatching-main--c5fe34ea9629a59acdb899296978eccf4abaeb27"
     ports:
       - containerPort: 5432
         localPort: 3206

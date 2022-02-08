@@ -5,7 +5,7 @@ version: "3.8"
 services:
   jore4-auth:
     container_name: "auth"
-    image: "hsldevcom/jore4-auth:main--9363f9aa7d8dd5fac3e746fd015e1f8a5b068bba"
+    image: "hsldevcom/jore4-auth:main--7655eaf0456a0fcacfa2fd542e68c2e66385e5db"
     restart: "unless-stopped"
     networks:
       - jore4
@@ -40,7 +40,7 @@ services:
 
   jore4-hasura:
     container_name: "hasura"
-    image: "hsldevcom/jore4-hasura:main--b8058278b54c4ae022775657520e98a3749ee319"
+    image: "hsldevcom/jore4-hasura:main--8ff82531bcca8ed0f4581c35e612f07b94ff3819"
     restart: "unless-stopped"
     networks:
       - jore4
@@ -75,23 +75,32 @@ services:
 
   jore4-jore3importer:
     container_name: "jore3importer"
-    image: "hsldevcom/jore4-jore3-importer:main--80cb88c8cc768ee9fb647dd58aac7d0036ad0905"
+    image: "hsldevcom/jore4-jore3-importer:main--ed27b502f3c8b057354c402df3946bab308b2160"
     restart: "unless-stopped"
     networks:
       - jore4
     environment:
+      DIGIROAD_STOPS_CSV_VERSION: "2022-02-03"
       SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
     ports:
       - "127.0.0.1:3004:8080"
     secrets:
-      - source: jore3importer-destination-db-database
-        target: /mnt/secrets-store/destination-db-database
-      - source: jore3importer-destination-db-hostname
-        target: /mnt/secrets-store/destination-db-hostname
-      - source: jore3importer-destination-db-password
-        target: /mnt/secrets-store/destination-db-password
-      - source: jore3importer-destination-db-username
-        target: /mnt/secrets-store/destination-db-username
+      - source: jore3importer-importer-db-database
+        target: /mnt/secrets-store/importer-db-database
+      - source: jore3importer-importer-db-hostname
+        target: /mnt/secrets-store/importer-db-hostname
+      - source: jore3importer-importer-db-password
+        target: /mnt/secrets-store/importer-db-password
+      - source: jore3importer-importer-db-username
+        target: /mnt/secrets-store/importer-db-username
+      - source: jore3importer-jore4-db-database
+        target: /mnt/secrets-store/jore4-db-database
+      - source: jore3importer-jore4-db-hostname
+        target: /mnt/secrets-store/jore4-db-hostname
+      - source: jore3importer-jore4-db-password
+        target: /mnt/secrets-store/jore4-db-password
+      - source: jore3importer-jore4-db-username
+        target: /mnt/secrets-store/jore4-db-username
       - source: jore3importer-source-db-database
         target: /mnt/secrets-store/source-db-database
       - source: jore3importer-source-db-hostname
@@ -107,7 +116,7 @@ services:
 
   jore4-mapmatching:
     container_name: "mapmatching"
-    image: "hsldevcom/jore4-map-matching:main--d3dd3e0a31e2080b556e21b14f96d3edb144591e"
+    image: "hsldevcom/jore4-map-matching:main--c88198562a3800b412647f2e487f89ba5972f216"
     restart: "unless-stopped"
     networks:
       - jore4
@@ -127,7 +136,7 @@ services:
 
   jore4-mapmatchingdb:
     container_name: "mapmatchingdb"
-    image: "hsldevcom/jore4-postgres:mapmatching-main--df61098c81ba5419cea763136644fa84ba31a870"
+    image: "hsldevcom/jore4-postgres:mapmatching-main--c5fe34ea9629a59acdb899296978eccf4abaeb27"
     restart: "unless-stopped"
     networks:
       - jore4
@@ -147,7 +156,7 @@ services:
 
   jore4-mbtiles:
     container_name: "mbtiles"
-    image: "hsldevcom/jore4-mbtiles-server:main--44335e22d65ec4cb2fd76b3869c4fc452f7f6dab"
+    image: "hsldevcom/jore4-mbtiles-server:main--3cc33ba369a0ad472b88de49baf201895eccc298"
     restart: "unless-stopped"
     networks:
       - jore4
@@ -158,7 +167,7 @@ services:
 
   jore4-mssqltestdb:
     container_name: "mssqltestdb"
-    image: "hsldevcom/jore4-mssql-testdb:schema-only-main--0cbf0c2778761d5ddd3eeff8c7071fd4fa712f8f"
+    image: "hsldevcom/jore4-mssql-testdb:schema-only-main--21ef30b56e38b0cfa118ccf610ba0fa7e9e00ef7"
     restart: "unless-stopped"
     networks:
       - jore4
@@ -204,7 +213,7 @@ services:
 
   jore4-ui:
     container_name: "ui"
-    image: "hsldevcom/jore4-ui:main--47192ac414251e071c1bbecc8894f99a8ea14c25"
+    image: "hsldevcom/jore4-ui:main--50b54adc700ff042ba106507a2bd0e5775209a47"
     restart: "unless-stopped"
     networks:
       - jore4
@@ -254,14 +263,22 @@ secrets:
     file: ./secret-hasura-db-username
   hasura-hasura-admin-secret:
     file: ./secret-hasura-hasura-admin-secret
-  jore3importer-destination-db-database:
-    file: ./secret-jore3importer-destination-db-database
-  jore3importer-destination-db-hostname:
-    file: ./secret-jore3importer-destination-db-hostname
-  jore3importer-destination-db-password:
-    file: ./secret-jore3importer-destination-db-password
-  jore3importer-destination-db-username:
-    file: ./secret-jore3importer-destination-db-username
+  jore3importer-importer-db-database:
+    file: ./secret-jore3importer-importer-db-database
+  jore3importer-importer-db-hostname:
+    file: ./secret-jore3importer-importer-db-hostname
+  jore3importer-importer-db-password:
+    file: ./secret-jore3importer-importer-db-password
+  jore3importer-importer-db-username:
+    file: ./secret-jore3importer-importer-db-username
+  jore3importer-jore4-db-database:
+    file: ./secret-jore3importer-jore4-db-database
+  jore3importer-jore4-db-hostname:
+    file: ./secret-jore3importer-jore4-db-hostname
+  jore3importer-jore4-db-password:
+    file: ./secret-jore3importer-jore4-db-password
+  jore3importer-jore4-db-username:
+    file: ./secret-jore3importer-jore4-db-username
   jore3importer-source-db-database:
     file: ./secret-jore3importer-source-db-database
   jore3importer-source-db-hostname:
