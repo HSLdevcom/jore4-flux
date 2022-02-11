@@ -106,7 +106,7 @@ microServices:
   jore3importer:
     serviceName: "jore3importer"
     serviceType: "ClusterIP"
-    dockerImage: "hsldevcom/jore4-jore3-importer:main--ed27b502f3c8b057354c402df3946bab308b2160"
+    dockerImage: "hsldevcom/jore4-jore3-importer:main--197540203ddc9c666d77330fbe722b6cc70f274f"
     ports:
       - containerPort: 8080
         localPort: 3204
