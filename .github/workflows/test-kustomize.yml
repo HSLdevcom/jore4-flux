@@ -5,8 +5,9 @@ on:
     branches:
       # pull request branches created by auto updater
       - "autoupdate/**"
+      - "autodeploy/**"
   pull_request:
-    branches: [main]
+    branches: ["**"]
 
 jobs:
   test-kustomizations:
