@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
 
   schedule:
-    # every 4 hours
-    - cron: "0 */4 * * *"
+    # every hour
+    - cron: "0 * * * *"
 
   # warning: cannot create pull requests when running this workflow from a push or a pull_request trigger
   # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#restrictions-on-repository-forks
@@ -111,6 +111,7 @@ jobs:
 
         # To make sure we don't exceed Github API's rate limit, slowing down the process of opening new PRs
       - name: Aaaand wait...
+        if: env.doPullRequest == 'true'
         run: |
           sleep 300
 
