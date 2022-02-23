@@ -111,7 +111,7 @@ jobs:
 
         # To make sure we don't exceed Github API's rate limit, slowing down the process of opening new PRs
       - name: Aaaand wait...
-        if: env.doPullRequest == 'true'
+        # if: env.doPullRequest == 'true'
         run: |
           sleep 300
 
