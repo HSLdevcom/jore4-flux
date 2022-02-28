@@ -84,7 +84,7 @@ metadata:
   name: "jore4-mapmatchingdb-env"
   namespace: hsl-jore4
 data:
-  DIGIROAD_ROUTING_DUMP_VERSION: "2021-11-04"
+  DIGIROAD_ROUTING_DUMP_VERSION: "2022-02-28"
   POSTGRES_DB: "jore4mapmatching"
   SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
 
