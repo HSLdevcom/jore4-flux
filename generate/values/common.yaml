@@ -181,4 +181,4 @@ microServices:
     env:
       SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
       POSTGRES_DB: jore4mapmatching
-      DIGIROAD_ROUTING_DUMP_VERSION: "2022-02-28"
+      DIGIROAD_ROUTING_DUMP_VERSION: "2022-03-11"
