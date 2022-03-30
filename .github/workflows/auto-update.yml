@@ -145,11 +145,24 @@ jobs:
           git fetch origin main:main
           git reset --hard main
 
+      - name: Generate github token for JORE4 auto update app to authenticate
+        # Note: this is the pinned commit hash for version v1, as of 30.3.2022
+        # @tamaspallos: I reviewed this github action's code on 30.3.2022 and have not found anything malicious in it
+        uses: tibdex/github-app-token@cd81e4cb40c3672f41b30a21758d6298e821691b
+        id: generate-token
+        with:
+          app_id: ${{ secrets.AUTO_UPDATER_APP_ID }}
+          private_key: ${{ secrets.AUTO_UPDATER_PRIVATE_KEY }}
+
+      # Creating pull requests using an authenticated github application (JORE4 auto update)
+      # This will enable triggering CI jobs automatically. More info here:
+      # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
       - name: Create Pull Request to target branch
         # Note: this is the pinned commit hash for version v3.12.1, as of 2.2.2022
         # @tamaspallos: I reviewed this github action's code on 2.2.2022 and have not found anything malicious in it
         uses: peter-evans/create-pull-request@f22a7da129c901513876a2380e2dae9f8e145330
         with:
+          token: ${{ steps.generate-token.outputs.token }}
           commit-message: "Auto-deploy to ${{ matrix.target }}"
           branch: "autodeploy/${{ matrix.target }}"
           base: "${{ matrix.target }}"
