@@ -28,7 +28,7 @@ jobs:
           # tag-prefix: look for the latest version (tag) of the docker image that starts with this prefix
           - service: hasura
             docker-image: jore4-hasura
-            tag-prefix: main
+            tag-prefix: main-hsl
           - service: ui
             docker-image: jore4-ui
             tag-prefix: main
