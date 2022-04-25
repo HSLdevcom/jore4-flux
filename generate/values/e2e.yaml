@@ -106,6 +106,8 @@ microServices:
       - containerPort: 8080
         nodePort: 30434
         localPort: 3004
+    env:
+      MAP_MATCHING_API_BASEURL: "http://localhost:3005/api/mapmatching"
     localSecrets:
       source-db-hostname: jore4-mssqltestdb
       source-db-port: 1433

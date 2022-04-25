@@ -22,6 +22,9 @@ microServices:
   hasura:
     env:
       HASURA_GRAPHQL_ENABLE_CONSOLE: "false"
+  jore3importer:
+    env:
+      MAP_MATCHING_API_BASEURL: "https://dev.jore.hsl.fi/api/mapmatching"
   auth:
     env:
       SELF_PUBLIC_BASE_URL: "https://dev.jore.hsl.fi"

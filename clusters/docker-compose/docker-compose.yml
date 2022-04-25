@@ -81,6 +81,7 @@ services:
       - jore4
     environment:
       DIGIROAD_STOPS_CSV_VERSION: "2022-02-03"
+      MAP_MATCHING_API_BASEURL: "http://localhost:3005/api/mapmatching"
       SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
     ports:
       - "127.0.0.1:3004:8080"

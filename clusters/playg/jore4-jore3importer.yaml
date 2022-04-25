@@ -141,6 +141,7 @@ metadata:
   namespace: hsl-jore4
 data:
   DIGIROAD_STOPS_CSV_VERSION: "2022-02-03"
+  MAP_MATCHING_API_BASEURL: "https://playg.jore.hsl.fi/api/mapmatching"
   SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
 
 

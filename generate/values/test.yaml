@@ -28,3 +28,6 @@ microServices:
       LOGINPAGE_URL: "https://test.jore.hsl.fi"
       LOGOUTPAGE_URL: "https://test.jore.hsl.fi"
       OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
+  jore3importer:
+    env:
+      MAP_MATCHING_API_BASEURL: "https://test.jore.hsl.fi/api/mapmatching"
