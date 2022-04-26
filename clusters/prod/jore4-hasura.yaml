@@ -20,7 +20,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: "jore4-hasura-image"
-          image: "hsldevcom/jore4-hasura:main--20220408-905ffb8eb505ff97920840117b199523a062af75"
+          image: "hsldevcom/jore4-hasura:hsl-main--20220426-4c760bb4fa5e64b5260e1942922c4656b3702e86"
           imagePullPolicy: Always
           ports:
           - containerPort: 8080
