@@ -117,7 +117,7 @@ services:
 
   jore4-mapmatching:
     container_name: "mapmatching"
-    image: "hsldevcom/jore4-map-matching:main--20220509-cf694daa41d78610e20af209f5ca010bb78969a6"
+    image: "hsldevcom/jore4-map-matching:main--20220511-b2e45b67b95ac7962fad518856450c62ed9e3b01"
     restart: "unless-stopped"
     networks:
       - jore4
