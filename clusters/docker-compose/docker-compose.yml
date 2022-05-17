@@ -75,7 +75,7 @@ services:
 
   jore4-jore3importer:
     container_name: "jore3importer"
-    image: "hsldevcom/jore4-jore3-importer:main--20220502-a78f3bac77d45e927be1e5ddf5f622aebeb39c2a"
+    image: "hsldevcom/jore4-jore3-importer:main--20220517-a892b33342cd44e0ff73d5d41a74066e02e50e3f"
     restart: "unless-stopped"
     networks:
       - jore4
