@@ -11,7 +11,7 @@ microServices:
   auth:
     serviceName: "auth"
     serviceType: "ClusterIP"
-    dockerImage: "hsldevcom/jore4-auth:main--7655eaf0456a0fcacfa2fd542e68c2e66385e5db"
+    dockerImage: "hsldevcom/jore4-auth:"
     ports:
       - containerPort: 8080
         localPort: 3200

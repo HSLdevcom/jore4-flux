@@ -20,7 +20,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: "jore4-auth-image"
-          image: "hsldevcom/jore4-auth:main--7655eaf0456a0fcacfa2fd542e68c2e66385e5db"
+          image: "hsldevcom/jore4-auth:"
           imagePullPolicy: Always
           ports:
           - containerPort: 8080
