@@ -22,6 +22,9 @@ jobs:
         run: |
           docker-compose -f clusters/docker-compose/docker-compose.yml up -d
 
+      - name: Show which versions are running from each image
+        run: docker ps
+
       - name: Verify that all services are up and running
         uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
         with:
