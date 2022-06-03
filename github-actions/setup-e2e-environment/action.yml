@@ -91,6 +91,10 @@ runs:
         docker-compose -f ${{ github.workspace }}/docker/docker-compose.yml -f ${{ github.workspace }}/docker/docker-compose.override.yml up -d
       shell: bash
 
+    - name: Show which versions of the docker images are spun up
+      run: docker ps
+      shell: bash
+
     - name: Verify that UI is up and running standalone
       uses: HSLdevcom/jore4-tools/github-actions/healthcheck@healthcheck-v1
       with:
