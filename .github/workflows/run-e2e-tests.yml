@@ -1,13 +1,12 @@
 name: Run e2e tests
 
 on:
-  push:
-    branches:
-      # pull request branches created by auto updater
-      - "autoupdate/**"
-      - "autodeploy/**"
   pull_request:
-    branches: ["**"]
+    # We only want to run e2e tests on bundles that are to be deployed to e2e and/or azure
+    # environments.
+    # For just getting an update to main, we only need the services to be able to run, e2e
+    # compatibility is not required.
+    branches: ["e2e", "playg", "dev", "test", "prod"]
 
 jobs:
   run-e2e-tests:
