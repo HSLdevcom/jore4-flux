@@ -60,7 +60,7 @@ jobs:
 
       - name: Find latest image with "main" tag from docker hub
         run: |
-          dockerHubTag="$(curl --silent --get -H \"Accept: application/json\" https://hub.docker.com/v2/repositories/hsldevcom/${{ matrix.docker-image }}/tags/\?page_size=25\&page=1\&ordering=last_updated | jq --raw-output 'first(.results[] | select(.name | startswith("${{ matrix.tag-prefix }}"))).name')"
+          dockerHubTag="$(curl --silent --get -H \"Accept: application/json\" https://hub.docker.com/v2/repositories/hsldevcom/${{ matrix.docker-image }}/tags/\?page_size=100\&page=1\&ordering=last_updated | jq --raw-output 'first(.results[] | select(.name | startswith("${{ matrix.tag-prefix }}"))).name')"
           echo $dockerHubTag
           dockerHubImage="hsldevcom/${{ matrix.docker-image }}:${dockerHubTag}"
           echo $dockerHubImage
