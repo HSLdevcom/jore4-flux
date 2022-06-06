@@ -16,7 +16,6 @@ Flux configuration for the jore4 Kubernetes deployment
   - [Basic Idea](#basic-idea)
   - [Trackability](#trackability)
   - [Branching](#branching)
-  - [Rebasing](#rebasing)
   - [Rollback and Hotfixes](#rollback-and-hotfixes)
 - [Directory Structure](#directory-structure)
   - [CRDs](#crds)
@@ -112,16 +111,9 @@ Kustomize restrictions:
 We have to following rules for the deployments' trackability:
 
 _Rule 1:_ We should be able to pinpoint that at what _time_ in what _stage_ what _version_ was
-deployed. We are aiming to use the git history for this, which is of course not 100% reliable,
-because:
-
-- failed deployments don't show in the git history
-- deployments only happen if the commit is actually pushed to GitHub
-- users can rewrite git history with force push
-- deployments take some time
-
-We are assuming here that git commits contain configurations which will succeed to deploy and the
-time delay is negligible.
+deployed. We are aiming to use the Flux's slack notifications for this (To be implemented). Another
+option is to check for changes from the `kustomize-controller` pod's logs in the Kubernetes
+cluster's `jore4-flux` namespace.
 
 _Rule 2:_ We should be able to _confidently_ push versions to `prod`, knowing that if the same configuration
 worked in `playg`, `dev` and `test`, it will also work in `prod`. This implies that we have to minimize the
@@ -140,41 +132,13 @@ implemented.
 
 The `playg` branch can be freely moved around to any commit. Its purpose is to allow fast and easy testing of a new cluster setup in Azure.
 
-Whenever deploying a version to a `dev`/`test`/`prod` stages, you should use no-fast-forward git merging to make sure that at
-least an empty commit is created to testify about the configuration change in the given stage
-(Trackability Rule 1). For `dev` stage, it should look like this:
-
-```
-git checkout dev
-git merge --no-ff main
-```
-
-You should always test your deployment changes in `dev` first, then in `test`, then `prod`.
-Propagating changes to `test` and `prod` work similarly:
-
-```
-git checkout test
-git merge --no-ff dev
-```
-
-These operations will make your git history look like this for the `main` branch:
-
-![deployment-strategy-main](./images/deployment-strategy-master.png "Deployment Strategy main branch only")
-
-And this is how the git history looks when changes are propagated to the `dev` and `test` branches.
-Propagating to `prod` works the same, it's been omitted from the image for clarity.
-
-![deployment-strategy-test](./images/deployment-strategy-test.png "Deployment Strategy with dev and test branches")
-
-### Rebasing
-
-Sometimes you may need to rebase your changes, e.g. when fixing a mistake in your commit. The default
-`git rebase` command discards the empty merge commits, so use `git rebase -i --rebase-merges [commit]`
-to preserve them.
+Whenever deploying a version to a `dev`/`test`/`prod` stages, you should keep these branches in line
+with `main` to have a linear history. You should always test your deployment changes in `dev` first,
+then in `test`, then `prod`.
 
 ### Rollback and Hotfixes
 
-When rolling back changes to the deployment configuration, you should never reset a branch to an
+When rolling back changes to the deployment configuration, you should never reset `main` to an
 older commit using e.g. `git reset --hard [commit]`, because you will lose the information from the
 git history that for a while a faulty configuration was deployed. Instead, always create a new commit
 to the `main` branch that reverts the changes back to the desired state and propagate it the usual way
