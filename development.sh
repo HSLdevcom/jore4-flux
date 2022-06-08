@@ -44,7 +44,7 @@ function super_linter {
 function toc {
   echo "Refreshing Table of Contents"
 
-  npx doctoc README.md
+  npx doctoc@2.2.0 README.md
 }
 
 function usage {
