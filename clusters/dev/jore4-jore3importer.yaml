@@ -20,7 +20,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: "jore4-jore3importer-image"
-          image: "hsldevcom/jore4-jore3-importer:main--20220517-a892b33342cd44e0ff73d5d41a74066e02e50e3f"
+          image: "hsldevcom/jore4-jore3-importer:main--20220608-3691247fb3a96e13e6ff824118ad5c04ceaaebb7"
           imagePullPolicy: Always
           ports:
           - containerPort: 8080
