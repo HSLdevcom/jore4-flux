@@ -142,7 +142,7 @@ services:
     networks:
       - jore4
     environment:
-      DIGIROAD_ROUTING_DUMP_VERSION: "2022-03-11"
+      DIGIROAD_ROUTING_DUMP_VERSION: "2022-06-09"
       POSTGRES_DB: "jore4mapmatching"
       SECRET_STORE_BASE_PATH: "/mnt/secrets-store"
     ports:
