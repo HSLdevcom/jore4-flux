@@ -148,7 +148,7 @@ microServices:
   mapmatching:
     serviceName: "mapmatching"
     serviceType: "ClusterIP"
-    dockerImage: "hsldevcom/jore4-map-matching:main--20220530-704480b438cc7969a0f136b946758235713898e7"
+    dockerImage: "hsldevcom/jore4-map-matching:main--20220609-e7848c2eee7520d9624e699589f99dce3e3e289e"
     ports:
       - containerPort: 8080
         localPort: 3205
