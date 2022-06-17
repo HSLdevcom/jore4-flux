@@ -20,7 +20,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: "jore4-ui-image"
-          image: "hsldevcom/jore4-ui:main--20220616-79fc399644d784d5bce00cdd0b4083c7e9e9df80"
+          image: "hsldevcom/jore4-ui:main--20220617-f4c6c9801fa868f24eccf2eb9a4fc3dc253e0b21"
           imagePullPolicy: Always
           ports:
           - containerPort: 80
