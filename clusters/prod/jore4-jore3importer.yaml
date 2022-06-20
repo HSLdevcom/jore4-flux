@@ -140,6 +140,7 @@ metadata:
   name: "jore4-jore3importer-env"
   namespace: hsl-jore4
 data:
+  DIGIROAD_STOP_CSV_FILE_URL: "https://jore4storage.blob.core.windows.net/jore4-digiroad/digiroad_stops_2022_06_08.csv"
   DIGIROAD_STOPS_CSV_VERSION: "2022-02-03"
   MAP_MATCHING_API_BASEURL: "https://jore.hsl.fi/api/mapmatching"
   SECRET_STORE_BASE_PATH: "/mnt/secrets-store"

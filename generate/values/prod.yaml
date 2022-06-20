@@ -37,4 +37,5 @@ microServices:
       OIDC_PROVIDER_BASE_URL: "https://hslid-dev.t5.fi"
   jore3importer:
     env:
+      DIGIROAD_STOP_CSV_FILE_URL: "https://jore4storage.blob.core.windows.net/jore4-digiroad/digiroad_stops_2022_06_08.csv"
       MAP_MATCHING_API_BASEURL: "https://jore.hsl.fi/api/mapmatching"
