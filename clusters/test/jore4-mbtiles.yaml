@@ -59,6 +59,6 @@ metadata:
   name: "jore4-mbtiles-env"
   namespace: hsl-jore4
 data:
-  DR_LINKKI_TILES_URL: "https://jore4storage.blob.core.windows.net/jore4-ui/dr_linkki.mbtiles"
+  DR_LINKKI_TILES_URL: "https://jore4storage.blob.core.windows.net/jore4-ui/dr_linkki_2022-06-27.mbtiles"
 
 
